@@ -1,8 +1,7 @@
-import { keyframes } from "@emotion/react";
 import styled from "@emotion/styled";
 import { ApolloError } from "@apollo/client";
 import type { ReactNode } from "react";
-import colors from "../colors";
+import Spinner from "./spinner";
 
 interface QueryResultProps {
   loading: boolean;
@@ -31,20 +30,4 @@ const SpinnerContainer = styled.div({
   alignItems: "center",
   width: "100%",
   height: "100vh",
-});
-
-const rotation = keyframes`
-  0% { transform: rotate(0deg) }
-  100% { transform: rotate(360deg) }
-`;
-
-const Spinner = styled.div({
-  width: "48px",
-  height: "48px",
-  border: `5px solid ${colors.accent}`,
-  borderBottomColor: "transparent",
-  borderRadius: "50%",
-  display: "inline-block",
-  boxSizing: "border-box",
-  animation: `${rotation} 1s linear infinite`,
 });
