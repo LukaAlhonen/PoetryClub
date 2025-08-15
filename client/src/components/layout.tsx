@@ -28,7 +28,6 @@ const PageContainer = styled.div({
   flexWrap: "wrap",
   alignSelf: "center",
   flexGrow: 1,
-  // flex: 1,
   width: "100%",
   paddingBottom: 8 * 5,
   paddingTop: "20px",

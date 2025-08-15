@@ -3,5 +3,5 @@ export type PoemModel = {
   title: string;
   authorId: string;
   text: string;
-  datePublished: string;
+  datePublished: Date;
 };

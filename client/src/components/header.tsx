@@ -26,6 +26,7 @@ const HeaderContainer = styled.div({
   paddingLeft: "20px",
   paddingRight: "20px",
   position: "sticky",
+  zIndex: "9",
   top: "0",
   backgroundColor: colors.primary,
 });
