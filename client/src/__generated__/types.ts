@@ -133,7 +133,7 @@ export type User = {
   username: Scalars['String']['output'];
 };
 
-export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, datePublished: any, author: { __typename?: 'User', username: string } };
+export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, author: { __typename?: 'User', username: string } };
 
 export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, datePublished: any, text: string, author: { __typename?: 'User', username: string } };
 
@@ -142,7 +142,7 @@ export type GetPoemsQueryVariables = Exact<{
 }>;
 
 
-export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, datePublished: any, author: { __typename?: 'User', username: string } }> };
+export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, author: { __typename?: 'User', username: string } }> };
 
 export type GetPoemQueryVariables = Exact<{
   poemId: Scalars['ID']['input'];
@@ -156,7 +156,7 @@ export type GetUserQueryVariables = Exact<{
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', username: string, id: string, email: string, poems: Array<{ __typename?: 'Poem', id: string, title: string, datePublished: any, author: { __typename?: 'User', username: string } }> } | null };
+export type GetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', username: string, id: string, email: string, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, author: { __typename?: 'User', username: string } }> } | null };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 

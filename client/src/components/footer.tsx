@@ -19,4 +19,6 @@ const FooterContainer = styled.div({
   borderTop: "1px solid black",
   backgroundColor: colors.primary,
   color: colors.secondary,
+  gridArea: "footer",
+  // width: "100%",
 });

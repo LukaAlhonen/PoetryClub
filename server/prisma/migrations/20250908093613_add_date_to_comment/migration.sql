@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Comment" ADD COLUMN     "datePublished" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;

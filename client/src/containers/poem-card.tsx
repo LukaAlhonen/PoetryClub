@@ -5,6 +5,11 @@ import { useFragment, type FragmentType } from "../__generated__";
 import { POEM_CARD_FRAGMENT } from "../fragments/poem-card.fragment";
 import { dateFormatter } from "../utils/formatters";
 
+import CommentsIcon from "../assets/icons/comment.svg?react";
+import LikesIcons from "../assets/icons/heart2.svg?react";
+import ViewsIcon from "../assets/icons/eye.svg?react";
+import ArrowIcon from "../assets/icons/arrow-right.svg?react";
+
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
 }
@@ -16,12 +21,11 @@ const PoemCard = (props: PoemCardProps) => {
     : "loading...";
 
   return (
-    <PoemContainer to={poem ? `/poem/${poem?.id}` : "#"}>
-      <CoverImage>
-        <img src="src/assets/3KopAOI.jpg"></img>
-      </CoverImage>
+    <PoemContainer>
       <PoemHeader>
-        <h3>{poem?.title ?? "loading..."}</h3>
+        <PoemTitle to={poem ? `/poem/${poem?.id}` : "#"}>
+          <h3>{poem?.title ?? "loading..."}</h3>
+        </PoemTitle>
         <PoemSubHeader>
           <ProfilePictureContainer></ProfilePictureContainer>
           <UsernameContainer to="/">
@@ -30,14 +34,22 @@ const PoemCard = (props: PoemCardProps) => {
           <h5>{date}</h5>
         </PoemSubHeader>
       </PoemHeader>
+      <TextContainer>
+        {poem?.text ?? "loading..."}
+        <PoemLink to={poem ? `/poem/${poem?.id}` : "#"}>
+          Show full poem <Arrow />
+        </PoemLink>
+      </TextContainer>
       <PoemFooter>
         <TagsContainer>
           <h5>#tag|#tag|#tag</h5>
         </TagsContainer>
         <StatsContainer>
-          <h5>comments</h5>
-          <h5>likes</h5>
-          <h5>views</h5>
+          <CommentsButton />
+          1
+          <LikesButton />
+          1
+          <ViewsButton />1
         </StatsContainer>
       </PoemFooter>
     </PoemContainer>
@@ -46,39 +58,23 @@ const PoemCard = (props: PoemCardProps) => {
 
 export default PoemCard;
 
-const PoemContainer = styled(Link)({
-  textDecoration: "none",
-  margin: "20px",
+const PoemContainer = styled.div({
+  minWidth: "20em",
+  maxWidth: "30em",
+  width: "100%",
+  justifySelf: "center",
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
-  flexWrap: "wrap",
-  alignItems: "flex-start",
-  maxWidth: "400px",
-  minWidth: "400px",
-  maxHeight: "600px",
+  alignItems: "stretch",
+  maxHeight: "20em",
+  minHeight: "8.5em",
+  height: "20em",
   boxSizing: "border-box",
   wordWrap: "break-word",
   overflowWrap: "break-word",
   background: colors.secondary,
   color: colors.primary,
-});
-
-const CoverImage = styled.div({
-  margin: "0",
-  padding: "0",
-  background: "white",
-  height: "50%",
-  minHeight: "150px",
-  width: "100%",
-  border: `2px solid ${colors.accent}`,
-  overflow: "hidden",
-  "& img": {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    filter: "grayscale(100%)",
-  },
 });
 
 const PoemHeader = styled.div({
@@ -90,6 +86,24 @@ const PoemHeader = styled.div({
   padding: "5px 10px 5px 10px",
   color: colors.secondary,
   width: "100%",
+});
+
+const PoemTitle = styled(Link)({
+  textDecoration: "none",
+  color: colors.secondary,
+  // position: "relative",
+  // "&::after": {
+  //   content: '""',
+  //   position: "absolute",
+  //   bottom: "-2em",
+  //   left: "0",
+  //   width: "100%",
+  //   borderBottom: "2px solid white",
+  //   transition: "width 0.4s ease",
+  // },
+  // "&:hover::after": {
+  //   width: "100%",
+  // },
 });
 
 const PoemSubHeader = styled.div({
@@ -118,16 +132,61 @@ const UsernameContainer = styled(Link)({
   marginRight: "auto",
 });
 
+const TextContainer = styled.div({
+  position: "relative",
+  height: "20em",
+  overflow: "hidden",
+  padding: "0.4em 0.4em 0 0.4em",
+
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: "5em",
+    background: `linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.9) 90%
+    )`,
+    pointerEvents: "none",
+  },
+});
+
+const PoemLink = styled(Link)({
+  position: "absolute",
+  bottom: "0.4em",
+  left: "50%",
+  transform: "translateX(-50%)",
+  textAlign: "center",
+  zIndex: 2,
+  // textShadow: "0 1px 2px black",
+  fontWeight: "bold",
+  cursor: "pointer",
+
+  transition: "transform 0.2s ease-out, color 0.15s ease",
+  "&:hover": {
+    transform: "translateX(-50%) translateY(-3px)",
+    color: "red",
+  },
+
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "4px",
+  textDecoration: "none",
+  color: "blue",
+});
+
 const PoemFooter = styled.div({
-  padding: "5px",
+  padding: "0.6em",
   width: "100%",
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-evenly",
-  borderBottomLeftRadius: "5px",
-  borderBottomRightRadius: "5px",
-  border: `2px solid ${colors.accent}`,
-  borderTop: "0",
+  alignItems: "center",
+  borderTop: `2px solid ${colors.background2}`,
   "& h5": {
     margin: 0,
   },
@@ -145,4 +204,44 @@ const StatsContainer = styled.div({
   flexDirection: "row",
   justifyContent: "right",
   alignContent: "space-evenly",
+});
+
+// Icons
+
+const svgButtonStyles = {
+  width: "1em",
+  margin: "0 0.5em 0 0.5em",
+  height: "1em",
+};
+
+const CommentsButton = styled(CommentsIcon)({
+  ...svgButtonStyles,
+  "& path": {
+    fill: "black",
+    transition: "fill 0.15s ease",
+  },
+  "&:hover path": {
+    fill: "red",
+  },
+});
+
+const LikesButton = styled(LikesIcons)({
+  ...svgButtonStyles,
+  "& path": {
+    fill: "black",
+    transition: "fill 0.15s ease",
+  },
+  "&:hover path": {
+    fill: "red",
+  },
+});
+
+const ViewsButton = styled(ViewsIcon)({
+  ...svgButtonStyles,
+});
+
+const Arrow = styled(ArrowIcon)({
+  width: "1em",
+  height: "1em",
+  fill: "currentcolor",
 });

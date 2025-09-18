@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
     "dev": "tsx --watch ./src/index.ts",
     "generate": "graphql-codegen"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,18 +22,29 @@
     "@apollo/utils.keyvaluecache": "^4.0.0",
     "@graphql-tools/mock": "^9.0.23",
     "@graphql-tools/schema": "^10.0.23",
-    "@prisma/client": "^6.10.1",
+    "@prisma/client": "^6.16.2",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@vitest/ui": "^3.2.4",
+    "argon2": "^0.44.0",
+    "dotenv": "^17.2.2",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.12.6",
-    "redis": "^5.5.6"
+    "jsonwebtoken": "^9.0.2",
+    "redis": "^5.8.2",
+    "vitest": "^3.2.4"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-resolvers": "^4.5.1",
-    "@types/node": "^24.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.5.1",
+    "@types/redis": "^4.0.10",
     "prisma": "^6.10.1",
+    "ts-jest": "^29.4.3",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2",
+    "vitest-mock-extended": "^3.1.0"
   }
 }

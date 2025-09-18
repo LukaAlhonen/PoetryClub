@@ -1,8 +1,10 @@
+import { Layout } from "../components";
+
 const ComposePoem = () => {
   return (
-    <div>
+    <Layout>
       <h1>Compose Poem</h1>
-    </div>
+    </Layout>
   );
 };
 

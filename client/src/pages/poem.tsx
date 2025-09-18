@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client";
 import PoemDetail from "../components/poem-detail";
 import { Layout } from "../components";
 import QueryResult from "../components/query-result";
+import styled from "@emotion/styled";
 
 const Poem = () => {
   const { poemId = "" } = useParams();
@@ -28,11 +29,20 @@ const Poem = () => {
 
   return (
     <Layout>
-      <QueryResult loading={loading} error={error} data={data}>
-        <PoemDetail poem={data?.poem} />
-      </QueryResult>
+      <PoemContainer>
+        <QueryResult loading={loading} error={error} data={data}>
+          <PoemDetail poem={data?.poem} />
+        </QueryResult>
+      </PoemContainer>
     </Layout>
   );
 };
 
 export default Poem;
+
+const PoemContainer = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  height: "100%",
+});

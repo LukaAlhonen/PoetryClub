@@ -1,228 +1,390 @@
-import { PrismaClient, Prisma } from "../../generated/prisma/client";
+import { PrismaClient, Prisma } from "../../generated/prisma/client.js";
 import { KeyValueCache } from "@apollo/utils.keyvaluecache";
 import {
+  CreateCollectionInput,
+  CreateCommentInput,
+  CreateLikeInput,
   CreatePoemInput,
+  CreateSavedPoemInput,
   CreateUserInput,
+  GetPoemsFilter,
+  UpdateCollectionInput,
   UpdatePoemInput,
   UpdateUserInput,
-} from "../types";
-import { handlePrismaError } from "../utils/prisma-error-handler";
+} from "../types.js";
 
+// TODO: Implement redis caching for all functions
 export class PoemAPI {
-  constructor(
-    private prisma: PrismaClient,
-    private cache: KeyValueCache,
-  ) {}
+  constructor(private prisma: PrismaClient) {}
 
   // Get all poems, optionally filter by author
-  // TODO: add more filtering options
-  async getPoems(authorId?: string | null) {
-    const cacheKey = authorId ? `poems:author:${authorId}` : "poems:all";
-    const cached = await this.cache.get(cacheKey);
+  async getPoems(
+    cursor: string,
+    limit: number,
+    filter?: GetPoemsFilter | null,
+  ) {
+    // Add fields from filter to queryfilter if they are present
+    const queryFilter: Prisma.PoemWhereInput = filter
+      ? {
+          ...(filter.authorId ? { authorId: filter.authorId } : {}),
+          ...(filter.textContains
+            ? { text: { contains: filter.textContains, mode: "insensitive" } }
+            : {}),
+          ...(filter.titleContains
+            ? { title: { contains: filter.titleContains, mode: "insensitive" } }
+            : {}),
+          ...(filter.authorNameContains
+            ? {
+                author: {
+                  username: {
+                    contains: filter.authorNameContains,
+                    mode: "insensitive",
+                  },
+                },
+              }
+            : {}),
+        }
+      : {};
 
-    if (cached) {
-      return JSON.parse(cached);
+    const queryOptions: Prisma.PoemFindManyArgs = {
+      where: queryFilter,
+      include: { author: true, likes: true },
+      take: limit,
+      orderBy: { datePublished: "desc" },
+    };
+
+    if (cursor) {
+      queryOptions.cursor = {
+        id: cursor,
+      };
+      queryOptions.skip = 1;
     }
 
-    const filter = authorId ? { authorId: authorId } : {};
-    const poems = await this.prisma.poem.findMany({
-      where: filter,
-      include: { author: true },
-    });
+    const poems = await this.prisma.poem.findMany(queryOptions);
 
-    await this.cache.set(cacheKey, JSON.stringify(poems), { ttl: 300 }); // Cache for 5 minutes
     return poems;
   }
 
   // Get poem by id
   async getPoem(id: string) {
-    const cacheKey = `poem:${id}`;
-    const cached = await this.cache.get(cacheKey);
-
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
-    const poem = await this.prisma.poem.findFirst({ where: { id: id } });
-    if (poem) {
-      await this.cache.set(cacheKey, JSON.stringify(poem), { ttl: 600 }); // Cache for 10 minutes
-    }
+    const poem = await this.prisma.poem.findFirst({
+      where: { id: id },
+      include: { author: true, inCollection: true },
+    });
     return poem;
   }
 
   // Get user by id
-  async getUser(id: string) {
-    const cacheKey = `user:${id}`;
-    const cached = await this.cache.get(cacheKey);
-
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
-    const user = await this.prisma.user.findFirst({ where: { id: id } });
-    if (user) {
-      await this.cache.set(cacheKey, JSON.stringify(user), { ttl: 900 }); // Cache for 15 minutes
-    }
+  async getUserById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      omit: {
+        password: true,
+      },
+      where: { id: id },
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
+    });
     return user;
   }
 
   // Get all users
   async getUsers() {
-    const cacheKey = "users:all";
-    const cached = await this.cache.get(cacheKey);
-
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
-    const users = await this.prisma.user.findMany();
-    await this.cache.set(cacheKey, JSON.stringify(users), { ttl: 300 });
+    const users = await this.prisma.user.findMany({
+      omit: {
+        password: true,
+      },
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
+    });
     return users;
   }
 
   // Search for user by name
   async getUserByName(username: string) {
-    const cacheKey = `users:username:${username}`;
-    const cached = await this.cache.get(cacheKey);
-
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
     const user = await this.prisma.user.findFirst({
       where: { username: username },
+      omit: { password: true },
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
     });
-    if (user) {
-      await this.cache.set(cacheKey, JSON.stringify(user), { ttl: 900 });
-    }
+
     return user;
+  }
+
+  async getUserWithPassword(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { username: username },
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
+    });
+
+    return user;
+  }
+
+  // Get comment by id
+  async getComment(id: string) {
+    const comment = await this.prisma.comment.findFirst({ where: { id: id } });
+    return comment;
+  }
+
+  // Get all comments, optionally filter by user and poem
+  async getComments(authorId: string | null, poemId: string | null) {
+    const filter = {
+      ...(authorId !== null && { authorId }),
+      ...(poemId !== null && { poemId }),
+    };
+
+    const comments = await this.prisma.comment.findMany({
+      where: filter,
+      include: { author: true },
+    });
+
+    return comments;
+  }
+
+  // Get collection by id
+  async getCollection(id: string) {
+    const collection = await this.prisma.collection.findUnique({
+      where: { id: id },
+      include: { owner: true, poems: true },
+    });
+
+    return collection;
+  }
+
+  // Get collections for specific user
+  // TODO: extend to allow filtering based on text included in collection title, username, included poems title/text
+  async getCollections(userId: string) {
+    const collections = await this.prisma.collection.findMany({
+      where: {
+        ownerId: userId,
+      },
+      include: {
+        owner: true,
+        poems: true,
+      },
+    });
+
+    return collections;
   }
 
   // Add new poem
   async createPoem(input: CreatePoemInput) {
-    try {
-      const poem = await this.prisma.poem.create({
-        data: input,
-        include: { author: true },
-      });
+    const poem = await this.prisma.poem.create({
+      data: {
+        title: input.title,
+        text: input.text,
+        author: {
+          connect: { id: input.authorId },
+        },
+        views: 0,
+      },
+      include: { author: true },
+    });
 
-      // Invalidate relevant caches
-      await this.invalidatePoemCache(undefined, input.authorId);
-
-      return {
-        code: 201,
-        success: true,
-        message: "Successfully added poem",
-        data: poem,
-      };
-    } catch (err) {
-      return handlePrismaError(err, "createPoem");
-    }
+    return poem;
   }
 
   // Add new user
   async createUser(input: CreateUserInput) {
-    try {
-      const user = await this.prisma.user.create({
-        data: input,
-      });
+    const user = await this.prisma.user.create({
+      data: input,
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
+    });
 
-      await this.invalidateUserCache(user.id);
+    const { password, ...userWihtoutPassword } = user;
 
-      return {
-        code: 201,
-        success: true,
-        message: "Successfully added user",
-        data: user,
-      };
-    } catch (err) {
-      return handlePrismaError(err, "createUser");
-    }
+    return userWihtoutPassword;
+  }
+
+  // For testing purposes, should not be used normally
+  // since it returns the password hash with the user object
+  async createUserWithPassword(input: CreateUserInput) {
+    const user = await this.prisma.user.create({
+      data: input,
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
+      },
+    });
+
+    return user;
+  }
+
+  // Add new comment
+  async createComment(input: CreateCommentInput) {
+    const comment = await this.prisma.comment.create({
+      data: input,
+    });
+
+    return comment;
+  }
+
+  async createCollection(input: CreateCollectionInput) {
+    const collection = await this.prisma.collection.create({
+      data: input,
+      include: { poems: true },
+    });
+
+    return collection;
+  }
+
+  async createSavedPoem(input: CreateSavedPoemInput) {
+    const savedPoem = await this.prisma.savedPoem.create({
+      data: input,
+    });
+
+    return savedPoem;
+  }
+
+  async createLike(input: CreateLikeInput) {
+    const like = await this.prisma.like.create({
+      data: input,
+    });
+
+    return like;
   }
 
   // Edit poem, mainly for testing
   async updatePoem(input: UpdatePoemInput) {
-    try {
-      const { poemId, title, authorId, text, datePublished } = input;
+    const data = {
+      ...(input.title ? { title: input.title } : {}),
+      ...(input.authorId ? { authorId: input.authorId } : {}),
+      ...(input.text ? { text: input.text } : {}),
+      ...(input.datePublished ? { datePublished: input.datePublished } : {}),
+      ...(input.collectionId ? { collectionId: input.collectionId } : {}),
+      ...(input.views ? { views: input.views } : {}),
+    };
 
-      // Dynamically construct data object so no null values are written to db
-      const data: any = {};
-      if (title != null) data.title = title;
-      if (authorId != null) data.authorId = authorId;
-      if (text != null) data.text = text;
-      if (datePublished != null) data.datePublished = datePublished;
+    const poem = await this.prisma.poem.update({
+      where: {
+        id: input.poemId,
+      },
+      data: data,
+    });
 
-      const poem = await this.prisma.poem.update({
-        where: {
-          id: poemId,
-        },
-        data: data,
-      });
+    console.log(`Data: ${data.collectionId} Poem: ${poem.collectionId}`);
 
-      // Remove old value from cache
-      this.invalidatePoemCache(poemId);
-
-      return {
-        code: 200,
-        success: true,
-        message: "Successfully updated poem",
-        data: poem,
-      };
-    } catch (err) {
-      return handlePrismaError(err, "editPoem");
-    }
+    return poem;
   }
 
   async updateUser(input: UpdateUserInput) {
-    try {
-      const { userId, username, password, email } = input;
+    const data = {
+      ...(input.userId ? { userId: input.userId } : {}),
+      ...(input.username ? { username: input.username } : {}),
+      ...(input.password ? { password: input.password } : {}),
+      ...(input.email ? { email: input.email } : {}),
+    };
 
-      const data: any = {};
-      if (username != null) data.username = username;
-      if (password != null) data.password = password;
-      if (email != null) data.email = email;
+    const user = await this.prisma.user.update({
+      where: {
+        id: input.userId,
+      },
+      data: data,
+    });
 
-      const user = await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: data,
-      });
-
-      // Remove old user from cache
-      this.invalidateUserCache(userId);
-
-      return {
-        code: 200,
-        success: true,
-        message: "Succesfully updated user",
-        data: user,
-      };
-    } catch (err) {
-      return handlePrismaError(err, "updateUser");
-    }
+    return user;
   }
 
-  // Cache invalidation methods
-  async invalidatePoemCache(poemId?: string, authorId?: string) {
-    const keysToDelete = ["poems:home", "poems:all"];
+  async updateCollection(input: UpdateCollectionInput) {
+    const data = input.title ? { title: input.title } : {};
 
-    if (poemId) {
-      keysToDelete.push(`poem:${poemId}`);
-    }
+    const collection = await this.prisma.collection.update({
+      where: {
+        id: input.id,
+      },
+      data: data,
+    });
 
-    if (authorId) {
-      keysToDelete.push(`poems:author:${authorId}`);
-    }
-
-    await Promise.all(keysToDelete.map((key) => this.cache.delete(key)));
+    return collection;
   }
 
-  async invalidateUserCache(userId: string) {
-    await this.cache.delete(`user:${userId}`);
-    // Also invalidate poems by this author
-    await this.cache.delete(`poems:author:${userId}`);
-    await this.cache.delete("poems:home");
-    await this.cache.delete("poems:all");
+  async removeUser(id: string) {
+    const user = await this.prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return user;
+  }
+
+  async removePoem(id: string) {
+    const poem = await this.prisma.poem.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return poem;
+  }
+
+  async removeComment(id: string) {
+    const comment = await this.prisma.comment.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return comment;
+  }
+
+  async removeCollection(id: string) {
+    const collection = await this.prisma.collection.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return collection;
+  }
+
+  async removeLike(id: string) {
+    const like = await this.prisma.like.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return like;
+  }
+
+  async removeSavedPoem(id: string) {
+    const savedPoem = await this.prisma.savedPoem.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return savedPoem;
   }
 }

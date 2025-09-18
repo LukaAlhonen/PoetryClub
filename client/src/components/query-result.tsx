@@ -24,10 +24,4 @@ const QueryResult = ({ loading, error, data, children }: QueryResultProps) => {
 
 export default QueryResult;
 
-const SpinnerContainer = styled.div({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "100%",
-  height: "100vh",
-});
+const SpinnerContainer = styled.div({});

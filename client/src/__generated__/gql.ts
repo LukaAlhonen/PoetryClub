@@ -14,7 +14,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      datePublished\n      author {\n          username\n      }\n  }\n": typeof types.PoemCardFragmentFragmentDoc,
+    "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      text\n      datePublished\n      author {\n          username\n      }\n  }\n": typeof types.PoemCardFragmentFragmentDoc,
     "\n  fragment PoemDetailFragment on Poem {\n     id\n     title\n     datePublished\n     text\n     author {\n         username\n     }\n  }\n": typeof types.PoemDetailFragmentFragmentDoc,
     "\n    query GetPoems($authorId: ID) {\n      poems(authorId: $authorId) {\n          id\n          ...PoemCardFragment\n      }\n    }\n\n": typeof types.GetPoemsDocument,
     "\n  query GetPoem($poemId: ID!) {\n    poem(id: $poemId) {\n        id\n        ...PoemDetailFragment\n    }\n  }\n\n": typeof types.GetPoemDocument,
@@ -22,7 +22,7 @@ type Documents = {
     "\n  query GetUsers {\n    users {\n    id\n    username\n    email\n    }\n  }\n": typeof types.GetUsersDocument,
 };
 const documents: Documents = {
-    "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      datePublished\n      author {\n          username\n      }\n  }\n": types.PoemCardFragmentFragmentDoc,
+    "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      text\n      datePublished\n      author {\n          username\n      }\n  }\n": types.PoemCardFragmentFragmentDoc,
     "\n  fragment PoemDetailFragment on Poem {\n     id\n     title\n     datePublished\n     text\n     author {\n         username\n     }\n  }\n": types.PoemDetailFragmentFragmentDoc,
     "\n    query GetPoems($authorId: ID) {\n      poems(authorId: $authorId) {\n          id\n          ...PoemCardFragment\n      }\n    }\n\n": types.GetPoemsDocument,
     "\n  query GetPoem($poemId: ID!) {\n    poem(id: $poemId) {\n        id\n        ...PoemDetailFragment\n    }\n  }\n\n": types.GetPoemDocument,
@@ -47,7 +47,7 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      datePublished\n      author {\n          username\n      }\n  }\n"): (typeof documents)["\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      datePublished\n      author {\n          username\n      }\n  }\n"];
+export function gql(source: "\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      text\n      datePublished\n      author {\n          username\n      }\n  }\n"): (typeof documents)["\n  fragment PoemCardFragment on Poem {\n      id\n      title\n      text\n      datePublished\n      author {\n          username\n      }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

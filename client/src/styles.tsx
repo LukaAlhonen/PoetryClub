@@ -1,5 +1,5 @@
 import { Global } from "@emotion/react";
-import colors from "./colors";
+// import colors from "./colors";
 
 // TODO: add global styles lol
 const GlobalStyles = () => {
@@ -19,19 +19,13 @@ const GlobalStyles = () => {
             margin: 0,
             padding: 0,
             fontFamily: "'JetBrains Mono', monospace",
-            overflow: "overlay",
-            background: colors.primary,
           },
 
           "*": {
             boxSizing: "border-box",
           },
 
-          ":root": {
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "100%",
-          },
+          ":root": {},
         },
       ]}
     />

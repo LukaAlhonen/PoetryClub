@@ -1,17 +1,19 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
-import colors from "../colors";
+// import colors from "../colors";
 
 const Header = () => {
   return (
     <HeaderContainer>
-      <div></div>
-      <HomeButtonContainer to={"/"}>
-        <h5>Home</h5>
-      </HomeButtonContainer>
-      <LoginButtonContainer to={"/login"}>
-        <h5>Login</h5>
-      </LoginButtonContainer>
+      <LeftNav>
+        <NavButtonContainer to="/">Home</NavButtonContainer>
+        <NavButtonContainer to="/compose">Compose</NavButtonContainer>
+        <NavButtonContainer to="/search">Search</NavButtonContainer>
+      </LeftNav>
+      <RightNav>
+        <NavButtonContainer to="/">Profile</NavButtonContainer>
+        <NavButtonContainer to="/login">Login</NavButtonContainer>
+      </RightNav>
     </HeaderContainer>
   );
 };
@@ -28,15 +30,20 @@ const HeaderContainer = styled.div({
   position: "sticky",
   zIndex: "9",
   top: "0",
-  backgroundColor: colors.primary,
 });
 
-const HomeButtonContainer = styled(Link)({
-  textDecoration: "none",
-  color: "white",
+const LeftNav = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  marginRight: "auto",
 });
 
-const LoginButtonContainer = styled(Link)({
+const RightNav = styled.div({
+  display: "flex",
+  flexDirection: "column",
+});
+
+const NavButtonContainer = styled(Link)({
   textDecoration: "none",
-  color: "white",
+  color: "black",
 });

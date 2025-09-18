@@ -1,14 +1,14 @@
-import { Footer, Header } from "../components";
 import React from "react";
 import styled from "@emotion/styled";
-import colors from "../colors";
+import LeftNav from "./left-nav";
+// import colors from "../colors";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <LayoutContainer>
-      <Header />
+      <LeftNav></LeftNav>
+      <HeaderContainer>PoetryClub</HeaderContainer>
       <PageContainer>{children}</PageContainer>
-      <Footer />
     </LayoutContainer>
   );
 };
@@ -16,20 +16,35 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 export default Layout;
 
 const LayoutContainer = styled.div({
-  display: "flex",
-  flexDirection: "column",
-  minHeight: "100vh",
+  display: "grid",
+  height: "100vh",
+  overflow: "hidden",
+  gridTemplateColumns: "auto minmax(300px, 1fr)",
+  gridTemplateRows: "auto auto",
+  gridTemplateAreas: `
+  "left-nav header"
+  "left-nav page-container"
+  `,
+  columnGap: "5px",
 });
 
 const PageContainer = styled.div({
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "row",
-  flexWrap: "wrap",
-  alignSelf: "center",
-  flexGrow: 1,
+  gridArea: "page-container",
   width: "100%",
-  paddingBottom: 8 * 5,
-  paddingTop: "20px",
-  backgroundColor: colors.secondary,
+  height: "100%",
+  boxSizing: "border-box",
+  paddingLeft: "1em",
+  paddingRight: "0.3em",
+  maxWidth: "100%",
+});
+
+const HeaderContainer = styled.div({
+  display: "flex",
+  width: "100%",
+  height: "2em",
+  gridArea: "header",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: "3em",
+  fontWeight: "bold",
 });

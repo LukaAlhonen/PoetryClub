@@ -4,6 +4,7 @@ export const POEM_CARD_FRAGMENT = gql(`
   fragment PoemCardFragment on Poem {
       id
       title
+      text
       datePublished
       author {
           username

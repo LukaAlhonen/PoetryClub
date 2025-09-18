@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,19 +9,70 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid()) @db.Uuid
-  username String @unique
-  email    String @unique
-  password String
-  poems    Poem[]
+  id          String       @id @default(uuid()) @db.Uuid
+  username    String       @unique
+  email       String       @unique
+  password    String
+  poems       Poem[]       @relation("AuthoredPoems")
+  collections Collection[]
+  comments    Comment[]
+  likedPoems  Like[]
+  savedPoems  SavedPoem[]  @relation("SavedPoems")
+  dateJoined  DateTime     @default(now()) @db.Timestamp(6)
 }
 
-// TODO: fix datePublished string to accept date in form "dd/mm/yyyy"
 model Poem {
+  id            String      @id @default(uuid()) @db.Uuid
+  title         String
+  text          String
+  datePublished DateTime    @default(now()) @db.Timestamp(6)
+  author        User        @relation("AuthoredPoems", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String      @db.Uuid
+  comments      Comment[]
+  likes         Like[]
+  inCollection  Collection? @relation(fields: [collectionId], references: [id])
+  collectionId  String?     @db.Uuid
+  savedBy       SavedPoem[]
+  views         Int         @default(0)
+}
+
+model SavedPoem {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation("SavedPoems", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId    String   @db.Uuid
+  dateSaved DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([userId, poemId])
+}
+
+model Collection {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String   @db.Uuid
+  poems       Poem[]
+  dateCreated DateTime @default(now()) @db.Timestamp(6)
+}
+
+model Comment {
   id            String   @id @default(uuid()) @db.Uuid
-  title         String   @unique
+  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String   @db.Uuid
+  poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId        String   @db.Uuid
   text          String
   datePublished DateTime @default(now()) @db.Timestamp(6)
-  author        User     @relation(fields: [authorId], references: [id])
-  authorId      String   @db.Uuid
+}
+
+model Like {
+  id            String   @id @default(uuid()) @db.Uuid
+  poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId        String   @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @db.Uuid
+  datePublished DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([poemId, userId])
 }
