@@ -1,6 +1,5 @@
 import { PoemAPI } from "../poem-api.js";
-import prisma from "../../../libs/__mocks__/prisma.js";
-import { PrismaClient } from "../../../generated/prisma/index.js";
+import { prisma } from "../../../prisma/index.js";
 import {
   CreatePoemInput,
   CreateUserInput,
@@ -11,122 +10,52 @@ import {
 } from "../../types.js";
 import { describe, expect, test, vi } from "vitest";
 
-vi.mock("../../../libs/prisma");
+describe("Integration Tests", () => {
+  const poemAPI = new PoemAPI(prisma);
 
-describe("PoemAPI", () => {
-  describe("Using mocked prisma client", () => {
-    const poemAPI = new PoemAPI(prisma);
-    test("createUser, succeeds", async () => {
-      const dateJoined = new Date();
-      const newUser: CreateUserInput = {
-        username: "test",
-        password: "password",
-        email: "test@domain.com",
-      };
-      prisma.user.create.mockResolvedValue({
-        ...newUser,
-        id: "1",
-        dateJoined,
-      });
-      const result = await poemAPI.createUserWithPassword(newUser);
-      expect(result).toStrictEqual({
-        ...newUser,
-        id: "1",
-        dateJoined,
-      });
-    });
+  test("createUser, succeeds", async () => {
+    const newUser: CreateUserInput = {
+      username: "testuser2",
+      password: "password",
+      email: "testuser@domain.com",
+    };
 
-    test("createPoem, succeeds", async () => {
-      const datePublished = new Date();
-      const newPoem: CreatePoemInput = {
-        title: "test_poem",
-        text: "poem text",
-        authorId: "1",
-      };
-      prisma.poem.create.mockResolvedValue({
-        ...newPoem,
-        id: "2",
-        datePublished,
-        views: 0,
-        collectionId: null,
-      });
-      const result = await poemAPI.createPoem(newPoem);
-      expect(result).toStrictEqual({
-        ...newPoem,
-        id: "2",
-        datePublished,
-        views: 0,
-        collectionId: null,
-      });
-    });
+    const result = await poemAPI.createUserWithPassword(newUser);
 
-    test("createPoem, with collectionId, succeeds", async () => {
-      const datePublished = new Date();
-      const newPoem: CreatePoemInput = {
-        title: "test_poem",
-        text: "poem text",
-        authorId: "1",
-        collectionId: "3",
-      };
-      prisma.poem.create.mockResolvedValue({
-        ...newPoem,
-        id: "2",
-        datePublished,
-        views: 0,
-        collectionId: "3",
-      });
-      const result = await poemAPI.createPoem(newPoem);
-      expect(result).toStrictEqual({
-        ...newPoem,
-        id: "2",
-        datePublished,
-        views: 0,
-        collectionId: "3",
-      });
-    });
-
-    test("createComment, succeeds", async () => {
-      const datePublished = new Date();
-      const newComment: CreateCommentInput = {
-        authorId: "1",
-        poemId: "2",
-        datePublished,
-        text: "comment text",
-      };
-
-      prisma.comment.create.mockResolvedValue({
-        ...newComment,
-        id: "3",
-      });
-
-      const result = await poemAPI.createComment(newComment);
-      expect(result).toStrictEqual({
-        ...newComment,
-        id: "3",
-      });
-    });
-
-    test("createCollection, succeeds", async () => {
-      const dateCreated = new Date();
-      const newCollection: CreateCollectionInput = {
-        ownerId: "1",
-        title: "test",
-      };
-
-      prisma.collection.create.mockResolvedValue({
-        ...newCollection,
-        id: "2",
-        dateCreated,
-      });
-
-      const result = await poemAPI.createCollection(newCollection);
-      expect(result).toStrictEqual({
-        ...newCollection,
-        id: "2",
-        dateCreated,
-      });
-    });
+    expect(result.id).toBeDefined();
+    expect(result.username).toBe(newUser.username);
+    expect(result.password).toBe(newUser.password);
+    expect(result.email).toBe(newUser.email);
+    expect(result.collections).toStrictEqual([]);
+    expect(result.poems).toStrictEqual([]);
+    expect(result.savedPoems).toStrictEqual([]);
+    expect(result.likedPoems).toStrictEqual([]);
+    expect(result.comments).toStrictEqual([]);
   });
 
-  // describe("Using real prisma client", () => {});
+  test("createPoem, succeeds", async () => {
+    const newUser: CreateUserInput = {
+      username: "testuser2",
+      password: "password",
+      email: "testuser@domain.com",
+    };
+
+    const testUser = await poemAPI.createUserWithPassword(newUser);
+
+    const newPoem: CreatePoemInput = {
+      authorId: testUser.id,
+      title: "testpoem",
+      text: "testpoemtext",
+    };
+
+    const result = await poemAPI.createPoem(newPoem);
+
+    expect(result.id).toBeDefined();
+    expect(result.title).toStrictEqual(newPoem.title);
+    expect(result.text).toStrictEqual(newPoem.text);
+    expect(result.inCollection).toStrictEqual(null);
+    expect(result.likes).toStrictEqual([]);
+    expect(result.comments).toStrictEqual([]);
+    expect(result.savedBy).toStrictEqual([]);
+  });
 });

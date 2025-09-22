@@ -199,7 +199,13 @@ export class PoemAPI {
         },
         views: 0,
       },
-      include: { author: true },
+      include: {
+        author: true,
+        inCollection: true,
+        likes: true,
+        savedBy: true,
+        comments: true,
+      },
     });
 
     return poem;
@@ -332,6 +338,13 @@ export class PoemAPI {
     const user = await this.prisma.user.delete({
       where: {
         id: id,
+      },
+      include: {
+        poems: true,
+        savedPoems: true,
+        likedPoems: true,
+        collections: true,
+        comments: true,
       },
     });
 
