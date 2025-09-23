@@ -3,7 +3,7 @@ import { gql } from "graphql-tag";
 export const typeDefs = gql`
   scalar Date
   type Query {
-    poems(cursor: String, limit: Int!, filter: GetPoemsFilter): [Poem!]!
+    poems(cursor: String, limit: Int, filter: GetPoemsFilter): [Poem!]!
     poem(id: ID!): Poem
     authorById(id: ID): Author
     authors: [Author!]!

@@ -13,7 +13,7 @@ export const resolvers: Resolvers = {
     },
 
     poems: (_, { cursor, limit, filter }, { dataSources }) => {
-      return dataSources.poemAPI.getPoems(cursor, limit, filter);
+      return dataSources.poemAPI.getPoems({ cursor, limit, filter });
     },
 
     authorById: (_, { id }, { dataSources }) => {
@@ -198,12 +198,12 @@ export const resolvers: Resolvers = {
   },
   Collection: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(authorId);
+      return dataSources.poemAPI.getAuthorById(authorId);
     },
   },
   SavedPoem: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(authorId);
+      return dataSources.poemAPI.getAuthorById(authorId);
     },
     poem: ({ poemId }, _, { dataSources }) => {
       return dataSources.poemAPI.getPoem(poemId);

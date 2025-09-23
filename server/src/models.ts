@@ -27,7 +27,7 @@ export type CollectionModel = {
   id: string;
   title: string;
   dateCreated: Date;
-  ownerId: string;
+  authorId: string;
 };
 
 export type SavedPoemModel = {

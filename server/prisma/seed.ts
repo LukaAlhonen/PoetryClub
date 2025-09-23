@@ -14,7 +14,7 @@ async function main() {
     console.error(`Error hashing password: ${err}`);
   }
 
-  const edgar = await prisma.user.create({
+  const edgar = await prisma.author.create({
     data: {
       username: "Edgar Allan Poe",
       email: "edgar.allan@domain.com",
@@ -304,7 +304,7 @@ async function main() {
     },
   });
 
-  const oscar = await prisma.user.create({
+  const oscar = await prisma.author.create({
     data: {
       username: "Oscar Wilde",
       email: "oscar.wilde@domain.com",
@@ -372,7 +372,7 @@ async function main() {
     },
   });
 
-  const emily = await prisma.user.create({
+  const emily = await prisma.author.create({
     data: {
       username: "Emily Dickinson",
       email: "emily.dickinson@domain.com",
@@ -474,7 +474,7 @@ async function main() {
       },
     },
   });
-  const runeberg = await prisma.user.create({
+  const runeberg = await prisma.author.create({
     data: {
       username: "Johan Ludvig Runeberg",
       email: "johan.l.runeberg@domain.com",
@@ -593,7 +593,7 @@ async function main() {
     },
   });
 
-  const doom = await prisma.user.create({
+  const doom = await prisma.author.create({
     data: {
       username: "MF DOOM",
       email: "metal.face@domain.com",

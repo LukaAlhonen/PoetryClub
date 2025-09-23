@@ -289,7 +289,7 @@ export type QueryPoemArgs = {
 export type QueryPoemsArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<GetPoemsFilter>;
-  limit: Scalars["Int"]["input"];
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type SavedPoem = {
@@ -774,7 +774,7 @@ export type QueryResolvers<
     Array<ResolversTypes["Poem"]>,
     ParentType,
     ContextType,
-    RequireFields<QueryPoemsArgs, "limit">
+    Partial<QueryPoemsArgs>
   >;
 };
 

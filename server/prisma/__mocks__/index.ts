@@ -24,6 +24,7 @@ beforeEach(async () => {
     env: {
       ...process.env,
     },
+    stdio: "ignore",
   });
 });
 

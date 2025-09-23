@@ -10,9 +10,6 @@
     "dev": "tsx --watch ./src/index.ts",
     "generate": "graphql-codegen"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -9,5 +9,5 @@
     "esModuleInterop": true,
     "types": ["node", "./global.d.ts", "vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "."]
 }

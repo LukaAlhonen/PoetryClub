@@ -1,23 +1,23 @@
 import { PoemAPI } from "../poem-api.js";
 import { prisma } from "../../../prisma/index.js";
-import {
-  CreatePoemInput,
-  CreateAuthorInput,
-  CreateCollectionInput,
-  CreateSavedPoemInput,
-  CreateCommentInput,
-  CreateLikeInput,
-} from "../../types.js";
 import { describe, expect, test, vi } from "vitest";
-import { PoemAPITestUtils } from "../../utils/tests/poem-api-test-utils.js";
+
+import {
+  createAuthorInputObject,
+  createCollectionInputObject,
+  createCommentInputObject,
+  createLikeInputObject,
+  createPoemInputObject,
+  createSavedPoemInputObject,
+} from "../../utils/tests/poem-api-test-utils.js";
 
 // TODO: test-cases:
 // - create author x
 // - create poem with author x
 // - create collection with author x
 // - create poem with collection x
-// - create comment for poem with author
-// - create savedpoem
+// - create comment for poem with author x
+// - create savedpoem x
 // - create like, verify likedpoems for author
 // - edit author, username, password, email
 // - edit pome, title, text, add to collection
@@ -32,10 +32,9 @@ import { PoemAPITestUtils } from "../../utils/tests/poem-api-test-utils.js";
 
 describe("Prisma PoemAPI Integration Tests", () => {
   const poemAPI = new PoemAPI(prisma);
-  const testUtils = new PoemAPITestUtils(poemAPI);
 
   test("createAuthor, succeeds", async () => {
-    const newAuthor = testUtils.createAuthorInputObject();
+    const newAuthor = createAuthorInputObject();
 
     const result = await poemAPI.createAuthorWithPassword(newAuthor);
 
@@ -51,17 +50,22 @@ describe("Prisma PoemAPI Integration Tests", () => {
   });
 
   test("createPoem, succeeds", async () => {
-    const newAuthor = testUtils.createAuthorInputObject();
+    const newAuthor = createAuthorInputObject();
     const testAuthor = await poemAPI.createAuthor(newAuthor);
 
-    const newPoem = testUtils.createPoemInputObject(testAuthor.id);
-
+    const newPoem = createPoemInputObject({ authorId: testAuthor.id });
     const result = await poemAPI.createPoem(newPoem);
 
+    const authorPoems = await poemAPI.getPoems({
+      filter: { authorId: testAuthor.id },
+    });
+
+    // check ids
     expect(result.id).toBeDefined();
     expect(result.author).toBeDefined();
     expect(result.author.id).toStrictEqual(result.authorId);
     expect(result.authorId).toStrictEqual(testAuthor.id);
+
     expect(result.title).toStrictEqual(newPoem.title);
     expect(result.text).toStrictEqual(newPoem.text);
     expect(result.inCollection).toStrictEqual(null);
@@ -69,38 +73,53 @@ describe("Prisma PoemAPI Integration Tests", () => {
     expect(result.comments).toStrictEqual([]);
     expect(result.savedBy).toStrictEqual([]);
     expect(result.datePublished).toBeDefined();
+
+    // make sure poem is included in authors poems
+    expect(authorPoems.includes(result));
   });
 
   test("createPoem, with collection, succeeds", async () => {
-    const newAuthor = testUtils.createAuthorInputObject();
+    const newAuthor = createAuthorInputObject();
     const testAuthor = await poemAPI.createAuthor(newAuthor);
 
-    const newCollection = testUtils.createCollectionInputObject(testAuthor.id);
+    const newCollection = createCollectionInputObject({
+      authorId: testAuthor.id,
+    });
     const testCollection = await poemAPI.createCollection(newCollection);
 
-    const newPoem = testUtils.createPoemInputObject(
-      testAuthor.id,
-      testCollection.id,
-    );
+    const newPoem = createPoemInputObject({
+      authorId: testAuthor.id,
+      collectionId: testCollection.id,
+    });
     const result = await poemAPI.createPoem(newPoem);
 
+    const poemsInCollection = (await poemAPI.getCollection(testCollection.id))
+      .poems;
+
+    // check ids
     expect(result.id).toBeDefined();
+    expect(result.author.id).toStrictEqual(result.authorId);
+    expect(result.authorId).toStrictEqual(testAuthor.id);
+    expect(result.inCollection.id).toStrictEqual(result.collectionId);
+    expect(result.collectionId).toStrictEqual(testCollection.id);
+
     expect(result.title).toStrictEqual(newPoem.title);
     expect(result.text).toStrictEqual(newPoem.text);
     expect(result.datePublished).toBeDefined();
     expect(result.author).toBeDefined();
-    expect(result.author.id).toStrictEqual(result.authorId);
-    expect(result.authorId).toStrictEqual(testAuthor.id);
     expect(result.inCollection).toBeDefined();
-    expect(result.inCollection.id).toStrictEqual(result.collectionId);
-    expect(result.collectionId).toStrictEqual(testCollection.id);
+
+    // make sure poem is included in collection
+    expect(poemsInCollection.includes(result));
   });
 
   test("createCollection, succeeds", async () => {
-    const newAuthor = testUtils.createAuthorInputObject();
+    const newAuthor = createAuthorInputObject();
     const testAuthor = await poemAPI.createAuthor(newAuthor);
 
-    const newCollection = testUtils.createCollectionInputObject(testAuthor.id);
+    const newCollection = createCollectionInputObject({
+      authorId: testAuthor.id,
+    });
     const result = await poemAPI.createCollection(newCollection);
 
     expect(result.id).toBeDefined();
@@ -113,22 +132,80 @@ describe("Prisma PoemAPI Integration Tests", () => {
   });
 
   test("createComment, succeeds", async () => {
-    const testPoem = await testUtils.createDefaultTestPoem();
-    const testAuthor = testPoem.author;
+    const newAuthor = createAuthorInputObject();
+    const testAuthor = await poemAPI.createAuthor(newAuthor);
 
-    const newComment = testUtils.createCommentInputObject(
-      testAuthor.id,
-      testPoem.id,
-    );
+    const newPoem = createPoemInputObject({ authorId: testAuthor.id });
+    const testPoem = await poemAPI.createPoem(newPoem);
 
+    const newComment = createCommentInputObject({
+      authorId: testAuthor.id,
+      poemId: testPoem.id,
+    });
     const result = await poemAPI.createComment(newComment);
+
+    const authorComments = await poemAPI.getComments(testAuthor.id);
 
     expect(result.id).toBeDefined();
     expect(result.datePublished).toBeDefined();
     expect(result.text).toStrictEqual(newComment.text);
+
+    // make sure all ids match
     expect(result.author.id).toStrictEqual(result.authorId);
     expect(result.authorId).toStrictEqual(testAuthor.id);
     expect(result.poem.id).toStrictEqual(result.poemId);
     expect(result.poemId).toStrictEqual(testPoem.id);
+
+    // make sure comment appears in authors comments array
+    expect(authorComments.includes(result));
+  });
+
+  test("createSavedPoem, succeeds", async () => {
+    const newAuthor = createAuthorInputObject();
+    const testAuthor = await poemAPI.createAuthor(newAuthor);
+
+    const newPoem = createPoemInputObject({ authorId: testAuthor.id });
+    const testPoem = await poemAPI.createPoem(newPoem);
+
+    const newSavedPoem = createSavedPoemInputObject({
+      authorId: testAuthor.id,
+      poemId: testPoem.id,
+    });
+    const result = await poemAPI.createSavedPoem(newSavedPoem);
+
+    // Get poems saved by user and use map to get only nested poem objects,
+    // same for savedBy but with nested author object instead
+    const savedPoems = (
+      await poemAPI.getAuthorById(testAuthor.id)
+    ).savedPoems.map((savedPoem) => savedPoem.poem);
+    const savedBy = (await poemAPI.getPoem(testPoem.id)).savedBy.map(
+      (savedPoem) => savedPoem.author,
+    );
+
+    // check ids
+    expect(result.id).toBeDefined();
+    expect(result.author.id).toStrictEqual(result.authorId);
+    expect(result.authorId).toStrictEqual(testAuthor.id);
+    expect(result.poem.id).toStrictEqual(result.poemId);
+    expect(result.poemId).toStrictEqual(testPoem.id);
+
+    expect(result.dateSaved).toBeDefined();
+
+    // make sure poem appears in authors saved poems and author appears in poems savedby
+    expect(savedPoems.includes(result.poem));
+    expect(savedBy.includes(result.author));
+  });
+
+  test("createLike, succeeds", async () => {
+    const newAuthor = createAuthorInputObject();
+    const testAuthor = await poemAPI.createAuthor(newAuthor);
+
+    const newPoem = createPoemInputObject({ authorId: testAuthor.id });
+    const testPoem = await poemAPI.createPoem(newPoem);
+
+    const newLike = createLikeInputObject({
+      authorId: testAuthor.id,
+      poemId: testPoem.id,
+    });
   });
 });
