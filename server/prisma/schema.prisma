@@ -8,17 +8,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String       @id @default(uuid()) @db.Uuid
-  username    String       @unique
-  email       String       @unique
+model Author {
+  id          String           @id @default(uuid()) @db.Uuid
+  username    String           @unique
+  email       String           @unique
   password    String
-  poems       Poem[]       @relation("AuthoredPoems")
+  poems       Poem[]           @relation("AuthoredPoems")
   collections Collection[]
   comments    Comment[]
   likedPoems  Like[]
-  savedPoems  SavedPoem[]  @relation("SavedPoems")
-  dateJoined  DateTime     @default(now()) @db.Timestamp(6)
+  savedPoems  SavedPoem[]      @relation("SavedPoems")
+  dateJoined  DateTime         @default(now()) @db.Timestamp(6)
+  followedBy  FollowedAuthor[] @relation("FollowedByAuthors")
+  following   FollowedAuthor[] @relation("FollowedAuthors")
+}
+
+model FollowedAuthor {
+  id          String @id @default(uuid()) @db.Uuid
+  follower    Author @relation("FollowedByAuthors", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String @db.Uuid
+  following   Author @relation("FollowedAuthors", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String @db.Uuid
+
+  @@unique([followerId, followingId])
 }
 
 model Poem {
@@ -26,7 +38,7 @@ model Poem {
   title         String
   text          String
   datePublished DateTime    @default(now()) @db.Timestamp(6)
-  author        User        @relation("AuthoredPoems", fields: [authorId], references: [id], onDelete: Cascade)
+  author        Author      @relation("AuthoredPoems", fields: [authorId], references: [id], onDelete: Cascade)
   authorId      String      @db.Uuid
   comments      Comment[]
   likes         Like[]
@@ -38,27 +50,27 @@ model Poem {
 
 model SavedPoem {
   id        String   @id @default(uuid()) @db.Uuid
-  user      User     @relation("SavedPoems", fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @db.Uuid
+  author    Author   @relation("SavedPoems", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String   @db.Uuid
   poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
   poemId    String   @db.Uuid
   dateSaved DateTime @default(now()) @db.Timestamp(6)
 
-  @@unique([userId, poemId])
+  @@unique([authorId, poemId])
 }
 
 model Collection {
   id          String   @id @default(uuid()) @db.Uuid
   title       String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId     String   @db.Uuid
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String   @db.Uuid
   poems       Poem[]
   dateCreated DateTime @default(now()) @db.Timestamp(6)
 }
 
 model Comment {
   id            String   @id @default(uuid()) @db.Uuid
-  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId      String   @db.Uuid
   poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
   poemId        String   @db.Uuid
@@ -70,9 +82,9 @@ model Like {
   id            String   @id @default(uuid()) @db.Uuid
   poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
   poemId        String   @db.Uuid
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String   @db.Uuid
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String   @db.Uuid
   datePublished DateTime @default(now()) @db.Timestamp(6)
 
-  @@unique([poemId, userId])
+  @@unique([authorId, poemId])
 }

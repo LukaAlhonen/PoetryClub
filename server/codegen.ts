@@ -9,11 +9,12 @@ const config: CodegenConfig = {
         contextType: "./context#DataSourceContext",
         mappers: {
           Poem: "./models#PoemModel",
-          User: "./models#UserModel",
+          Author: "./models#AuthorModel",
           Comment: "./models#CommentModel",
           Collection: "./models#CollectionModel",
           SavedPoem: "./models#SavedPoemModel",
           Like: "./models#LikeModel",
+          FollowedAuthor: "./models#FollowedAuthorModel",
         },
       },
     },

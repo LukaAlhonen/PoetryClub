@@ -5,11 +5,11 @@ export const typeDefs = gql`
   type Query {
     poems(cursor: String, limit: Int!, filter: GetPoemsFilter): [Poem!]!
     poem(id: ID!): Poem
-    userById(id: ID): User
-    users: [User!]!
-    userByName(username: String!): User
+    authorById(id: ID): Author
+    authors: [Author!]!
+    authorByName(username: String!): Author
     comment(id: ID!): Comment
-    comments(userId: ID, poemId: ID): [Comment!]!
+    comments(authorId: ID, poemId: ID): [Comment!]!
     collection(id: ID!): Collection!
     collections(id: ID!): [Collection!]!
   }
@@ -17,7 +17,7 @@ export const typeDefs = gql`
   type Mutation {
     # Create
     createPoem(input: CreatePoemInput!): Poem!
-    createUser(input: CreateUserInput!): User!
+    createAuthor(input: CreateAuthorInput!): Author!
     createComment(input: CreateCommentInput!): Comment!
     createCollection(input: CreateCollectionInput!): Collection!
     createSavedPoem(input: CreateSavedPoemInput!): SavedPoem!
@@ -25,11 +25,11 @@ export const typeDefs = gql`
 
     # Update
     updatePoem(input: UpdatePoemInput!): Poem!
-    updateUser(input: UpdateUserInput!): User!
+    updateAuthor(input: UpdateAuthorInput!): Author!
     updateCollection(input: UpdateCollectionInput!): Collection!
 
     # Remove
-    removeUser(id: String!): User!
+    removeAuthor(id: String!): Author!
     removePoem(id: String!): Poem!
     removeComment(id: String!): Comment!
     removeCollection(id: String!): Collection!
@@ -40,7 +40,7 @@ export const typeDefs = gql`
     login(username: String!, password: String!): AuthPayload!
   }
 
-  type User {
+  type Author {
     id: ID!
     username: String!
     email: String!
@@ -55,7 +55,7 @@ export const typeDefs = gql`
   type Poem {
     id: ID!
     title: String!
-    author: User!
+    author: Author!
     text: String!
     datePublished: Date!
     comments: [Comment!]!
@@ -67,7 +67,7 @@ export const typeDefs = gql`
 
   type Comment {
     id: ID!
-    author: User!
+    author: Author!
     poem: Poem!
     text: String!
     datePublished: Date!
@@ -75,7 +75,7 @@ export const typeDefs = gql`
 
   type Collection {
     id: ID!
-    owner: User!
+    author: Author!
     poems: [Poem!]!
     dateCreated: Date!
     title: String!
@@ -83,21 +83,27 @@ export const typeDefs = gql`
 
   type Like {
     id: ID!
-    author: User!
+    author: Author!
     poem: Poem!
     datePublished: Date!
   }
 
   type SavedPoem {
     id: ID!
-    user: User!
+    author: Author!
     poem: Poem!
     dateSaved: Date!
   }
 
+  type FollowedAuthor {
+    id: ID!
+    follower: Author!
+    following: Author!
+  }
+
   type AuthPayload {
     token: String!
-    user: User!
+    author: Author!
   }
 
   input GetPoemsFilter {
@@ -114,7 +120,7 @@ export const typeDefs = gql`
     collectionId: String
   }
 
-  input CreateUserInput {
+  input CreateAuthorInput {
     username: String!
     password: String!
     email: String!
@@ -130,8 +136,8 @@ export const typeDefs = gql`
     views: Int
   }
 
-  input UpdateUserInput {
-    userId: String!
+  input UpdateAuthorInput {
+    authorId: String!
     username: String
     email: String
     password: String
@@ -141,26 +147,30 @@ export const typeDefs = gql`
     text: String!
     poemId: String!
     authorId: String!
-    datePublished: Date!
   }
 
   input CreateCollectionInput {
     title: String!
-    ownerId: String!
+    authorId: String!
   }
 
   input CreateSavedPoemInput {
     poemId: String!
-    userId: String!
+    authorId: String!
   }
 
   input CreateLikeInput {
     poemId: String!
-    userId: String!
+    authorId: String!
   }
 
   input UpdateCollectionInput {
     id: String!
     title: String!
+  }
+
+  input CreateFollowedAuthorInput {
+    followerId: String!
+    followingId: String!
   }
 `;

@@ -8,7 +8,7 @@ export type PoemModel = {
   views: number;
 };
 
-export type UserModel = {
+export type AuthorModel = {
   id: string;
   username: string;
   email: string;
@@ -33,7 +33,7 @@ export type CollectionModel = {
 export type SavedPoemModel = {
   id: string;
   poemId: string;
-  userId: string;
+  authorId: string;
   dateSaved: Date;
 };
 
@@ -41,5 +41,11 @@ export type LikeModel = {
   id: string;
   datePublished: Date;
   poemId: string;
-  userId: string;
+  authorId: string;
+};
+
+export type FollowedAuthorModel = {
+  id: string;
+  followerId: string;
+  followingId: string;
 };

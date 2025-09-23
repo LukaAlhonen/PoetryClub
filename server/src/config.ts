@@ -27,7 +27,6 @@ const getSanitizedConfig = (config: ENV): Config => {
     if (value === undefined || value.trim() === "") {
       throw new Error(`Missing key ${key} in .env`);
     }
-    console.log(`Found key ${key}`);
   }
 
   return config as Config;

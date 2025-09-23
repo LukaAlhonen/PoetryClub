@@ -16,16 +16,16 @@ export const resolvers: Resolvers = {
       return dataSources.poemAPI.getPoems(cursor, limit, filter);
     },
 
-    userById: (_, { id }, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(id);
+    authorById: (_, { id }, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorById(id);
     },
 
-    users: (_, __, { dataSources }) => {
-      return dataSources.poemAPI.getUsers();
+    authors: (_, __, { dataSources }) => {
+      return dataSources.poemAPI.getAuthors();
     },
 
-    userByName: (_, { username }, { dataSources }) => {
-      return dataSources.poemAPI.getUserByName(username);
+    authorByName: (_, { username }, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorByName(username);
     },
 
     collection: (_, { id }, { dataSources }) => {
@@ -47,11 +47,11 @@ export const resolvers: Resolvers = {
       }
     },
 
-    createUser: (_, { input }, { dataSources }) => {
+    createAuthor: (_, { input }, { dataSources }) => {
       try {
-        return dataSources.poemAPI.createUser(input);
+        return dataSources.poemAPI.createAuthor(input);
       } catch (err) {
-        handlePrismaError(err, "createUser");
+        handlePrismaError(err, "createAuthor");
       }
     },
 
@@ -96,11 +96,11 @@ export const resolvers: Resolvers = {
       }
     },
 
-    updateUser: (_, { input }, { dataSources }) => {
+    updateAuthor: (_, { input }, { dataSources }) => {
       try {
-        return dataSources.poemAPI.updateUser(input);
+        return dataSources.poemAPI.updateAuthor(input);
       } catch (err) {
-        handlePrismaError(err, "updateUser");
+        handlePrismaError(err, "updateAuthor");
       }
     },
 
@@ -113,11 +113,11 @@ export const resolvers: Resolvers = {
     },
 
     // Remove
-    removeUser: (_, { id }, { dataSources }) => {
+    removeAuthor: (_, { id }, { dataSources }) => {
       try {
-        return dataSources.poemAPI.removeUser(id);
+        return dataSources.poemAPI.removeAuthor(id);
       } catch (err) {
-        handlePrismaError(err, "removeUser");
+        handlePrismaError(err, "removeAuthor");
       }
     },
 
@@ -162,28 +162,26 @@ export const resolvers: Resolvers = {
     },
 
     login: async (_, { username, password }, { dataSources }) => {
-      const user = await dataSources.poemAPI.getUserWithPassword(username);
+      const author = await dataSources.poemAPI.getAuthorWithPassword(username);
 
-      if (!user || !argon2.verify(user.password, password)) {
+      if (!author || !argon2.verify(author.password, password)) {
         throw new Error("Incorrect username or password");
       }
 
       const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { userId: author.id, email: author.email },
         config.JWT_SECRET,
         { expiresIn: "4h" },
       );
 
-      return { token, user };
+      return { token, author };
     },
   },
 
   // TODO:
-  // - add inCollection to poem
-  // - might have to do similar thing for collection, comment, like, savedpoem
   Poem: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(authorId);
+      return dataSources.poemAPI.getAuthorById(authorId);
     },
     inCollection: ({ collectionId }, _, { dataSources }) => {
       if (!collectionId) return null;
@@ -191,21 +189,21 @@ export const resolvers: Resolvers = {
     },
   },
   Like: {
-    author: ({ userId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(userId);
+    author: ({ authorId }, _, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorById(authorId);
     },
     poem: ({ poemId }, _, { dataSources }) => {
       return dataSources.poemAPI.getPoem(poemId);
     },
   },
   Collection: {
-    owner: ({ ownerId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(ownerId);
+    author: ({ authorId }, _, { dataSources }) => {
+      return dataSources.poemAPI.getUserById(authorId);
     },
   },
   SavedPoem: {
-    user: ({ userId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getUserById(userId);
+    author: ({ authorId }, _, { dataSources }) => {
+      return dataSources.poemAPI.getUserById(authorId);
     },
     poem: ({ poemId }, _, { dataSources }) => {
       return dataSources.poemAPI.getPoem(poemId);
