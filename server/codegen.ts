@@ -6,15 +6,15 @@ const config: CodegenConfig = {
     "./src/types.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
-        contextType: "./context#DataSourceContext",
+        contextType: "./context.js#MyContext",
         mappers: {
-          Poem: "./models#PoemModel",
-          Author: "./models#AuthorModel",
-          Comment: "./models#CommentModel",
-          Collection: "./models#CollectionModel",
-          SavedPoem: "./models#SavedPoemModel",
-          Like: "./models#LikeModel",
-          FollowedAuthor: "./models#FollowedAuthorModel",
+          Poem: "./models.js#PoemModel",
+          Author: "./models.js#AuthorModel",
+          Comment: "./models.js#CommentModel",
+          Collection: "./models.js#CollectionModel",
+          SavedPoem: "./models.js#SavedPoemModel",
+          Like: "./models.js#LikeModel",
+          FollowedAuthor: "./models.js#FollowedAuthorModel",
         },
       },
     },

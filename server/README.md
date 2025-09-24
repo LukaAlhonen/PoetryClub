@@ -1,10 +1,11 @@
 ### TODO
-- rename id fields and objects for consistency
-  - rename user model to author
-  - rename all id fields referencing a user to authorId
+- Implement auth with jwt
+  - decrease ttl for auth token and implement refresh tokens
 - Implement caching with redis
 - Extend error handling to allow for more specific handling of different errors
-- ADD TESTS!!!!!!
+- ADD TESTS
+  - Prisma integration tests
+  - graphql integration and unit tests
 - Add CI/CD pipelie with github actions
  - Use self hosted runner
  - need to create docker containers for backend and possibly frontend (easier testing on runner)

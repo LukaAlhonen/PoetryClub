@@ -22,6 +22,7 @@ export const typeDefs = gql`
     createCollection(input: CreateCollectionInput!): Collection!
     createSavedPoem(input: CreateSavedPoemInput!): SavedPoem!
     createLike(input: CreateLikeInput!): Like!
+    createFollowedAuthor(input: CreateFollowedAuthorInput!): FollowedAuthor!
 
     # Update
     updatePoem(input: UpdatePoemInput!): Poem!
@@ -30,11 +31,12 @@ export const typeDefs = gql`
 
     # Remove
     removeAuthor(id: String!): Author!
-    removePoem(id: String!): Poem!
-    removeComment(id: String!): Comment!
-    removeCollection(id: String!): Collection!
-    removeSavedPoem(id: String!): SavedPoem!
-    removeLike(id: String!): Like!
+    removePoem(input: RemovePoemInput!): Poem!
+    removeComment(input: RemoveCommentInput!): Comment!
+    removeCollection(input: RemoveCollectionInput!): Collection!
+    removeSavedPoem(input: RemoveSavedPoemInput!): SavedPoem!
+    removeLike(input: RemoveLikeInput!): Like!
+    removeFollowedAuthor(input: RemoveFollowedAuthorInput!): FollowedAuthor!
 
     # Auth
     login(username: String!, password: String!): AuthPayload!
@@ -126,23 +128,6 @@ export const typeDefs = gql`
     email: String!
   }
 
-  input UpdatePoemInput {
-    poemId: String!
-    title: String
-    authorId: String
-    text: String
-    datePublished: Date
-    collectionId: ID
-    views: Int
-  }
-
-  input UpdateAuthorInput {
-    authorId: String!
-    username: String
-    email: String
-    password: String
-  }
-
   input CreateCommentInput {
     text: String!
     poemId: String!
@@ -164,12 +149,60 @@ export const typeDefs = gql`
     authorId: String!
   }
 
+  input CreateFollowedAuthorInput {
+    followerId: String!
+    followingId: String!
+  }
+
+  input UpdatePoemInput {
+    poemId: String!
+    title: String
+    authorId: String
+    text: String
+    datePublished: Date
+    collectionId: ID
+    views: Int
+  }
+
+  input UpdateAuthorInput {
+    authorId: String!
+    username: String
+    email: String
+    password: String
+  }
+
   input UpdateCollectionInput {
     id: String!
+    authorId: String!
     title: String!
   }
 
-  input CreateFollowedAuthorInput {
+  input RemovePoemInput {
+    poemId: String!
+    authorId: String!
+  }
+
+  input RemoveCommentInput {
+    commentId: String!
+    authorId: String!
+  }
+
+  input RemoveSavedPoemInput {
+    savedPoemId: String!
+    authorId: String!
+  }
+
+  input RemoveLikeInput {
+    likeId: String!
+    authorId: String!
+  }
+
+  input RemoveCollectionInput {
+    collectionId: String!
+    authorId: String!
+  }
+
+  input RemoveFollowedAuthorInput {
     followerId: String!
     followingId: String!
   }

@@ -11,6 +11,7 @@ import {
   UpdateCollectionInput,
   UpdatePoemInput,
   UpdateAuthorInput,
+  CreateFollowedAuthorInput,
 } from "../types.js";
 
 // TODO: Implement redis caching for all functions
@@ -86,6 +87,9 @@ export class PoemAPI {
         savedBy: {
           include: { author: { omit: { password: true } } },
         },
+        likes: {
+          include: { author: { omit: { password: true } } },
+        },
       },
     });
     return poem;
@@ -117,8 +121,8 @@ export class PoemAPI {
       },
       include: {
         poems: true,
-        savedPoems: true,
-        likedPoems: true,
+        savedPoems: { include: { poem: true } },
+        likedPoems: { include: { poem: true } },
         collections: true,
         comments: true,
       },
@@ -133,8 +137,8 @@ export class PoemAPI {
       omit: { password: true },
       include: {
         poems: true,
-        savedPoems: true,
-        likedPoems: true,
+        savedPoems: { include: { poem: true } },
+        likedPoems: { include: { poem: true } },
         collections: true,
         comments: true,
       },
@@ -232,20 +236,21 @@ export class PoemAPI {
   }
 
   // Add new poem
-  async createPoem(input: CreatePoemInput) {
+  async createPoem({
+    authorId,
+    text,
+    title,
+    collectionId = undefined,
+  }: CreatePoemInput) {
     const poem = await this.prisma.poem.create({
       data: {
-        title: input.title,
-        text: input.text,
+        title,
+        text,
         author: {
-          connect: { id: input.authorId },
+          connect: { id: authorId },
         },
-        ...(input.collectionId
-          ? {
-              inCollection: {
-                connect: { id: input.collectionId },
-              },
-            }
+        ...(collectionId
+          ? { inCollection: { connect: { id: collectionId } } }
           : {}),
         views: 0,
       },
@@ -352,20 +357,36 @@ export class PoemAPI {
     return like;
   }
 
+  async createFollowedAuthor(input: CreateFollowedAuthorInput) {
+    const followedAuthor = await this.prisma.followedAuthor.create({
+      data: input,
+    });
+
+    return followedAuthor;
+  }
+
   // Edit poem, mainly for testing
-  async updatePoem(input: UpdatePoemInput) {
+  async updatePoem({
+    title,
+    authorId,
+    poemId,
+    text,
+    datePublished,
+    collectionId,
+    views,
+  }: UpdatePoemInput) {
     const data = {
-      ...(input.title ? { title: input.title } : {}),
-      ...(input.authorId ? { authorId: input.authorId } : {}),
-      ...(input.text ? { text: input.text } : {}),
-      ...(input.datePublished ? { datePublished: input.datePublished } : {}),
-      ...(input.collectionId ? { collectionId: input.collectionId } : {}),
-      ...(input.views ? { views: input.views } : {}),
+      ...(title ? { title } : {}),
+      ...(authorId ? { authorId } : {}),
+      ...(text ? { text } : {}),
+      ...(datePublished ? { datePublished } : {}),
+      ...(collectionId ? { collectionId } : {}),
+      ...(views ? { views } : {}),
     };
 
     const poem = await this.prisma.poem.update({
       where: {
-        id: input.poemId,
+        id: poemId,
       },
       data: data,
     });
@@ -375,17 +396,23 @@ export class PoemAPI {
     return poem;
   }
 
-  async updateAuthor(input: UpdateAuthorInput) {
+  // rework to omit pasword
+  async updateAuthor({
+    authorId,
+    username,
+    password,
+    email,
+  }: UpdateAuthorInput) {
     const data = {
-      ...(input.authorId ? { authorId: input.authorId } : {}),
-      ...(input.username ? { username: input.username } : {}),
-      ...(input.password ? { password: input.password } : {}),
-      ...(input.email ? { email: input.email } : {}),
+      ...(authorId ? { authorId } : {}),
+      ...(username ? { username } : {}),
+      ...(password ? { password } : {}),
+      ...(email ? { email } : {}),
     };
 
     const author = await this.prisma.author.update({
       where: {
-        id: input.authorId,
+        id: authorId,
       },
       data: data,
     });
@@ -393,12 +420,12 @@ export class PoemAPI {
     return author;
   }
 
-  async updateCollection(input: UpdateCollectionInput) {
-    const data = input.title ? { title: input.title } : {};
+  async updateCollection({ id, title }: UpdateCollectionInput) {
+    const data = title ? { title } : {};
 
     const collection = await this.prisma.collection.update({
       where: {
-        id: input.id,
+        id: id,
       },
       data: data,
     });

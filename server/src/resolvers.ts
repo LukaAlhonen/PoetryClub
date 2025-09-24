@@ -39,7 +39,11 @@ export const resolvers: Resolvers = {
 
   Mutation: {
     // Create
-    createPoem: (_, { input }, { dataSources }) => {
+    createPoem: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null) {
+        throw new Error("not authenticated");
+      }
+      console.log(user);
       try {
         return dataSources.poemAPI.createPoem(input);
       } catch (err) {
@@ -55,7 +59,11 @@ export const resolvers: Resolvers = {
       }
     },
 
-    createComment: (_, { input }, { dataSources }) => {
+    createComment: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
+
       try {
         return dataSources.poemAPI.createComment(input);
       } catch (err) {
@@ -63,7 +71,10 @@ export const resolvers: Resolvers = {
       }
     },
 
-    createCollection: (_, { input }, { dataSources }) => {
+    createCollection: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.createCollection(input);
       } catch (err) {
@@ -71,7 +82,10 @@ export const resolvers: Resolvers = {
       }
     },
 
-    createSavedPoem: (_, { input }, { dataSources }) => {
+    createSavedPoem: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.createSavedPoem(input);
       } catch (err) {
@@ -79,7 +93,10 @@ export const resolvers: Resolvers = {
       }
     },
 
-    createLike: (_, { input }, { dataSources }) => {
+    createLike: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.createLike(input);
       } catch (err) {
@@ -87,8 +104,23 @@ export const resolvers: Resolvers = {
       }
     },
 
+    createFollowedAuthor: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.followerId) {
+        throw new Error("not authenticated");
+      }
+
+      try {
+        return dataSources.poemAPI.createFollowedAuthor(input);
+      } catch (err) {
+        handlePrismaError(err, "createFollowedAuthor");
+      }
+    },
+
     // Update
-    updatePoem: (_, { input }, { dataSources }) => {
+    updatePoem: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.updatePoem(input);
       } catch (err) {
@@ -96,7 +128,10 @@ export const resolvers: Resolvers = {
       }
     },
 
-    updateAuthor: (_, { input }, { dataSources }) => {
+    updateAuthor: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.updateAuthor(input);
       } catch (err) {
@@ -104,7 +139,10 @@ export const resolvers: Resolvers = {
       }
     },
 
-    updateCollection: (_, { input }, { dataSources }) => {
+    updateCollection: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.updateCollection(input);
       } catch (err) {
@@ -113,7 +151,10 @@ export const resolvers: Resolvers = {
     },
 
     // Remove
-    removeAuthor: (_, { id }, { dataSources }) => {
+    removeAuthor: (_, { id }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== id) {
+        throw new Error("not authenticated");
+      }
       try {
         return dataSources.poemAPI.removeAuthor(id);
       } catch (err) {
@@ -121,41 +162,56 @@ export const resolvers: Resolvers = {
       }
     },
 
-    removePoem: (_, { id }, { dataSources }) => {
+    removePoem: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
-        return dataSources.poemAPI.removePoem(id);
+        return dataSources.poemAPI.removePoem(input.poemId);
       } catch (err) {
         handlePrismaError(err, "removePoem");
       }
     },
 
-    removeComment: (_, { id }, { dataSources }) => {
+    removeComment: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
-        return dataSources.poemAPI.removeComment(id);
+        return dataSources.poemAPI.removeComment(input.commentId);
       } catch (err) {
         handlePrismaError(err, "removeComment");
       }
     },
 
-    removeCollection: (_, { id }, { dataSources }) => {
+    removeCollection: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
-        return dataSources.poemAPI.removeCollection(id);
+        return dataSources.poemAPI.removeCollection(input.collectionId);
       } catch (err) {
         handlePrismaError(err, "removeCollection");
       }
     },
 
-    removeLike: (_, { id }, { dataSources }) => {
+    removeLike: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
-        return dataSources.poemAPI.removeLike(id);
+        return dataSources.poemAPI.removeLike(input.likeId);
       } catch (err) {
         handlePrismaError(err, "removeLike");
       }
     },
 
-    removeSavedPoem: (_, { id }, { dataSources }) => {
+    removeSavedPoem: (_, { input }, { user, dataSources }) => {
+      if (!user || user === null || user.authorId !== input.authorId) {
+        throw new Error("not authenticated");
+      }
       try {
-        return dataSources.poemAPI.removeSavedPoem(id);
+        return dataSources.poemAPI.removeSavedPoem(input.savedPoemId);
       } catch (err) {
         handlePrismaError(err, "removeSavedPoem");
       }
@@ -169,7 +225,7 @@ export const resolvers: Resolvers = {
       }
 
       const token = jwt.sign(
-        { userId: author.id, email: author.email },
+        { authorId: author.id, email: author.email },
         config.JWT_SECRET,
         { expiresIn: "4h" },
       );
@@ -178,7 +234,6 @@ export const resolvers: Resolvers = {
     },
   },
 
-  // TODO:
   Poem: {
     author: ({ authorId }, _, { dataSources }) => {
       return dataSources.poemAPI.getAuthorById(authorId);

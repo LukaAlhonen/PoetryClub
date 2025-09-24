@@ -18,7 +18,7 @@ import {
 // - create poem with collection x
 // - create comment for poem with author x
 // - create savedpoem x
-// - create like, verify likedpoems for author
+// - create like, verify likedpoems for author x
 // - edit author, username, password, email
 // - edit pome, title, text, add to collection
 // - edit comment
@@ -207,5 +207,27 @@ describe("Prisma PoemAPI Integration Tests", () => {
       authorId: testAuthor.id,
       poemId: testPoem.id,
     });
+    const result = await poemAPI.createLike(newLike);
+
+    // Get liked poems for author and authors that liked poem
+    const likedPoems = (
+      await poemAPI.getAuthorById(testAuthor.id)
+    ).likedPoems.map((like) => like.poem);
+    const likedByAuthor = (await poemAPI.getPoem(testPoem.id)).likes.map(
+      (like) => like.author,
+    );
+
+    // check ids
+    expect(result.id).toBeDefined();
+    expect(result.author.id).toStrictEqual(result.authorId);
+    expect(result.authorId).toStrictEqual(testAuthor.id);
+    expect(result.poem.id).toStrictEqual(result.poemId);
+    expect(result.poemId).toStrictEqual(testPoem.id);
+
+    expect(result.datePublished).toBeDefined();
+
+    // Make sure poem appears in authors liked poems and author appears in poems likes
+    expect(likedPoems.includes(result.poem));
+    expect(likedByAuthor.includes(result.author));
   });
 });
