@@ -9,31 +9,75 @@ export const resolvers: Resolvers = {
   Date: DateScalar,
   Query: {
     poem: (_, { id }, { dataSources }) => {
-      return dataSources.poemAPI.getPoem(id);
+      return dataSources.poemAPI.getPoem({ id });
     },
 
-    poems: (_, { cursor, limit, filter }, { dataSources }) => {
+    poems: (_, { limit, cursor, filter }, { dataSources }) => {
       return dataSources.poemAPI.getPoems({ cursor, limit, filter });
     },
 
     authorById: (_, { id }, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorById(id);
+      return dataSources.poemAPI.getAuthorById({ id });
     },
 
-    authors: (_, __, { dataSources }) => {
-      return dataSources.poemAPI.getAuthors();
+    authors: (_, { limit, cursor, usernameContains }, { dataSources }) => {
+      return dataSources.poemAPI.getAuthors({
+        limit,
+        cursor,
+        usernameContains,
+      });
     },
 
-    authorByName: (_, { username }, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorByName(username);
+    authorByUsername: (_, { username }, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorByUsername({
+        username,
+      });
     },
 
     collection: (_, { id }, { dataSources }) => {
-      return dataSources.poemAPI.getCollection(id);
+      return dataSources.poemAPI.getCollection({ id });
     },
 
-    collections: (_, { id }, { dataSources }) => {
-      return dataSources.poemAPI.getCollections(id);
+    collections: (_, { limit, cursor, filter }, { dataSources }) => {
+      return dataSources.poemAPI.getCollections({ limit, cursor, filter });
+    },
+
+    like: (_, { id }, { dataSources }) => {
+      return dataSources.poemAPI.getLike({ id });
+    },
+
+    likes: (_, { limit, cursor, authorId, poemId }, { dataSources }) => {
+      return dataSources.poemAPI.getLikes({ limit, cursor, authorId, poemId });
+    },
+
+    savedPoem: (_, { id }, { dataSources }) => {
+      return dataSources.poemAPI.getSavedPoem({ id });
+    },
+
+    savedPoems: (_, { limit, cursor, authorId, poemId }, { dataSources }) => {
+      return dataSources.poemAPI.getSavedPoems({
+        limit,
+        cursor,
+        authorId,
+        poemId,
+      });
+    },
+
+    followedAuthor: (_, { id }, { dataSources }) => {
+      return dataSources.poemAPI.getFollowedAuthor({ id });
+    },
+
+    followedAuthors: (
+      _,
+      { limit, cursor, followerId, followingId },
+      { dataSources },
+    ) => {
+      return dataSources.poemAPI.getFollowedAuthors({
+        limit,
+        cursor,
+        followerId,
+        followingId,
+      });
     },
   },
 
@@ -156,7 +200,7 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removeAuthor(id);
+        return dataSources.poemAPI.removeAuthor({ id });
       } catch (err) {
         handlePrismaError(err, "removeAuthor");
       }
@@ -167,7 +211,7 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removePoem(input.poemId);
+        return dataSources.poemAPI.removePoem({ id: input.poemId });
       } catch (err) {
         handlePrismaError(err, "removePoem");
       }
@@ -178,7 +222,7 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removeComment(input.commentId);
+        return dataSources.poemAPI.removeComment({ id: input.commentId });
       } catch (err) {
         handlePrismaError(err, "removeComment");
       }
@@ -189,7 +233,7 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removeCollection(input.collectionId);
+        return dataSources.poemAPI.removeCollection({ id: input.collectionId });
       } catch (err) {
         handlePrismaError(err, "removeCollection");
       }
@@ -200,7 +244,7 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removeLike(input.likeId);
+        return dataSources.poemAPI.removeLike({ id: input.likeId });
       } catch (err) {
         handlePrismaError(err, "removeLike");
       }
@@ -211,14 +255,17 @@ export const resolvers: Resolvers = {
         throw new Error("not authenticated");
       }
       try {
-        return dataSources.poemAPI.removeSavedPoem(input.savedPoemId);
+        return dataSources.poemAPI.removeSavedPoem({ id: input.savedPoemId });
       } catch (err) {
         handlePrismaError(err, "removeSavedPoem");
       }
     },
 
     login: async (_, { username, password }, { dataSources }) => {
-      const author = await dataSources.poemAPI.getAuthorWithPassword(username);
+      const author = await dataSources.poemAPI.getAuthorByUsername({
+        username,
+        omitPassword: false,
+      });
 
       if (!author || !argon2.verify(author.password, password)) {
         throw new Error("Incorrect username or password");
@@ -234,34 +281,142 @@ export const resolvers: Resolvers = {
     },
   },
 
+  Author: {
+    poems: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getPoems({
+        limit,
+        cursor,
+        filter: {
+          authorId: id,
+        },
+      });
+    },
+
+    savedPoems: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getSavedPoems({
+        limit,
+        cursor,
+        authorId: id,
+      });
+    },
+
+    comments: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getComments({
+        limit,
+        cursor,
+        authorId: id,
+      });
+    },
+
+    collections: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getCollections({
+        limit,
+        cursor,
+        filter: {
+          authorId: id,
+        },
+      });
+    },
+
+    likedPoems: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getLikes({
+        limit,
+        cursor,
+        authorId: id,
+      });
+    },
+  },
+
   Poem: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorById(authorId);
+      return dataSources.poemAPI.getAuthorById({
+        id: authorId,
+      });
     },
+
     inCollection: ({ collectionId }, _, { dataSources }) => {
       if (!collectionId) return null;
-      return dataSources.poemAPI.getCollection(collectionId);
+      return dataSources.poemAPI.getCollection({ id: collectionId });
+    },
+
+    comments: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getComments({
+        poemId: id,
+        limit,
+        cursor,
+      });
+    },
+
+    likes: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getLikes({
+        limit,
+        cursor,
+        poemId: id,
+      });
+    },
+
+    savedBy: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getSavedPoems({
+        limit,
+        cursor,
+        poemId: id,
+      });
     },
   },
+
   Like: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorById(authorId);
+      return dataSources.poemAPI.getAuthorById({
+        id: authorId,
+      });
     },
+
     poem: ({ poemId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getPoem(poemId);
+      return dataSources.poemAPI.getPoem({ id: poemId });
     },
   },
+
   Collection: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorById(authorId);
+      return dataSources.poemAPI.getAuthorById({
+        id: authorId,
+      });
+    },
+
+    poems: ({ id }, { limit, cursor }, { dataSources }) => {
+      return dataSources.poemAPI.getPoems({
+        limit,
+        cursor,
+        filter: {
+          collectionId: id,
+        },
+      });
     },
   },
+
   SavedPoem: {
     author: ({ authorId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getAuthorById(authorId);
+      return dataSources.poemAPI.getAuthorById({
+        id: authorId,
+      });
     },
+
     poem: ({ poemId }, _, { dataSources }) => {
-      return dataSources.poemAPI.getPoem(poemId);
+      return dataSources.poemAPI.getPoem({ id: poemId });
+    },
+  },
+
+  FollowedAuthor: {
+    follower: ({ followerId }, _, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorById({
+        id: followerId,
+      });
+    },
+
+    following: ({ followingId }, _, { dataSources }) => {
+      return dataSources.poemAPI.getAuthorById({
+        id: followingId,
+      });
     },
   },
 };

@@ -1,25 +1,27 @@
+import { PoemAPI } from "../../datasources/poem-api.js";
 import {
   CreatePoemInput,
   CreateAuthorInput,
   CreateCollectionInput,
-  CreateSavedPoemInput,
   CreateCommentInput,
-  CreateLikeInput,
 } from "../../types.js";
 
 export const createAuthorInputObject = ({
   username = "testauthor",
   password = "password",
   email = "test.author@domain.com",
+  omitPassword = true,
 }: {
   username?: string;
   password?: string;
   email?: string;
+  omitPassword?: boolean;
 } = {}): CreateAuthorInput => {
   const newAuthor: CreateAuthorInput = {
     username,
     password,
     email,
+    omitPassword,
   };
 
   return newAuthor;
@@ -77,34 +79,4 @@ export const createCommentInputObject = ({
   };
 
   return newComment;
-};
-
-export const createLikeInputObject = ({
-  authorId,
-  poemId,
-}: {
-  authorId: string;
-  poemId: string;
-}): CreateLikeInput => {
-  const newLike: CreateLikeInput = {
-    poemId,
-    authorId,
-  };
-
-  return newLike;
-};
-
-export const createSavedPoemInputObject = ({
-  authorId,
-  poemId,
-}: {
-  authorId: string;
-  poemId: string;
-}): CreateSavedPoemInput => {
-  const newSavedPoem: CreateSavedPoemInput = {
-    poemId,
-    authorId,
-  };
-
-  return newSavedPoem;
 };

@@ -3,15 +3,30 @@ import { gql } from "graphql-tag";
 export const typeDefs = gql`
   scalar Date
   type Query {
-    poems(cursor: String, limit: Int, filter: GetPoemsFilter): [Poem!]!
+    poems(limit: Int, cursor: ID, filter: GetPoemsFilter): [Poem!]!
     poem(id: ID!): Poem
     authorById(id: ID): Author
-    authors: [Author!]!
-    authorByName(username: String!): Author
+    authors(limit: Int, cursor: ID, usernameContains: String): [Author!]!
+    authorByUsername(username: String!): Author
     comment(id: ID!): Comment
-    comments(authorId: ID, poemId: ID): [Comment!]!
+    comments(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Comment!]!
     collection(id: ID!): Collection!
-    collections(id: ID!): [Collection!]!
+    collections(
+      limit: Int
+      cursor: ID
+      filter: GetCollectionsFilter
+    ): [Collection!]!
+    like(id: ID!): Like
+    likes(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Like!]!
+    savedPoem(id: ID!): SavedPoem
+    savedPoems(limit: Int, cursor: ID, authorId: ID, poemId: ID): [SavedPoem!]!
+    followedAuthor(id: ID!): FollowedAuthor
+    followedAuthors(
+      limit: Int
+      cursor: ID
+      followingId: ID
+      followerId: ID
+    ): [FollowedAuthor!]!
   }
 
   type Mutation {
@@ -46,11 +61,11 @@ export const typeDefs = gql`
     id: ID!
     username: String!
     email: String!
-    poems: [Poem!]!
-    savedPoems: [SavedPoem!]!
-    comments: [Comment!]!
-    collections: [Collection!]!
-    likedPoems: [Like!]!
+    poems(limit: Int, cursor: ID): [Poem!]!
+    savedPoems(limit: Int, cursor: ID): [SavedPoem!]!
+    comments(limit: Int, cursor: ID): [Comment!]!
+    collections(limit: Int, cursor: ID): [Collection!]!
+    likedPoems(limit: Int, cursor: ID): [Like!]!
     dateJoined: Date!
   }
 
@@ -60,10 +75,10 @@ export const typeDefs = gql`
     author: Author!
     text: String!
     datePublished: Date!
-    comments: [Comment!]!
+    comments(limit: Int, cursor: ID): [Comment!]!
     inCollection: Collection
-    likes: [Like!]!
-    savedBy: [SavedPoem!]!
+    likes(limit: Int, cursor: ID): [Like!]!
+    savedBy(limit: Int, cursor: ID): [SavedPoem!]!
     views: Int!
   }
 
@@ -78,7 +93,7 @@ export const typeDefs = gql`
   type Collection {
     id: ID!
     author: Author!
-    poems: [Poem!]!
+    poems(limit: Int, cursor: ID): [Poem!]!
     dateCreated: Date!
     title: String!
   }
@@ -101,6 +116,7 @@ export const typeDefs = gql`
     id: ID!
     follower: Author!
     following: Author!
+    dateFollowed: Date!
   }
 
   type AuthPayload {
@@ -110,7 +126,14 @@ export const typeDefs = gql`
 
   input GetPoemsFilter {
     authorId: ID
+    collectionId: ID
     textContains: String
+    titleContains: String
+    authorNameContains: String
+  }
+
+  input GetCollectionsFilter {
+    authorId: ID
     titleContains: String
     authorNameContains: String
   }
@@ -126,6 +149,7 @@ export const typeDefs = gql`
     username: String!
     password: String!
     email: String!
+    omitPassword: Boolean! = true
   }
 
   input CreateCommentInput {
@@ -169,11 +193,12 @@ export const typeDefs = gql`
     username: String
     email: String
     password: String
+    omitPassword: Boolean! = true
   }
 
   input UpdateCollectionInput {
     id: String!
-    authorId: String!
+    authorId: String
     title: String!
   }
 

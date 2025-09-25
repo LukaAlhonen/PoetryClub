@@ -24,11 +24,12 @@ model Author {
 }
 
 model FollowedAuthor {
-  id          String @id @default(uuid()) @db.Uuid
-  follower    Author @relation("FollowedByAuthors", fields: [followerId], references: [id], onDelete: Cascade)
-  followerId  String @db.Uuid
-  following   Author @relation("FollowedAuthors", fields: [followingId], references: [id], onDelete: Cascade)
-  followingId String @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
+  follower     Author   @relation("FollowedByAuthors", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId   String   @db.Uuid
+  following    Author   @relation("FollowedAuthors", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId  String   @db.Uuid
+  dateFollowed DateTime @default(now()) @db.Timestamp(6)
 
   @@unique([followerId, followingId])
 }
