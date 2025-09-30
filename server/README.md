@@ -1,12 +1,11 @@
 ### TODO
-- Implement auth with jwt
-  - decrease ttl for auth token and implement refresh tokens
 - Implement caching with redis
 - Extend error handling to allow for more specific handling of different errors
 - ADD TESTS
-  - graphql integration and unit tests
+  - Need to clean up poemApi.test.ts file
 - Add CI/CD pipelie with github actions
  - Use self hosted runner
  - need to create docker containers for backend and possibly frontend (easier testing on runner)
  - need to figure out how to handle .env files on runner
 - Implement webpack?
+- Add documentation

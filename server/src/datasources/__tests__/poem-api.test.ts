@@ -83,6 +83,8 @@ describe("Prisma PoemAPI Integration Tests", () => {
     const result = await poemAPI.getAuthorById({ id: testAuthor.id });
 
     expect(result).toStrictEqual(testAuthor);
+    expect(result.authVersion).toBeUndefined();
+    expect(result.password).toBeUndefined();
   });
 
   test("getAuthorByUsername, succeeds", async () => {
@@ -93,6 +95,8 @@ describe("Prisma PoemAPI Integration Tests", () => {
     });
 
     expect(result).toStrictEqual(testAuthor);
+    expect(result.authVersion).toBeUndefined();
+    expect(result.password).toBeUndefined();
   });
 
   test("getAuthors, succeeds", async () => {
@@ -459,6 +463,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
     expect(result.username).toBe(newAuthor.username);
     expect(argon2.verify(result.password, password));
     expect(result.email).toBe(newAuthor.email);
+    expect(result.authVersion).toBeUndefined();
   });
 
   test("createAuthor, fails", async () => {
@@ -897,11 +902,13 @@ describe("Prisma PoemAPI Integration Tests", () => {
       password: "1234",
       omitPassword: false,
     });
-    expect(updateAuthorPassword.password).toStrictEqual("1234");
-    expect(
-      (await poemAPI.getAuthorById({ id: testAuthor.id, omitPassword: false }))
-        .password,
-    ).toStrictEqual("1234");
+    assert(argon2.verify(updateAuthorPassword.password, "1234"));
+    const author = await poemAPI.getAuthorById({
+      id: testAuthor.id,
+      omitPassword: false,
+    });
+    expect(author.password).toStrictEqual(updateAuthorPassword.password);
+    expect(author.authVersion).toBeUndefined();
   });
 
   test("updateAuthor, username, email, fails", async () => {

@@ -8,10 +8,20 @@ import {
 import { SafeAuthor } from "../types/extended-types.js";
 import argon2 from "argon2";
 
-// TODO: Implement redis caching for all functions
+/**
+ * Represents a set of defined functions to interract with the prisma client
+ **/
 export class PoemAPI {
+  /**
+   * Create a new PoemAPI instance
+   * @param prisma - the prisma client to use
+   **/
   constructor(private prisma: PrismaClient) {}
 
+  /**
+   * Ensures no strings are empty
+   * @param input - an object possibly containing strings
+   **/
   private validateInputStrings(input: Object) {
     Object.entries(input).forEach((entry) => {
       if (entry[1] instanceof String || typeof entry[1] === "string") {
@@ -22,8 +32,21 @@ export class PoemAPI {
     });
   }
 
-  // Get all poems, optianlly filter based on authorId, collectionId
-  // textContains, titleContains, authornameContains
+  /**
+   * returns all poems,
+   * optionally filter by authorId, authorNameContains, collectionId, textContains, titleContains
+   *
+   * @param cursor
+   * @param limit
+   * @param filter
+   * @returns All poems that match filter
+   *
+   * @example
+   * ```ts
+   * const poems = await poemAPI.getPoems({limit: 10, filter: {authorNameContains: "edgar"}})
+   * console.log(poems.length) // 10
+   * ```
+   **/
   async getPoems({
     cursor,
     limit,
@@ -85,7 +108,9 @@ export class PoemAPI {
     return poems;
   }
 
-  // Get poem by id
+  /**
+   *
+   **/
   async getPoem({ id }: { id: string }) {
     const poem = await this.prisma.poem.findUnique({
       where: { id: id },
@@ -100,19 +125,9 @@ export class PoemAPI {
     return poem;
   }
 
-  // async getAuthorById(options: {
-  //   id: string;
-  //   omitPassword: false;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Author>;
-
-  // async getAuthorById(options: {
-  //   id: string;
-  //   omitPassword?: boolean;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Omit<Author, "password">>;
-
-  // Get author by id
+  /**
+   *
+   **/
   async getAuthorById({
     id,
     omitPassword = true,
@@ -146,19 +161,9 @@ export class PoemAPI {
     return copy;
   }
 
-  // async getAuthorByUsername(options: {
-  //   username: string;
-  //   omitPassword: false;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Author>;
-
-  // async getAuthorByUsername(options: {
-  //   username: string;
-  //   omitPassword?: boolean;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Omit<Author, "password">>;
-
-  // Search for author by name
+  /**
+   *
+   **/
   async getAuthorByUsername({
     username,
     omitPassword = true,
@@ -189,23 +194,9 @@ export class PoemAPI {
     return copy;
   }
 
-  // async getAuthors(options: {
-  //   omitPassword: false;
-  //   omitAuthVersion?: boolean;
-  //   usernameContains?: string;
-  //   limit?: number;
-  //   cursor?: string;
-  // }): Promise<Author[]>;
-
-  // async getAuthors(options: {
-  //   omitPassword?: boolean;
-  //   omitAuthVersion?: boolean;
-  //   usernameContains?: string;
-  //   limit?: number;
-  //   cursor?: string;
-  // }): Promise<Omit<Author, "password">[]>;
-
-  // Get all users
+  /**
+   *
+   **/
   async getAuthors({
     omitPassword = true,
     omitAuthVersion = true,
@@ -257,11 +248,11 @@ export class PoemAPI {
       if (omitAuthVersion) delete copy.authVersion;
       return copy;
     });
-
-    // return authors;
   }
 
-  // Get comment by id
+  /**
+   *
+   **/
   async getComment({ id }: { id: string }) {
     const comment = await this.prisma.comment.findFirst({
       where: { id: id },
@@ -270,7 +261,9 @@ export class PoemAPI {
     return comment;
   }
 
-  // Get all comments, optionally filter by author and poem
+  /**
+   *
+   **/
   async getComments({
     authorId,
     poemId,
@@ -311,7 +304,9 @@ export class PoemAPI {
     return comments;
   }
 
-  // get number of comments for poem
+  /**
+   *
+   **/
   async getCommentsCount({ poemId }: { poemId: string }) {
     const count = await this.prisma.comment.count({
       where: {
@@ -322,7 +317,9 @@ export class PoemAPI {
     return count;
   }
 
-  // Get collection by id
+  /**
+   *
+   **/
   async getCollection({ id }: { id: string }) {
     const collection = await this.prisma.collection.findUnique({
       where: { id: id },
@@ -332,7 +329,9 @@ export class PoemAPI {
     return collection;
   }
 
-  // Get collections, optionally filter by authorId, username contains, title contains
+  /**
+   *
+   **/
   async getCollections({
     limit,
     cursor,
@@ -385,7 +384,9 @@ export class PoemAPI {
     return collections;
   }
 
-  // Get like by id
+  /**
+   *
+   **/
   async getLike({ id }: { id: string }) {
     const like = await this.prisma.like.findUnique({
       where: {
@@ -400,7 +401,9 @@ export class PoemAPI {
     return like;
   }
 
-  // get likes, optionally filter by authorId or poemId
+  /**
+   *
+   **/
   async getLikes({
     authorId,
     poemId,
@@ -441,7 +444,9 @@ export class PoemAPI {
     return likes;
   }
 
-  // get number of likes for poem
+  /**
+   *
+   **/
   async getLikesCount({ poemId }: { poemId: string }) {
     const count = await this.prisma.like.count({
       where: {
@@ -464,7 +469,9 @@ export class PoemAPI {
     return savedPoem;
   }
 
-  // get savedPoems, optionally filter by authorId or poemId
+  /**
+   *
+   **/
   async getSavedPoems({
     authorId,
     poemId,
@@ -504,7 +511,9 @@ export class PoemAPI {
     return savedPoems;
   }
 
-  // get number of times poem has been saved
+  /**
+   *
+   **/
   async getSavedPoemsCount({ poemId }: { poemId: string }) {
     const count = await this.prisma.savedPoem.count({
       where: {
@@ -527,7 +536,9 @@ export class PoemAPI {
     return followedAuthor;
   }
 
-  // get followed authors, optionally filter by followerId or followingId
+  /**
+   *
+   **/
   async getFollowedAuthors({
     followerId,
     followingId,
@@ -569,8 +580,9 @@ export class PoemAPI {
     return followedAuthors;
   }
 
-  // get number of followers or followed authors for author
-  // for simplicity, if neither followerId or followingId is given, return total number of followedAuthor objects as punishment
+  /**
+   *
+   **/
   async getFollowedAuthorsCount({
     followerId,
     followingId,
@@ -590,7 +602,9 @@ export class PoemAPI {
     return count;
   }
 
-  // Add new poem
+  /**
+   *
+   **/
   async createPoem({
     authorId,
     text,
@@ -627,30 +641,9 @@ export class PoemAPI {
     return poem;
   }
 
-  // async createAuthor(
-  //   options: CreateAuthorInput & { omitPassword: false },
-  // ): Promise<Author>;
-  // async createAuthor(options: {
-  //   username: string;
-  //   email: string;
-  //   password: string;
-  //   omitPassword: false;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Author>;
-
-  // // async createAuthor(
-  // //   options: CreateAuthorInput & { omitPassword?: boolean },
-  // // ): Promise<Omit<Author, "password">>;
-
-  // async createAuthor(options: {
-  //   username: string;
-  //   email: string;
-  //   password: string;
-  //   omitPassword?: boolean;
-  //   omitAuthVersion?: boolean;
-  // }): Promise<Omit<Author, "password">>;
-
-  // Add new author
+  /**
+   *
+   **/
   async createAuthor({
     username,
     email,
@@ -689,22 +682,15 @@ export class PoemAPI {
       },
     });
 
-    // if (omitPassword) {
-    //   if (omitAuthVersion) {
-    //     const { password, authVersion, ...userWithoutAuthVersion } = author;
-    //     return userWithoutAuthVersion;
-    //   }
-    //   const { password, ...userWihtoutPassword } = author;
-    //   return userWihtoutPassword;
-    // }
-
     const copy = { ...author };
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
     return copy;
   }
 
-  // Add new comment
+  /**
+   *
+   **/
   async createComment({
     poemId,
     authorId,
@@ -730,6 +716,9 @@ export class PoemAPI {
     return comment;
   }
 
+  /**
+   *
+   **/
   async createCollection({
     authorId,
     title,
@@ -746,6 +735,9 @@ export class PoemAPI {
     return collection;
   }
 
+  /**
+   *
+   **/
   async createSavedPoem({
     poemId,
     authorId,
@@ -768,6 +760,9 @@ export class PoemAPI {
     return savedPoem;
   }
 
+  /**
+   *
+   **/
   async createLike({ poemId, authorId }: { poemId: string; authorId: string }) {
     this.validateInputStrings({ poemId, authorId });
     const like = await this.prisma.like.create({
@@ -784,6 +779,9 @@ export class PoemAPI {
     return like;
   }
 
+  /**
+   *
+   **/
   async createFollowedAuthor({
     authorId,
     followingId,
@@ -810,7 +808,9 @@ export class PoemAPI {
     return followedAuthor;
   }
 
-  // Edit poem, mainly for testing
+  /**
+   *
+   **/
   async updatePoem({
     title,
     poemId,
@@ -837,6 +837,9 @@ export class PoemAPI {
     return poem;
   }
 
+  /**
+   *
+   **/
   async updateAuthor({
     authorId,
     username,
@@ -863,10 +866,12 @@ export class PoemAPI {
 
     this.validateInputStrings(data);
 
-    const hashedPassword = await argon2.hash(data.password, {
-      type: argon2.argon2id,
-    });
-    data.password = hashedPassword;
+    if (password) {
+      const hashedPassword = await argon2.hash(data.password, {
+        type: argon2.argon2id,
+      });
+      data.password = hashedPassword;
+    }
 
     const author = await this.prisma.author.update({
       where: {
@@ -879,6 +884,9 @@ export class PoemAPI {
     return author;
   }
 
+  /**
+   *
+   **/
   async updateCollection({ id, title }: UpdateCollectionInput) {
     this.validateInputStrings({ title });
 
@@ -892,6 +900,9 @@ export class PoemAPI {
     return collection;
   }
 
+  /**
+   *
+   **/
   async removeAuthor({ id }: { id: string }) {
     const author = await this.prisma.author.delete({
       where: {
@@ -910,6 +921,9 @@ export class PoemAPI {
     return author;
   }
 
+  /**
+   *
+   **/
   async removePoem({ id }: { id: string }) {
     const poem = await this.prisma.poem.delete({
       where: {
@@ -920,6 +934,9 @@ export class PoemAPI {
     return poem;
   }
 
+  /**
+   *
+   **/
   async removeComment({ id }: { id: string }) {
     const comment = await this.prisma.comment.delete({
       where: {
@@ -930,6 +947,9 @@ export class PoemAPI {
     return comment;
   }
 
+  /**
+   *
+   **/
   async removeCollection({ id }: { id: string }) {
     const collection = await this.prisma.collection.delete({
       where: {
@@ -940,6 +960,9 @@ export class PoemAPI {
     return collection;
   }
 
+  /**
+   *
+   **/
   async removeLike({ id }: { id: string }) {
     const like = await this.prisma.like.delete({
       where: {
@@ -950,6 +973,9 @@ export class PoemAPI {
     return like;
   }
 
+  /**
+   *
+   **/
   async removeSavedPoem({ id }: { id: string }) {
     const savedPoem = await this.prisma.savedPoem.delete({
       where: {
@@ -960,6 +986,9 @@ export class PoemAPI {
     return savedPoem;
   }
 
+  /**
+   *
+   **/
   async removeFollowedAuthor({ id }: { id: string }) {
     const followedAuthor = await this.prisma.followedAuthor.delete({
       where: {

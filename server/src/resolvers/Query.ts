@@ -86,11 +86,25 @@ export const Query: Resolvers["Query"] = {
     });
   },
 
-  me: (_, __, { user, dataSources }) => {
+  me: async (_, __, { user, dataSources }) => {
     if (!user || user === null) {
       throw new Error("Not authenticated");
     }
 
-    return dataSources.poemAPI.getAuthorById({ id: user.authorId });
+    const author = await dataSources.poemAPI.getAuthorById({
+      id: user.authorId,
+      omitAuthVersion: false,
+    });
+
+    if (!author) {
+      throw new Error("user not found");
+    }
+
+    if (!(author.authVersion === user.authVersion)) {
+      throw new Error("token no longer valid");
+    }
+
+    const { authVersion, ...authorWithoutAuthVersion } = author;
+    return authorWithoutAuthVersion;
   },
 };

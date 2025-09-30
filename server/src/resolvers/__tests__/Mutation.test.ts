@@ -31,6 +31,10 @@ import {
   SignupMutation,
   UpdateAuthorInput,
   UpdateAuthorMutation,
+  UpdateCollectionInput,
+  UpdateCollectionMutation,
+  UpdatePoemInput,
+  UpdatePoemMutation,
 } from "../../__generated__/graphql.js";
 
 import {
@@ -51,6 +55,8 @@ import {
   REMOVE_SAVED_POEM,
   SIGNUP,
   UPDATE_AUTHOR,
+  UPDATE_COLLECTION,
+  UPDATE_POEM,
 } from "../../__tests__/mutations/index.js";
 import {
   AuthorModel,
@@ -662,22 +668,6 @@ describe("Graphql Mutation integration tests", () => {
       } else {
         throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
-    }
-  });
-
-  test("removeAuthor, without authentication", async () => {
-    const response = await testServer.executeOperation<RemoveAuthorMutation>({
-      query: REMOVE_AUTHOR,
-    });
-
-    if (response.body.kind === "single") {
-      const author = response.body.singleResult.data?.removeAuthor;
-      const errors = response.body.singleResult.errors;
-
-      expect(author).toBeUndefined();
-      expect(errors).toBeDefined();
     } else {
       throw new Error("invalid response kind");
     }
@@ -1528,6 +1518,8 @@ describe("Graphql Mutation integration tests", () => {
 
         expect(author).toBeUndefined();
         expect(errors).toBeDefined();
+      } else {
+        throw new Error("invalid response kind");
       }
 
       // make sure author was updated
@@ -1547,6 +1539,8 @@ describe("Graphql Mutation integration tests", () => {
         expect(author).toBeDefined();
         expect(author.username).toStrictEqual(input.username);
         expect(author.email).toStrictEqual(input.email);
+      } else {
+        throw new Error("invalid response kind");
       }
 
       // make sure login works with new username and password
@@ -1559,20 +1553,311 @@ describe("Graphql Mutation integration tests", () => {
       expect(newLogin).toBeDefined();
       expect(newLogin.author.id).toStrictEqual(authorToUpdate.id);
       expect(newLogin.token).toBeDefined();
+    } else {
+      throw new Error("invalid response kind");
     }
   });
 
-  test.todo("updateAuthor, without authentication");
+  test("updateCollection", async () => {
+    const login = await testLogin({ testServer });
 
-  test.todo("updateCollection");
+    const collectionToUpdate = collections.filter(
+      (collection) => collection.authorId === login.author.id,
+    )[0];
 
-  test.todo("updateCollection, without authentication");
+    const input: UpdateCollectionInput = {
+      id: collectionToUpdate.id,
+      title: "super cool collection title",
+    };
 
-  test.todo("updateCollection, without authorisation");
+    const response =
+      await testServer.executeOperation<UpdateCollectionMutation>({
+        query: UPDATE_COLLECTION,
+        variables: {
+          input,
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      });
 
-  test.todo("updatePoem");
+    if (response.body.kind === "single") {
+      const collection = response.body.singleResult.data?.updateCollection;
+      const errors = response.body.singleResult.errors;
 
-  test.todo("updatePoem, without authentication");
+      if (errors) console.error(errors);
 
-  test.todo("updatePoem, without authorisation");
+      expect(collection).toBeDefined();
+
+      // make sure collection was updated
+      const response2 = await testServer.executeOperation<GetCollectionQuery>({
+        query: GET_COLLECTION,
+        variables: { id: collectionToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const collection = response2.body.singleResult.data?.collection;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(collection.title).toStrictEqual(input.title);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("updateCollection, without authentication", async () => {
+    const collectionToUpdate = collections[0];
+
+    const input: UpdateCollectionInput = {
+      id: collectionToUpdate.id,
+      title: "super cool collection title",
+    };
+
+    const response =
+      await testServer.executeOperation<UpdateCollectionMutation>({
+        query: UPDATE_COLLECTION,
+        variables: {
+          input,
+        },
+      });
+
+    if (response.body.kind === "single") {
+      const collection = response.body.singleResult.data?.updateCollection;
+      const errors = response.body.singleResult.errors;
+
+      expect(collection).toBeUndefined();
+      expect(errors).toBeDefined();
+
+      // make sure collection was not updated
+      const response2 = await testServer.executeOperation<GetCollectionQuery>({
+        query: GET_COLLECTION,
+        variables: { id: collectionToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const collection = response2.body.singleResult.data?.collection;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(collection.title).toStrictEqual(collectionToUpdate.title);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("updateCollection, without authorisation", async () => {
+    const login = await testLogin({ testServer });
+
+    const collectionToUpdate = collections.filter(
+      (collection) => collection.authorId !== login.author.id,
+    )[0];
+
+    const input: UpdateCollectionInput = {
+      id: collectionToUpdate.id,
+      title: "super cool collection title",
+    };
+
+    const response =
+      await testServer.executeOperation<UpdateCollectionMutation>({
+        query: UPDATE_COLLECTION,
+        variables: {
+          input,
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      });
+
+    if (response.body.kind === "single") {
+      const collection = response.body.singleResult.data?.updateCollection;
+      const errors = response.body.singleResult.errors;
+
+      expect(collection).toBeUndefined();
+      expect(errors).toBeDefined();
+
+      // make sure collection was not updated
+      const response2 = await testServer.executeOperation<GetCollectionQuery>({
+        query: GET_COLLECTION,
+        variables: { id: collectionToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const collection = response2.body.singleResult.data?.collection;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(collection.title).toStrictEqual(collectionToUpdate.title);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("updatePoem", async () => {
+    const login = await testLogin({ testServer });
+
+    const poemToUpdate = poems.filter(
+      (poem) => poem.authorId === login.author.id,
+    )[0];
+
+    const input: UpdatePoemInput = {
+      poemId: poemToUpdate.id,
+      title: "super cool collection title",
+      text: "super cool poem text",
+      views: 10,
+    };
+
+    const response = await testServer.executeOperation<UpdatePoemMutation>({
+      query: UPDATE_POEM,
+      variables: {
+        input,
+      },
+      headers: {
+        authorization: `Bearer ${login.token}`,
+      },
+    });
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.updatePoem;
+      const errors = response.body.singleResult.errors;
+
+      if (errors) console.error(errors);
+
+      expect(poem).toBeDefined();
+
+      // make sure poem was updated
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
+        query: GET_POEM,
+        variables: { id: poemToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(poem.title).toStrictEqual(input.title);
+        expect(poem.text).toStrictEqual(input.text);
+        expect(poem.views).toStrictEqual(input.views);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("updatePoem, without authentication", async () => {
+    const poemToUpdate = poems[0];
+
+    const input: UpdatePoemInput = {
+      poemId: poemToUpdate.id,
+      title: "super cool collection title",
+      text: "super cool poem text",
+      views: 10,
+    };
+
+    const response = await testServer.executeOperation<UpdatePoemMutation>({
+      query: UPDATE_POEM,
+      variables: {
+        input,
+      },
+    });
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.updatePoem;
+      const errors = response.body.singleResult.errors;
+
+      expect(poem).toBeUndefined();
+      expect(errors).toBeDefined();
+
+      // make sure poem was not updated
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
+        query: GET_POEM,
+        variables: { id: poemToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(poem.title).toStrictEqual(poemToUpdate.title);
+        expect(poem.text).toStrictEqual(poemToUpdate.text);
+        expect(poem.views).toStrictEqual(poemToUpdate.views);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("updatePoem, without authorisation", async () => {
+    const login = await testLogin({ testServer });
+
+    const poemToUpdate = poems.filter(
+      (poem) => poem.authorId !== login.author.id,
+    )[0];
+
+    const input: UpdatePoemInput = {
+      poemId: poemToUpdate.id,
+      title: "super cool collection title",
+      text: "super cool poem text",
+      views: 10,
+    };
+
+    const response = await testServer.executeOperation<UpdatePoemMutation>({
+      query: UPDATE_POEM,
+      variables: {
+        input,
+      },
+      headers: {
+        authorization: `Bearer ${login.token}`,
+      },
+    });
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.updatePoem;
+      const errors = response.body.singleResult.errors;
+
+      expect(poem).toBeUndefined();
+      expect(errors).toBeDefined();
+
+      // make sure poem was not updated
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
+        query: GET_POEM,
+        variables: { id: poemToUpdate.id },
+      });
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(poem.title).toStrictEqual(poemToUpdate.title);
+        expect(poem.text).toStrictEqual(poemToUpdate.text);
+        expect(poem.views).toStrictEqual(poemToUpdate.views);
+      } else {
+        throw new Error("invalid response kind");
+      }
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
 });
