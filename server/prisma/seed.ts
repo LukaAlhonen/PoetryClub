@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "../generated/prisma/index.js";
 import argon2 from "argon2";
 
 const prisma = new PrismaClient();
@@ -9,7 +9,6 @@ async function main() {
   let hash = "password";
   try {
     hash = await argon2.hash(password, { type: argon2.argon2id });
-    console.log(`Hashed password: ${hash}`);
   } catch (err) {
     console.error(`Error hashing password: ${err}`);
   }
@@ -713,16 +712,6 @@ async function main() {
       },
     },
   });
-  console.log(`Seeding db with data:
-    ${edgar}
-
-    ${oscar}
-
-    ${emily}
-
-    ${runeberg}
-
-    ${doom}`);
 }
 
 main()

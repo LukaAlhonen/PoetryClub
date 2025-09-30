@@ -11,6 +11,22 @@ const generateDatabaseURL = (schema: string) => {
   return url.toString();
 };
 
+const clearDB = async (prisma: PrismaClient) => {
+  await prisma.$executeRawUnsafe(`
+      DO $$ DECLARE
+          r RECORD;
+      BEGIN
+          FOR r IN (
+              SELECT tablename
+              FROM pg_tables
+              WHERE schemaname = current_schema()
+          ) LOOP
+              EXECUTE 'TRUNCATE TABLE "' || r.tablename || '" RESTART IDENTITY CASCADE;';
+          END LOOP;
+      END $$;
+    `);
+};
+
 const schemaId = `test-${v4()}`;
 
 const url = generateDatabaseURL(schemaId);
@@ -19,7 +35,7 @@ export const prisma = new PrismaClient({
   datasources: { db: { url } },
 });
 
-beforeEach(async () => {
+beforeAll(async () => {
   execSync("npx prisma db push", {
     env: {
       ...process.env,
@@ -29,6 +45,14 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  await clearDB(prisma);
+});
+
+// beforeEach(async () => {
+//   await clearDB(prisma);
+// });
+
+afterAll(async () => {
   try {
     await prisma.$executeRawUnsafe(
       `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,

@@ -1,4 +1,3 @@
-import { PoemAPI } from "../../datasources/poem-api.js";
 import {
   CreatePoemInput,
   CreateAuthorInput,

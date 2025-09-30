@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { PoemModel, AuthorModel, CommentModel, CollectionModel, SavedPoemModel, LikeModel, FollowedAuthorModel } from './models.js';
-import { MyContext } from './context.js';
+import { PoemModel, AuthorModel, CommentModel, CollectionModel, SavedPoemModel, LikeModel, FollowedAuthorModel } from '../models.js';
+import { MyContext } from '../types/context.js';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -32,6 +32,10 @@ export type Author = {
   comments: Array<Comment>;
   dateJoined: Scalars['Date']['output'];
   email: Scalars['String']['output'];
+  followedBy: Array<FollowedAuthor>;
+  followedByCount: Scalars['Int']['output'];
+  following: Array<FollowedAuthor>;
+  followingCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   likedPoems: Array<Like>;
   poems: Array<Poem>;
@@ -47,6 +51,18 @@ export type AuthorCollectionsArgs = {
 
 
 export type AuthorCommentsArgs = {
+  cursor?: InputMaybe<Scalars['ID']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type AuthorFollowedByArgs = {
+  cursor?: InputMaybe<Scalars['ID']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type AuthorFollowingArgs = {
   cursor?: InputMaybe<Scalars['ID']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -95,42 +111,14 @@ export type Comment = {
 
 export type CreateAuthorInput = {
   email: Scalars['String']['input'];
-  omitPassword?: Scalars['Boolean']['input'];
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
 
-export type CreateCollectionInput = {
-  authorId: Scalars['String']['input'];
-  title: Scalars['String']['input'];
-};
-
-export type CreateCommentInput = {
-  authorId: Scalars['String']['input'];
-  poemId: Scalars['String']['input'];
-  text: Scalars['String']['input'];
-};
-
-export type CreateFollowedAuthorInput = {
-  followerId: Scalars['String']['input'];
-  followingId: Scalars['String']['input'];
-};
-
-export type CreateLikeInput = {
-  authorId: Scalars['String']['input'];
-  poemId: Scalars['String']['input'];
-};
-
 export type CreatePoemInput = {
-  authorId: Scalars['String']['input'];
   collectionId?: InputMaybe<Scalars['String']['input']>;
   text: Scalars['String']['input'];
   title: Scalars['String']['input'];
-};
-
-export type CreateSavedPoemInput = {
-  authorId: Scalars['String']['input'];
-  poemId: Scalars['String']['input'];
 };
 
 export type FollowedAuthor = {
@@ -168,11 +156,13 @@ export type Mutation = {
   createAuthor: Author;
   createCollection: Collection;
   createComment: Comment;
-  createFollowedAuthor: FollowedAuthor;
+  createFollowedAuthor?: Maybe<FollowedAuthor>;
   createLike: Like;
   createPoem: Poem;
   createSavedPoem: SavedPoem;
   login: AuthPayload;
+  logout: Scalars['Boolean']['output'];
+  refreshToken: AuthPayload;
   removeAuthor: Author;
   removeCollection: Collection;
   removeComment: Comment;
@@ -180,6 +170,7 @@ export type Mutation = {
   removeLike: Like;
   removePoem: Poem;
   removeSavedPoem: SavedPoem;
+  signup: Author;
   updateAuthor: Author;
   updateCollection: Collection;
   updatePoem: Poem;
@@ -192,22 +183,23 @@ export type MutationCreateAuthorArgs = {
 
 
 export type MutationCreateCollectionArgs = {
-  input: CreateCollectionInput;
+  title: Scalars['String']['input'];
 };
 
 
 export type MutationCreateCommentArgs = {
-  input: CreateCommentInput;
+  poemId: Scalars['ID']['input'];
+  text: Scalars['String']['input'];
 };
 
 
 export type MutationCreateFollowedAuthorArgs = {
-  input: CreateFollowedAuthorInput;
+  followingId: Scalars['ID']['input'];
 };
 
 
 export type MutationCreateLikeArgs = {
-  input: CreateLikeInput;
+  poemId: Scalars['ID']['input'];
 };
 
 
@@ -217,7 +209,7 @@ export type MutationCreatePoemArgs = {
 
 
 export type MutationCreateSavedPoemArgs = {
-  input: CreateSavedPoemInput;
+  poemId: Scalars['ID']['input'];
 };
 
 
@@ -227,38 +219,38 @@ export type MutationLoginArgs = {
 };
 
 
-export type MutationRemoveAuthorArgs = {
-  id: Scalars['String']['input'];
-};
-
-
 export type MutationRemoveCollectionArgs = {
-  input: RemoveCollectionInput;
+  collectionId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveCommentArgs = {
-  input: RemoveCommentInput;
+  commentId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveFollowedAuthorArgs = {
-  input: RemoveFollowedAuthorInput;
+  followedAuthorId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveLikeArgs = {
-  input: RemoveLikeInput;
+  likeId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemovePoemArgs = {
-  input: RemovePoemInput;
+  poemId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveSavedPoemArgs = {
-  input: RemoveSavedPoemInput;
+  savedPoemId: Scalars['ID']['input'];
+};
+
+
+export type MutationSignupArgs = {
+  input: CreateAuthorInput;
 };
 
 
@@ -280,11 +272,14 @@ export type Poem = {
   __typename?: 'Poem';
   author: Author;
   comments: Array<Comment>;
+  commentsCount: Scalars['Int']['output'];
   datePublished: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
   inCollection?: Maybe<Collection>;
   likes: Array<Like>;
+  likesCount: Scalars['Int']['output'];
   savedBy: Array<SavedPoem>;
+  savedByCount: Scalars['Int']['output'];
   text: Scalars['String']['output'];
   title: Scalars['String']['output'];
   views: Scalars['Int']['output'];
@@ -310,26 +305,27 @@ export type PoemSavedByArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  authorById?: Maybe<Author>;
-  authorByUsername?: Maybe<Author>;
+  authorById: Author;
+  authorByUsername: Author;
   authors: Array<Author>;
   collection: Collection;
   collections: Array<Collection>;
-  comment?: Maybe<Comment>;
+  comment: Comment;
   comments: Array<Comment>;
-  followedAuthor?: Maybe<FollowedAuthor>;
+  followedAuthor: FollowedAuthor;
   followedAuthors: Array<FollowedAuthor>;
-  like?: Maybe<Like>;
+  like: Like;
   likes: Array<Like>;
-  poem?: Maybe<Poem>;
+  me: Author;
+  poem: Poem;
   poems: Array<Poem>;
-  savedPoem?: Maybe<SavedPoem>;
+  savedPoem: SavedPoem;
   savedPoems: Array<SavedPoem>;
 };
 
 
 export type QueryAuthorByIdArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -420,36 +416,6 @@ export type QuerySavedPoemsArgs = {
   poemId?: InputMaybe<Scalars['ID']['input']>;
 };
 
-export type RemoveCollectionInput = {
-  authorId: Scalars['String']['input'];
-  collectionId: Scalars['String']['input'];
-};
-
-export type RemoveCommentInput = {
-  authorId: Scalars['String']['input'];
-  commentId: Scalars['String']['input'];
-};
-
-export type RemoveFollowedAuthorInput = {
-  followerId: Scalars['String']['input'];
-  followingId: Scalars['String']['input'];
-};
-
-export type RemoveLikeInput = {
-  authorId: Scalars['String']['input'];
-  likeId: Scalars['String']['input'];
-};
-
-export type RemovePoemInput = {
-  authorId: Scalars['String']['input'];
-  poemId: Scalars['String']['input'];
-};
-
-export type RemoveSavedPoemInput = {
-  authorId: Scalars['String']['input'];
-  savedPoemId: Scalars['String']['input'];
-};
-
 export type SavedPoem = {
   __typename?: 'SavedPoem';
   author: Author;
@@ -459,24 +425,19 @@ export type SavedPoem = {
 };
 
 export type UpdateAuthorInput = {
-  authorId: Scalars['String']['input'];
   email?: InputMaybe<Scalars['String']['input']>;
-  omitPassword?: Scalars['Boolean']['input'];
   password?: InputMaybe<Scalars['String']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCollectionInput = {
-  authorId?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };
 
 export type UpdatePoemInput = {
-  authorId?: InputMaybe<Scalars['String']['input']>;
   collectionId?: InputMaybe<Scalars['ID']['input']>;
-  datePublished?: InputMaybe<Scalars['Date']['input']>;
-  poemId: Scalars['String']['input'];
+  poemId: Scalars['ID']['input'];
   text?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
   views?: InputMaybe<Scalars['Int']['input']>;
@@ -561,12 +522,7 @@ export type ResolversTypes = {
   Collection: ResolverTypeWrapper<CollectionModel>;
   Comment: ResolverTypeWrapper<CommentModel>;
   CreateAuthorInput: CreateAuthorInput;
-  CreateCollectionInput: CreateCollectionInput;
-  CreateCommentInput: CreateCommentInput;
-  CreateFollowedAuthorInput: CreateFollowedAuthorInput;
-  CreateLikeInput: CreateLikeInput;
   CreatePoemInput: CreatePoemInput;
-  CreateSavedPoemInput: CreateSavedPoemInput;
   Date: ResolverTypeWrapper<Scalars['Date']['output']>;
   FollowedAuthor: ResolverTypeWrapper<FollowedAuthorModel>;
   GetCollectionsFilter: GetCollectionsFilter;
@@ -577,12 +533,6 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Poem: ResolverTypeWrapper<PoemModel>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  RemoveCollectionInput: RemoveCollectionInput;
-  RemoveCommentInput: RemoveCommentInput;
-  RemoveFollowedAuthorInput: RemoveFollowedAuthorInput;
-  RemoveLikeInput: RemoveLikeInput;
-  RemovePoemInput: RemovePoemInput;
-  RemoveSavedPoemInput: RemoveSavedPoemInput;
   SavedPoem: ResolverTypeWrapper<SavedPoemModel>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateAuthorInput: UpdateAuthorInput;
@@ -598,12 +548,7 @@ export type ResolversParentTypes = {
   Collection: CollectionModel;
   Comment: CommentModel;
   CreateAuthorInput: CreateAuthorInput;
-  CreateCollectionInput: CreateCollectionInput;
-  CreateCommentInput: CreateCommentInput;
-  CreateFollowedAuthorInput: CreateFollowedAuthorInput;
-  CreateLikeInput: CreateLikeInput;
   CreatePoemInput: CreatePoemInput;
-  CreateSavedPoemInput: CreateSavedPoemInput;
   Date: Scalars['Date']['output'];
   FollowedAuthor: FollowedAuthorModel;
   GetCollectionsFilter: GetCollectionsFilter;
@@ -614,12 +559,6 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   Poem: PoemModel;
   Query: Record<PropertyKey, never>;
-  RemoveCollectionInput: RemoveCollectionInput;
-  RemoveCommentInput: RemoveCommentInput;
-  RemoveFollowedAuthorInput: RemoveFollowedAuthorInput;
-  RemoveLikeInput: RemoveLikeInput;
-  RemovePoemInput: RemovePoemInput;
-  RemoveSavedPoemInput: RemoveSavedPoemInput;
   SavedPoem: SavedPoemModel;
   String: Scalars['String']['output'];
   UpdateAuthorInput: UpdateAuthorInput;
@@ -637,6 +576,10 @@ export type AuthorResolvers<ContextType = MyContext, ParentType extends Resolver
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType, Partial<AuthorCommentsArgs>>;
   dateJoined?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  followedBy?: Resolver<Array<ResolversTypes['FollowedAuthor']>, ParentType, ContextType, Partial<AuthorFollowedByArgs>>;
+  followedByCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  following?: Resolver<Array<ResolversTypes['FollowedAuthor']>, ParentType, ContextType, Partial<AuthorFollowingArgs>>;
+  followingCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   likedPoems?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType, Partial<AuthorLikedPoemsArgs>>;
   poems?: Resolver<Array<ResolversTypes['Poem']>, ParentType, ContextType, Partial<AuthorPoemsArgs>>;
@@ -680,20 +623,23 @@ export type LikeResolvers<ContextType = MyContext, ParentType extends ResolversP
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<MutationCreateAuthorArgs, 'input'>>;
-  createCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationCreateCollectionArgs, 'input'>>;
-  createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'input'>>;
-  createFollowedAuthor?: Resolver<ResolversTypes['FollowedAuthor'], ParentType, ContextType, RequireFields<MutationCreateFollowedAuthorArgs, 'input'>>;
-  createLike?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<MutationCreateLikeArgs, 'input'>>;
+  createCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationCreateCollectionArgs, 'title'>>;
+  createComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'poemId' | 'text'>>;
+  createFollowedAuthor?: Resolver<Maybe<ResolversTypes['FollowedAuthor']>, ParentType, ContextType, RequireFields<MutationCreateFollowedAuthorArgs, 'followingId'>>;
+  createLike?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<MutationCreateLikeArgs, 'poemId'>>;
   createPoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationCreatePoemArgs, 'input'>>;
-  createSavedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<MutationCreateSavedPoemArgs, 'input'>>;
+  createSavedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<MutationCreateSavedPoemArgs, 'poemId'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
-  removeAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<MutationRemoveAuthorArgs, 'id'>>;
-  removeCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationRemoveCollectionArgs, 'input'>>;
-  removeComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationRemoveCommentArgs, 'input'>>;
-  removeFollowedAuthor?: Resolver<ResolversTypes['FollowedAuthor'], ParentType, ContextType, RequireFields<MutationRemoveFollowedAuthorArgs, 'input'>>;
-  removeLike?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<MutationRemoveLikeArgs, 'input'>>;
-  removePoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationRemovePoemArgs, 'input'>>;
-  removeSavedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<MutationRemoveSavedPoemArgs, 'input'>>;
+  logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  refreshToken?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType>;
+  removeAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType>;
+  removeCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationRemoveCollectionArgs, 'collectionId'>>;
+  removeComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationRemoveCommentArgs, 'commentId'>>;
+  removeFollowedAuthor?: Resolver<ResolversTypes['FollowedAuthor'], ParentType, ContextType, RequireFields<MutationRemoveFollowedAuthorArgs, 'followedAuthorId'>>;
+  removeLike?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<MutationRemoveLikeArgs, 'likeId'>>;
+  removePoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationRemovePoemArgs, 'poemId'>>;
+  removeSavedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<MutationRemoveSavedPoemArgs, 'savedPoemId'>>;
+  signup?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<MutationSignupArgs, 'input'>>;
   updateAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<MutationUpdateAuthorArgs, 'input'>>;
   updateCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationUpdateCollectionArgs, 'input'>>;
   updatePoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationUpdatePoemArgs, 'input'>>;
@@ -702,31 +648,35 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
 export type PoemResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Poem'] = ResolversParentTypes['Poem']> = {
   author?: Resolver<ResolversTypes['Author'], ParentType, ContextType>;
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType, Partial<PoemCommentsArgs>>;
+  commentsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   datePublished?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inCollection?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType>;
   likes?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType, Partial<PoemLikesArgs>>;
+  likesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   savedBy?: Resolver<Array<ResolversTypes['SavedPoem']>, ParentType, ContextType, Partial<PoemSavedByArgs>>;
+  savedByCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   views?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  authorById?: Resolver<Maybe<ResolversTypes['Author']>, ParentType, ContextType, Partial<QueryAuthorByIdArgs>>;
-  authorByUsername?: Resolver<Maybe<ResolversTypes['Author']>, ParentType, ContextType, RequireFields<QueryAuthorByUsernameArgs, 'username'>>;
+  authorById?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<QueryAuthorByIdArgs, 'id'>>;
+  authorByUsername?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<QueryAuthorByUsernameArgs, 'username'>>;
   authors?: Resolver<Array<ResolversTypes['Author']>, ParentType, ContextType, Partial<QueryAuthorsArgs>>;
   collection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<QueryCollectionArgs, 'id'>>;
   collections?: Resolver<Array<ResolversTypes['Collection']>, ParentType, ContextType, Partial<QueryCollectionsArgs>>;
-  comment?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType, RequireFields<QueryCommentArgs, 'id'>>;
+  comment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<QueryCommentArgs, 'id'>>;
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType, Partial<QueryCommentsArgs>>;
-  followedAuthor?: Resolver<Maybe<ResolversTypes['FollowedAuthor']>, ParentType, ContextType, RequireFields<QueryFollowedAuthorArgs, 'id'>>;
+  followedAuthor?: Resolver<ResolversTypes['FollowedAuthor'], ParentType, ContextType, RequireFields<QueryFollowedAuthorArgs, 'id'>>;
   followedAuthors?: Resolver<Array<ResolversTypes['FollowedAuthor']>, ParentType, ContextType, Partial<QueryFollowedAuthorsArgs>>;
-  like?: Resolver<Maybe<ResolversTypes['Like']>, ParentType, ContextType, RequireFields<QueryLikeArgs, 'id'>>;
+  like?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<QueryLikeArgs, 'id'>>;
   likes?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType, Partial<QueryLikesArgs>>;
-  poem?: Resolver<Maybe<ResolversTypes['Poem']>, ParentType, ContextType, RequireFields<QueryPoemArgs, 'id'>>;
+  me?: Resolver<ResolversTypes['Author'], ParentType, ContextType>;
+  poem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<QueryPoemArgs, 'id'>>;
   poems?: Resolver<Array<ResolversTypes['Poem']>, ParentType, ContextType, Partial<QueryPoemsArgs>>;
-  savedPoem?: Resolver<Maybe<ResolversTypes['SavedPoem']>, ParentType, ContextType, RequireFields<QuerySavedPoemArgs, 'id'>>;
+  savedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<QuerySavedPoemArgs, 'id'>>;
   savedPoems?: Resolver<Array<ResolversTypes['SavedPoem']>, ParentType, ContextType, Partial<QuerySavedPoemsArgs>>;
 };
 

@@ -21,13 +21,14 @@ model Author {
   dateJoined  DateTime         @default(now()) @db.Timestamp(6)
   followedBy  FollowedAuthor[] @relation("FollowedByAuthors")
   following   FollowedAuthor[] @relation("FollowedAuthors")
+  authVersion String           @default(uuid()) @db.Uuid
 }
 
 model FollowedAuthor {
   id           String   @id @default(uuid()) @db.Uuid
-  follower     Author   @relation("FollowedByAuthors", fields: [followerId], references: [id], onDelete: Cascade)
+  follower     Author   @relation("FollowedAuthors", fields: [followerId], references: [id], onDelete: Cascade)
   followerId   String   @db.Uuid
-  following    Author   @relation("FollowedAuthors", fields: [followingId], references: [id], onDelete: Cascade)
+  following    Author   @relation("FollowedByAuthors", fields: [followingId], references: [id], onDelete: Cascade)
   followingId  String   @db.Uuid
   dateFollowed DateTime @default(now()) @db.Timestamp(6)
 

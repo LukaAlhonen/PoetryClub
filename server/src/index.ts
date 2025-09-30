@@ -1,6 +1,7 @@
 import { ApolloServer } from "@apollo/server";
-import { typeDefs } from "./schema.js";
-import { resolvers } from "./resolvers.js";
+// import { typeDefs } from "./schema.js";
+// import { resolvers } from "./resolvers.js";
+import { schema } from "./schema.js";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { PoemAPI } from "./datasources/poem-api.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -10,7 +11,8 @@ import { expressMiddleware } from "@as-integrations/express5";
 import cors from "cors";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import http from "http";
-import { MyContext } from "./context.js";
+import { MyContext } from "./types/context.js";
+import { MyJwtPayload } from "./types/auth.js";
 
 const prisma = new PrismaClient();
 
@@ -19,8 +21,9 @@ async function startApolloServer() {
   const httpServer = http.createServer(app);
 
   const server = new ApolloServer<MyContext>({
-    typeDefs,
-    resolvers,
+    // typeDefs,
+    // resolvers,
+    schema,
     csrfPrevention: {
       requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
     },
@@ -40,20 +43,22 @@ async function startApolloServer() {
     "/graphql",
     cors<cors.CorsRequest>(corsOptions),
     express.json(),
-    expressMiddleware(server, {
-      context: async ({ req }) => {
+    expressMiddleware<MyContext>(server, {
+      context: async ({ req, res }) => {
         const token = req.headers.authorization || "";
-        let user: JwtPayload | null = null;
+        let user: MyJwtPayload | null = null;
 
         if (token.startsWith("Bearer ")) {
           const rawToken = token.split(" ")[1];
           try {
-            user = jwt.verify(rawToken, config.JWT_SECRET) as JwtPayload;
+            user = jwt.verify(rawToken, config.JWT_SECRET) as MyJwtPayload;
           } catch (err) {
             console.error("Invalid jwt", err);
           }
         }
         return {
+          req,
+          res,
           user,
           dataSources: {
             poemAPI: new PoemAPI(prisma),

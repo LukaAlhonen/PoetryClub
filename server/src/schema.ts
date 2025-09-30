@@ -1,14 +1,16 @@
 import { gql } from "graphql-tag";
+import { resolvers } from "./resolvers/index.js";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 
 export const typeDefs = gql`
   scalar Date
   type Query {
     poems(limit: Int, cursor: ID, filter: GetPoemsFilter): [Poem!]!
-    poem(id: ID!): Poem
-    authorById(id: ID): Author
+    poem(id: ID!): Poem!
+    authorById(id: ID!): Author!
     authors(limit: Int, cursor: ID, usernameContains: String): [Author!]!
-    authorByUsername(username: String!): Author
-    comment(id: ID!): Comment
+    authorByUsername(username: String!): Author!
+    comment(id: ID!): Comment!
     comments(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Comment!]!
     collection(id: ID!): Collection!
     collections(
@@ -16,28 +18,29 @@ export const typeDefs = gql`
       cursor: ID
       filter: GetCollectionsFilter
     ): [Collection!]!
-    like(id: ID!): Like
+    like(id: ID!): Like!
     likes(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Like!]!
-    savedPoem(id: ID!): SavedPoem
+    savedPoem(id: ID!): SavedPoem!
     savedPoems(limit: Int, cursor: ID, authorId: ID, poemId: ID): [SavedPoem!]!
-    followedAuthor(id: ID!): FollowedAuthor
+    followedAuthor(id: ID!): FollowedAuthor!
     followedAuthors(
       limit: Int
       cursor: ID
       followingId: ID
       followerId: ID
     ): [FollowedAuthor!]!
+    me: Author!
   }
 
   type Mutation {
     # Create
     createPoem(input: CreatePoemInput!): Poem!
     createAuthor(input: CreateAuthorInput!): Author!
-    createComment(input: CreateCommentInput!): Comment!
-    createCollection(input: CreateCollectionInput!): Collection!
-    createSavedPoem(input: CreateSavedPoemInput!): SavedPoem!
-    createLike(input: CreateLikeInput!): Like!
-    createFollowedAuthor(input: CreateFollowedAuthorInput!): FollowedAuthor!
+    createComment(poemId: ID!, text: String!): Comment!
+    createCollection(title: String!): Collection!
+    createSavedPoem(poemId: ID!): SavedPoem!
+    createLike(poemId: ID!): Like!
+    createFollowedAuthor(followingId: ID!): FollowedAuthor
 
     # Update
     updatePoem(input: UpdatePoemInput!): Poem!
@@ -45,16 +48,19 @@ export const typeDefs = gql`
     updateCollection(input: UpdateCollectionInput!): Collection!
 
     # Remove
-    removeAuthor(id: String!): Author!
-    removePoem(input: RemovePoemInput!): Poem!
-    removeComment(input: RemoveCommentInput!): Comment!
-    removeCollection(input: RemoveCollectionInput!): Collection!
-    removeSavedPoem(input: RemoveSavedPoemInput!): SavedPoem!
-    removeLike(input: RemoveLikeInput!): Like!
-    removeFollowedAuthor(input: RemoveFollowedAuthorInput!): FollowedAuthor!
+    removeAuthor: Author!
+    removePoem(poemId: ID!): Poem!
+    removeComment(commentId: ID!): Comment!
+    removeCollection(collectionId: ID!): Collection!
+    removeSavedPoem(savedPoemId: ID!): SavedPoem!
+    removeLike(likeId: ID!): Like!
+    removeFollowedAuthor(followedAuthorId: ID!): FollowedAuthor!
 
     # Auth
     login(username: String!, password: String!): AuthPayload!
+    signup(input: CreateAuthorInput!): Author!
+    logout: Boolean!
+    refreshToken: AuthPayload!
   }
 
   type Author {
@@ -66,6 +72,10 @@ export const typeDefs = gql`
     comments(limit: Int, cursor: ID): [Comment!]!
     collections(limit: Int, cursor: ID): [Collection!]!
     likedPoems(limit: Int, cursor: ID): [Like!]!
+    following(limit: Int, cursor: ID): [FollowedAuthor!]!
+    followingCount: Int!
+    followedBy(limit: Int, cursor: ID): [FollowedAuthor!]!
+    followedByCount: Int!
     dateJoined: Date!
   }
 
@@ -76,9 +86,12 @@ export const typeDefs = gql`
     text: String!
     datePublished: Date!
     comments(limit: Int, cursor: ID): [Comment!]!
+    commentsCount: Int!
     inCollection: Collection
     likes(limit: Int, cursor: ID): [Like!]!
+    likesCount: Int!
     savedBy(limit: Int, cursor: ID): [SavedPoem!]!
+    savedByCount: Int!
     views: Int!
   }
 
@@ -141,7 +154,6 @@ export const typeDefs = gql`
   input CreatePoemInput {
     title: String!
     text: String!
-    authorId: String!
     collectionId: String
   }
 
@@ -149,86 +161,26 @@ export const typeDefs = gql`
     username: String!
     password: String!
     email: String!
-    omitPassword: Boolean! = true
-  }
-
-  input CreateCommentInput {
-    text: String!
-    poemId: String!
-    authorId: String!
-  }
-
-  input CreateCollectionInput {
-    title: String!
-    authorId: String!
-  }
-
-  input CreateSavedPoemInput {
-    poemId: String!
-    authorId: String!
-  }
-
-  input CreateLikeInput {
-    poemId: String!
-    authorId: String!
-  }
-
-  input CreateFollowedAuthorInput {
-    followerId: String!
-    followingId: String!
   }
 
   input UpdatePoemInput {
-    poemId: String!
+    poemId: ID!
     title: String
-    authorId: String
     text: String
-    datePublished: Date
     collectionId: ID
     views: Int
   }
 
   input UpdateAuthorInput {
-    authorId: String!
     username: String
     email: String
     password: String
-    omitPassword: Boolean! = true
   }
 
   input UpdateCollectionInput {
     id: String!
-    authorId: String
     title: String!
   }
-
-  input RemovePoemInput {
-    poemId: String!
-    authorId: String!
-  }
-
-  input RemoveCommentInput {
-    commentId: String!
-    authorId: String!
-  }
-
-  input RemoveSavedPoemInput {
-    savedPoemId: String!
-    authorId: String!
-  }
-
-  input RemoveLikeInput {
-    likeId: String!
-    authorId: String!
-  }
-
-  input RemoveCollectionInput {
-    collectionId: String!
-    authorId: String!
-  }
-
-  input RemoveFollowedAuthorInput {
-    followerId: String!
-    followingId: String!
-  }
 `;
+
+export const schema = makeExecutableSchema({ typeDefs, resolvers });

@@ -8,15 +8,12 @@ export type PoemModel = {
   views: number;
 };
 
-export type AuthorWithPasswordModel = {
+export type AuthorModel = {
   id: string;
   username: string;
   email: string;
-  password: string;
   dateJoined: Date;
 };
-
-export type AuthorModel = Omit<AuthorWithPasswordModel, "password">;
 
 export type CommentModel = {
   id: string;

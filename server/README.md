@@ -4,9 +4,9 @@
 - Implement caching with redis
 - Extend error handling to allow for more specific handling of different errors
 - ADD TESTS
-  - Prisma integration tests
   - graphql integration and unit tests
 - Add CI/CD pipelie with github actions
  - Use self hosted runner
  - need to create docker containers for backend and possibly frontend (easier testing on runner)
  - need to figure out how to handle .env files on runner
+- Implement webpack?

@@ -2,6 +2,12 @@ import { PoemAPI } from "../poem-api.js";
 import { prisma } from "../../../prisma/index.js";
 import { describe, expect, test } from "vitest";
 import { v4 } from "uuid";
+import argon2 from "argon2";
+
+import {
+  AuthorIncludes,
+  AuthorWithPasswordIncludes,
+} from "../../types/extended-types.js";
 
 import {
   createAuthorInputObject,
@@ -212,6 +218,10 @@ describe("Prisma PoemAPI Integration Tests", () => {
     await expect(
       poemAPI.getComments({ limit: 1, cursor: testComment2.id }),
     ).resolves.toStrictEqual([testComment]);
+    await expect(poemAPI.getComments({})).resolves.toStrictEqual([
+      testComment2,
+      testComment,
+    ]);
   });
 
   test("getLike, succeeds", async () => {
@@ -360,7 +370,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
     });
 
     const testFollowedAuthor = await poemAPI.createFollowedAuthor({
-      followerId: followerAuthor.id,
+      authorId: followerAuthor.id,
       followingId: followedAuthor.id,
     });
 
@@ -370,6 +380,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
   });
 
   test("getFollowedAuthors, succeeds", async () => {
+    // pelle and kalle follow linux
     const followerAuthor = await poemAPI.createAuthor({
       omitPassword: false,
       username: "pelle",
@@ -389,45 +400,65 @@ describe("Prisma PoemAPI Integration Tests", () => {
       password: "password",
     });
 
+    // make pelle follow linus
     const testFollowedAuthor = await poemAPI.createFollowedAuthor({
-      followerId: followerAuthor.id,
-      followingId: followedAuthor.id,
-    });
-    const testFollowedAuthor2 = await poemAPI.createFollowedAuthor({
-      followerId: followerAuthor2.id,
+      authorId: followerAuthor.id,
       followingId: followedAuthor.id,
     });
 
+    // make kalle follow linus
+    const testFollowedAuthor2 = await poemAPI.createFollowedAuthor({
+      authorId: followerAuthor2.id,
+      followingId: followedAuthor.id,
+    });
+
+    // get followerIds form linus
+    const followedAuthorIds = (
+      (await poemAPI.getAuthorById({
+        id: followedAuthor.id,
+      })) as AuthorIncludes
+    ).followedBy.map((followedAuthor) => followedAuthor.followerId);
+
+    // make sure pelle and kalle follow linus
     await expect(
       poemAPI.getFollowedAuthors({ followingId: followedAuthor.id }),
     ).resolves.toStrictEqual([testFollowedAuthor2, testFollowedAuthor]);
+
+    expect(followedAuthorIds.includes(followerAuthor.id));
+    expect(followedAuthorIds.includes(followerAuthor2.id));
+
+    // make sure pelle follows linus
     await expect(
       poemAPI.getFollowedAuthors({ followerId: followerAuthor.id }),
     ).resolves.toStrictEqual([testFollowedAuthor]);
+
+    // make sure kalle follows linus
     await expect(
-      poemAPI.getFollowedAuthors({ limit: 1 }),
+      poemAPI.getFollowedAuthors({ followerId: followerAuthor2.id }),
     ).resolves.toStrictEqual([testFollowedAuthor2]);
-    await expect(
-      poemAPI.getFollowedAuthors({ limit: 1, cursor: testFollowedAuthor.id }),
-    ).resolves.toStrictEqual([testFollowedAuthor]);
   });
 
   test("createAuthor, succeeds", async () => {
-    const newAuthor = createAuthorInputObject({ omitPassword: false });
-    const result = (await poemAPI.createAuthor({
+    const password = "password";
+    const newAuthor = createAuthorInputObject({
+      omitPassword: false,
+      password,
+    });
+
+    const result = await poemAPI.createAuthor({
       ...newAuthor,
       omitPassword: false,
-    })) as typeof result & { password: string };
+    });
 
-    expect(result.id).toBeDefined();
+    // verify author was created
+    await expect(
+      poemAPI.getAuthorById({ id: result.id, omitPassword: false }),
+    ).resolves.toStrictEqual(result);
+
+    // verify username, email, password
     expect(result.username).toBe(newAuthor.username);
-    expect(result.password).toBe(newAuthor.password);
+    expect(argon2.verify(result.password, password));
     expect(result.email).toBe(newAuthor.email);
-    expect(result.collections).toStrictEqual([]);
-    expect(result.poems).toStrictEqual([]);
-    expect(result.savedPoems).toStrictEqual([]);
-    expect(result.likedPoems).toStrictEqual([]);
-    expect(result.comments).toStrictEqual([]);
   });
 
   test("createAuthor, fails", async () => {
@@ -787,7 +818,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
     const followingAuthor = await poemAPI.createAuthor(newAuthor2); // author that is followed by other author
 
     const result = await poemAPI.createFollowedAuthor({
-      followerId: followerAuthor.id,
+      authorId: followerAuthor.id,
       followingId: followingAuthor.id,
     });
 
@@ -816,21 +847,21 @@ describe("Prisma PoemAPI Integration Tests", () => {
     // create followedAuthor with nonexistent followerId
     await expect(
       poemAPI.createFollowedAuthor({
-        followerId: testId,
+        authorId: testId,
         followingId: testAuthor.id,
       }),
     ).rejects.toThrow();
     // create followedAuthor with nonexistent followingId
     await expect(
       poemAPI.createFollowedAuthor({
-        followerId: testAuthor.id,
+        authorId: testAuthor.id,
         followingId: testId,
       }),
     ).rejects.toThrow();
     // create followedAuthor with same value for followingId and followerId
     await expect(
       poemAPI.createFollowedAuthor({
-        followerId: testAuthor.id,
+        authorId: testAuthor.id,
         followingId: testAuthor.id,
       }),
     ).rejects.toThrow();
@@ -998,13 +1029,12 @@ describe("Prisma PoemAPI Integration Tests", () => {
 
     // update collection with invalid collectionId
     await expect(
-      poemAPI.updateCollection({ id: "1", authorId: "1", title: "title" }),
+      poemAPI.updateCollection({ id: "1", title: "title" }),
     ).rejects.toThrow();
     // update collection with empty string for title
     await expect(
       poemAPI.updateCollection({
         id: testCollection.id,
-        authorId: "1",
         title: "",
       }),
     ).rejects.toThrow();
@@ -1037,7 +1067,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
     );
 
     const testFollowedAuthor = await poemAPI.createFollowedAuthor({
-      followerId: testAuthor.id,
+      authorId: testAuthor.id,
       followingId: testAuthor2.id,
     });
 
@@ -1064,7 +1094,7 @@ describe("Prisma PoemAPI Integration Tests", () => {
     // make sure author was deleted
     await expect(
       poemAPI.getAuthorById({ id: testAuthor.id }),
-    ).resolves.toBeNull();
+    ).resolves.toStrictEqual({});
     // make sure poem is deleted
     await expect(poemAPI.getPoem({ id: testPoem.id })).resolves.toBeNull();
     // make sure collection is deleted

@@ -21,6 +21,7 @@
     "@as-integrations/express5": "^1.1.2",
     "@graphql-tools/mock": "^9.0.25",
     "@graphql-tools/schema": "^10.0.25",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@prisma/client": "^6.16.2",
     "@testing-library/jest-dom": "^6.8.0",
     "@types/cors": "^2.8.19",

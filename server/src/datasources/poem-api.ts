@@ -1,20 +1,12 @@
-import { PrismaClient, Prisma } from "../../generated/prisma/client.js";
+import { PrismaClient, Prisma, Author } from "../../generated/prisma/client.js";
 import {
-  CreateCollectionInput,
-  CreateCommentInput,
-  CreateLikeInput,
-  CreatePoemInput,
-  CreateSavedPoemInput,
-  CreateAuthorInput,
   GetPoemsFilter,
   UpdateCollectionInput,
   UpdatePoemInput,
-  UpdateAuthorInput,
-  CreateFollowedAuthorInput,
   GetCollectionsFilter,
-} from "../types.js";
-
-import { AuthorModel, AuthorWithPasswordModel } from "../models.js";
+} from "../__generated__/types.js";
+import { SafeAuthor } from "../types/extended-types.js";
+import argon2 from "argon2";
 
 // TODO: Implement redis caching for all functions
 export class PoemAPI {
@@ -74,7 +66,7 @@ export class PoemAPI {
         comments: true,
         inCollection: true,
       },
-      orderBy: { datePublished: "desc" },
+      orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -95,7 +87,7 @@ export class PoemAPI {
 
   // Get poem by id
   async getPoem({ id }: { id: string }) {
-    const poem = await this.prisma.poem.findFirst({
+    const poem = await this.prisma.poem.findUnique({
       where: { id: id },
       include: {
         author: true,
@@ -108,28 +100,33 @@ export class PoemAPI {
     return poem;
   }
 
-  async getAuthorById(options: {
-    id: string;
-    omitPassword: false;
-  }): Promise<AuthorWithPasswordModel>;
+  // async getAuthorById(options: {
+  //   id: string;
+  //   omitPassword: false;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Author>;
 
-  async getAuthorById(options: {
-    id: string;
-    omitPassword?: boolean;
-  }): Promise<AuthorModel>;
+  // async getAuthorById(options: {
+  //   id: string;
+  //   omitPassword?: boolean;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Omit<Author, "password">>;
 
   // Get author by id
   async getAuthorById({
     id,
     omitPassword = true,
+    omitAuthVersion = true,
   }: {
     id: string;
     omitPassword?: boolean;
-  }) {
+    omitAuthVersion?: boolean;
+  }): Promise<SafeAuthor> {
     const author = await this.prisma.author.findUnique({
-      omit: {
-        password: omitPassword,
-      },
+      // omit: {
+      //   password: omitPassword,
+      //   authVersion: omitAuthVersion,
+      // },
       where: { id: id },
       include: {
         poems: true,
@@ -141,30 +138,39 @@ export class PoemAPI {
         following: true,
       },
     });
-    return author;
+
+    const copy = { ...author };
+    if (omitPassword) delete copy.password;
+    if (omitAuthVersion) delete copy.authVersion;
+
+    return copy;
   }
 
-  async getAuthorByUsername(options: {
-    username: string;
-    omitPassword: false;
-  }): Promise<AuthorWithPasswordModel>;
+  // async getAuthorByUsername(options: {
+  //   username: string;
+  //   omitPassword: false;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Author>;
 
-  async getAuthorByUsername(options: {
-    username: string;
-    omitPassword?: boolean;
-  }): Promise<AuthorModel>;
+  // async getAuthorByUsername(options: {
+  //   username: string;
+  //   omitPassword?: boolean;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Omit<Author, "password">>;
 
   // Search for author by name
   async getAuthorByUsername({
     username,
     omitPassword = true,
+    omitAuthVersion = true,
   }: {
     username: string;
     omitPassword?: boolean;
-  }) {
+    omitAuthVersion?: boolean;
+  }): Promise<SafeAuthor> {
     const author = await this.prisma.author.findFirst({
       where: { username: username },
-      omit: { password: omitPassword },
+      // omit: { password: omitPassword, authVersion: omitAuthVersion },
       include: {
         poems: true,
         savedPoems: true,
@@ -176,35 +182,43 @@ export class PoemAPI {
       },
     });
 
-    return author;
+    const copy = { ...author };
+    if (omitPassword) delete copy.password;
+    if (omitAuthVersion) delete copy.authVersion;
+
+    return copy;
   }
 
-  async getAuthors(options: {
-    omitPassword: false;
-    usernameContains?: string;
-    limit?: number;
-    cursor?: string;
-  }): Promise<AuthorWithPasswordModel[]>;
+  // async getAuthors(options: {
+  //   omitPassword: false;
+  //   omitAuthVersion?: boolean;
+  //   usernameContains?: string;
+  //   limit?: number;
+  //   cursor?: string;
+  // }): Promise<Author[]>;
 
-  async getAuthors(options: {
-    omitPassword?: boolean;
-    usernameContains?: string;
-    limit?: number;
-    cursor?: string;
-  }): Promise<AuthorModel[]>;
+  // async getAuthors(options: {
+  //   omitPassword?: boolean;
+  //   omitAuthVersion?: boolean;
+  //   usernameContains?: string;
+  //   limit?: number;
+  //   cursor?: string;
+  // }): Promise<Omit<Author, "password">[]>;
 
   // Get all users
   async getAuthors({
     omitPassword = true,
+    omitAuthVersion = true,
     usernameContains,
     limit,
     cursor,
   }: {
     omitPassword?: boolean;
+    omitAuthVersion?: boolean;
     usernameContains?: string;
     limit?: number;
     cursor?: string;
-  }) {
+  }): Promise<SafeAuthor[]> {
     const queryFilter: Prisma.AuthorWhereInput = {
       ...(usernameContains
         ? { username: { contains: usernameContains, mode: "insensitive" } }
@@ -222,10 +236,7 @@ export class PoemAPI {
         followedBy: true,
         following: true,
       },
-      omit: { password: omitPassword },
-      orderBy: {
-        dateJoined: "desc",
-      },
+      orderBy: [{ dateJoined: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -240,7 +251,14 @@ export class PoemAPI {
 
     const authors = await this.prisma.author.findMany(queryOptions);
 
-    return authors;
+    return authors.map((author) => {
+      const copy = { ...author };
+      if (omitPassword) delete copy.password;
+      if (omitAuthVersion) delete copy.authVersion;
+      return copy;
+    });
+
+    // return authors;
   }
 
   // Get comment by id
@@ -275,9 +293,7 @@ export class PoemAPI {
         author: true,
         poem: true,
       },
-      orderBy: {
-        datePublished: "desc",
-      },
+      orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -293,6 +309,17 @@ export class PoemAPI {
     const comments = await this.prisma.comment.findMany(queryOptions);
 
     return comments;
+  }
+
+  // get number of comments for poem
+  async getCommentsCount({ poemId }: { poemId: string }) {
+    const count = await this.prisma.comment.count({
+      where: {
+        poemId,
+      },
+    });
+
+    return count;
   }
 
   // Get collection by id
@@ -340,7 +367,7 @@ export class PoemAPI {
         author: true,
         poems: true,
       },
-      orderBy: { dateCreated: "desc" },
+      orderBy: [{ dateCreated: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -396,9 +423,7 @@ export class PoemAPI {
         author: true,
         poem: true,
       },
-      orderBy: {
-        datePublished: "desc",
-      },
+      orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -414,6 +439,17 @@ export class PoemAPI {
     const likes = await this.prisma.like.findMany(queryOptions);
 
     return likes;
+  }
+
+  // get number of likes for poem
+  async getLikesCount({ poemId }: { poemId: string }) {
+    const count = await this.prisma.like.count({
+      where: {
+        poemId,
+      },
+    });
+
+    return count;
   }
 
   async getSavedPoem({ id }: { id: string }) {
@@ -451,9 +487,7 @@ export class PoemAPI {
         author: true,
         poem: true,
       },
-      orderBy: {
-        dateSaved: "desc",
-      },
+      orderBy: [{ dateSaved: "desc" }, { id: "desc" }],
     };
     if (limit) {
       queryOptions.take = limit;
@@ -468,6 +502,17 @@ export class PoemAPI {
     const savedPoems = await this.prisma.savedPoem.findMany(queryOptions);
 
     return savedPoems;
+  }
+
+  // get number of times poem has been saved
+  async getSavedPoemsCount({ poemId }: { poemId: string }) {
+    const count = await this.prisma.savedPoem.count({
+      where: {
+        poemId,
+      },
+    });
+
+    return count;
   }
 
   async getFollowedAuthor({ id }: { id: string }) {
@@ -505,9 +550,7 @@ export class PoemAPI {
         follower: true,
         following: true,
       },
-      orderBy: {
-        dateFollowed: "asc",
-      },
+      orderBy: [{ dateFollowed: "desc" }, { id: "desc" }],
     };
 
     if (limit) {
@@ -526,13 +569,39 @@ export class PoemAPI {
     return followedAuthors;
   }
 
+  // get number of followers or followed authors for author
+  // for simplicity, if neither followerId or followingId is given, return total number of followedAuthor objects as punishment
+  async getFollowedAuthorsCount({
+    followerId,
+    followingId,
+  }: {
+    followerId?: string;
+    followingId?: string;
+  }) {
+    const queryFilter: Prisma.FollowedAuthorWhereInput = {
+      ...(followerId ? { followerId } : {}),
+      ...(followingId ? { followingId } : {}),
+    };
+
+    const count = await this.prisma.followedAuthor.count({
+      where: queryFilter,
+    });
+
+    return count;
+  }
+
   // Add new poem
   async createPoem({
     authorId,
     text,
     title,
     collectionId = undefined,
-  }: CreatePoemInput) {
+  }: {
+    authorId: string;
+    text: string;
+    title: string;
+    collectionId?: string;
+  }) {
     this.validateInputStrings({ authorId, text, title, collectionId });
     const poem = await this.prisma.poem.create({
       data: {
@@ -558,19 +627,55 @@ export class PoemAPI {
     return poem;
   }
 
+  // async createAuthor(
+  //   options: CreateAuthorInput & { omitPassword: false },
+  // ): Promise<Author>;
+  // async createAuthor(options: {
+  //   username: string;
+  //   email: string;
+  //   password: string;
+  //   omitPassword: false;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Author>;
+
+  // // async createAuthor(
+  // //   options: CreateAuthorInput & { omitPassword?: boolean },
+  // // ): Promise<Omit<Author, "password">>;
+
+  // async createAuthor(options: {
+  //   username: string;
+  //   email: string;
+  //   password: string;
+  //   omitPassword?: boolean;
+  //   omitAuthVersion?: boolean;
+  // }): Promise<Omit<Author, "password">>;
+
   // Add new author
   async createAuthor({
     username,
     email,
     password,
-    omitPassword,
-  }: CreateAuthorInput) {
+    omitPassword = true,
+    omitAuthVersion = true,
+  }: {
+    username: string;
+    email: string;
+    password: string;
+    omitPassword?: boolean;
+    omitAuthVersion?: boolean;
+  }): Promise<SafeAuthor> {
+    // make sure no strings are empty before hashing password
+    this.validateInputStrings({ username, email, password });
+
+    const hashedPassword = await argon2.hash(password, {
+      type: argon2.argon2id,
+    });
+
     const data = {
       username,
       email,
-      password,
+      password: hashedPassword,
     };
-    this.validateInputStrings(data);
     const author = await this.prisma.author.create({
       data,
       include: {
@@ -584,18 +689,38 @@ export class PoemAPI {
       },
     });
 
-    if (omitPassword) {
-      const { password, ...userWihtoutPassword } = author;
-      return userWihtoutPassword;
-    }
-    return author;
+    // if (omitPassword) {
+    //   if (omitAuthVersion) {
+    //     const { password, authVersion, ...userWithoutAuthVersion } = author;
+    //     return userWithoutAuthVersion;
+    //   }
+    //   const { password, ...userWihtoutPassword } = author;
+    //   return userWihtoutPassword;
+    // }
+
+    const copy = { ...author };
+    if (omitPassword) delete copy.password;
+    if (omitAuthVersion) delete copy.authVersion;
+    return copy;
   }
 
   // Add new comment
-  async createComment(input: CreateCommentInput) {
-    this.validateInputStrings(input);
+  async createComment({
+    poemId,
+    authorId,
+    text,
+  }: {
+    poemId: string;
+    authorId: string;
+    text: string;
+  }) {
+    this.validateInputStrings({ poemId, authorId, text });
     const comment = await this.prisma.comment.create({
-      data: input,
+      data: {
+        poemId,
+        authorId,
+        text,
+      },
       include: {
         author: true,
         poem: true,
@@ -605,19 +730,35 @@ export class PoemAPI {
     return comment;
   }
 
-  async createCollection(input: CreateCollectionInput) {
-    this.validateInputStrings(input);
+  async createCollection({
+    authorId,
+    title,
+  }: {
+    authorId: string;
+    title: string;
+  }) {
+    this.validateInputStrings({ authorId, title });
     const collection = await this.prisma.collection.create({
-      data: input,
+      data: { authorId, title },
       include: { poems: true, author: true },
     });
 
     return collection;
   }
 
-  async createSavedPoem(input: CreateSavedPoemInput) {
+  async createSavedPoem({
+    poemId,
+    authorId,
+  }: {
+    poemId: string;
+    authorId: string;
+  }) {
+    this.validateInputStrings({ poemId, authorId });
     const savedPoem = await this.prisma.savedPoem.create({
-      data: input,
+      data: {
+        poemId,
+        authorId,
+      },
       include: {
         author: true,
         poem: true,
@@ -627,9 +768,13 @@ export class PoemAPI {
     return savedPoem;
   }
 
-  async createLike(input: CreateLikeInput) {
+  async createLike({ poemId, authorId }: { poemId: string; authorId: string }) {
+    this.validateInputStrings({ poemId, authorId });
     const like = await this.prisma.like.create({
-      data: input,
+      data: {
+        poemId,
+        authorId,
+      },
       include: {
         author: true,
         poem: true,
@@ -639,13 +784,23 @@ export class PoemAPI {
     return like;
   }
 
-  async createFollowedAuthor(input: CreateFollowedAuthorInput) {
+  async createFollowedAuthor({
+    authorId,
+    followingId,
+  }: {
+    authorId: string;
+    followingId: string;
+  }) {
+    this.validateInputStrings({ authorId, followingId });
     // author cannot follow themself
-    if (input.followerId === input.followingId) {
+    if (authorId === followingId) {
       throw new Error("An author cannot follow themself");
     }
     const followedAuthor = await this.prisma.followedAuthor.create({
-      data: input,
+      data: {
+        followerId: authorId,
+        followingId,
+      },
       include: {
         follower: true,
         following: true,
@@ -660,14 +815,12 @@ export class PoemAPI {
     title,
     poemId,
     text,
-    datePublished,
     collectionId,
     views,
   }: UpdatePoemInput) {
     const data = {
       ...(title ? { title } : {}),
       ...(text ? { text } : {}),
-      ...(datePublished ? { datePublished } : {}),
       ...(collectionId ? { collectionId } : {}),
       ...(views ? { views } : {}),
     };
@@ -678,7 +831,7 @@ export class PoemAPI {
       where: {
         id: poemId,
       },
-      data: data,
+      data,
     });
 
     return poem;
@@ -689,22 +842,38 @@ export class PoemAPI {
     username,
     password,
     email,
-    omitPassword,
-  }: UpdateAuthorInput) {
+    omitPassword = true,
+    omitAuthVersion = true,
+    authVersion,
+  }: {
+    authorId: string;
+    username?: string;
+    password?: string;
+    email?: string;
+    omitPassword?: boolean;
+    omitAuthVersion?: boolean;
+    authVersion?: string;
+  }) {
     const data = {
       ...(username ? { username } : {}),
       ...(password ? { password } : {}),
       ...(email ? { email } : {}),
+      ...(authVersion ? { authVersion } : {}),
     };
 
     this.validateInputStrings(data);
+
+    const hashedPassword = await argon2.hash(data.password, {
+      type: argon2.argon2id,
+    });
+    data.password = hashedPassword;
 
     const author = await this.prisma.author.update({
       where: {
         id: authorId,
       },
-      data: data,
-      omit: { password: omitPassword },
+      data,
+      omit: { password: omitPassword, authVersion: omitAuthVersion },
     });
 
     return author;
@@ -715,7 +884,7 @@ export class PoemAPI {
 
     const collection = await this.prisma.collection.update({
       where: {
-        id: id,
+        id,
       },
       data: { title },
     });
@@ -726,7 +895,7 @@ export class PoemAPI {
   async removeAuthor({ id }: { id: string }) {
     const author = await this.prisma.author.delete({
       where: {
-        id: id,
+        id,
       },
       include: {
         poems: true,
@@ -744,7 +913,7 @@ export class PoemAPI {
   async removePoem({ id }: { id: string }) {
     const poem = await this.prisma.poem.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -754,7 +923,7 @@ export class PoemAPI {
   async removeComment({ id }: { id: string }) {
     const comment = await this.prisma.comment.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -764,7 +933,7 @@ export class PoemAPI {
   async removeCollection({ id }: { id: string }) {
     const collection = await this.prisma.collection.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -774,7 +943,7 @@ export class PoemAPI {
   async removeLike({ id }: { id: string }) {
     const like = await this.prisma.like.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -784,10 +953,20 @@ export class PoemAPI {
   async removeSavedPoem({ id }: { id: string }) {
     const savedPoem = await this.prisma.savedPoem.delete({
       where: {
-        id: id,
+        id,
       },
     });
 
     return savedPoem;
+  }
+
+  async removeFollowedAuthor({ id }: { id: string }) {
+    const followedAuthor = await this.prisma.followedAuthor.delete({
+      where: {
+        id,
+      },
+    });
+
+    return followedAuthor;
   }
 }
