@@ -21,6 +21,7 @@ import {
   GetPoemQuery,
   GetSavedPoemQuery,
   LoginMutation,
+  LogoutMutation,
   RemoveAuthorMutation,
   RemoveCollectionMutation,
   RemoveCommentMutation,
@@ -67,7 +68,6 @@ import {
   PoemModel,
   SavedPoemModel,
 } from "../../models.js";
-import { GET_AUTHORS } from "../../__tests__/queries/authors.js";
 import { GET_AUTHOR_BY_ID } from "../../__tests__/queries/authorById.js";
 import { GET_COLLECTION } from "../../__tests__/queries/collection.js";
 import { GET_COMMENT } from "../../__tests__/queries/comment.js";
@@ -75,6 +75,7 @@ import { GET_FOLLOWED_AUTHOR } from "../../__tests__/queries/followedAuthor.js";
 import { GET_LIKE } from "../../__tests__/queries/like.js";
 import { GET_POEM } from "../../__tests__/queries/poem.js";
 import { GET_SAVED_POEM } from "../../__tests__/queries/savedPoem.js";
+import { LOGOUT } from "../../__tests__/mutations/logout.js";
 
 const testLogin = async ({
   username = "author1",
@@ -199,6 +200,43 @@ describe("Graphql Mutation integration tests", () => {
       const errors = response.body.singleResult.errors;
 
       expect(login).toBeUndefined();
+      expect(errors).toBeDefined();
+    } else {
+      throw new Error("invalid response kind");
+    }
+  });
+
+  test("logout", async () => {
+    const login = await testLogin({ testServer });
+    const response = await testServer.executeOperation<LogoutMutation>({
+      query: LOGOUT,
+      headers: {
+        authorization: `Bearer ${login.token}`,
+      },
+    });
+
+    if (response.body.kind === "single") {
+      const logout = response.body.singleResult.data?.logout;
+      const errors = response.body.singleResult.errors;
+
+      if (errors) console.error(errors);
+
+      expect(logout).toBe(true);
+    }
+
+    // make sure token was invalidated
+    const response2 = await testServer.executeOperation<RemoveAuthorMutation>({
+      query: REMOVE_AUTHOR,
+      headers: {
+        authorization: `Bearer ${login.token}`,
+      },
+    });
+
+    if (response2.body.kind === "single") {
+      const author = response2.body.singleResult.data?.removeAuthor;
+      const errors = response2.body.singleResult.errors;
+
+      expect(author).toBeUndefined();
       expect(errors).toBeDefined();
     } else {
       throw new Error("invalid response kind");

@@ -18,6 +18,8 @@ import {
   GetSavedPoemQuery,
   GetFollowedAuthorsQuery,
   GetFollowedAuthorQuery,
+  LoginMutation,
+  MeQuery,
 } from "../../__generated__/graphql.js";
 
 import {
@@ -37,6 +39,8 @@ import {
   GET_SAVED_POEM,
   GET_SAVED_POEMS,
 } from "../../__tests__/queries/index.js";
+import { LOGIN } from "../../__tests__/mutations/login.js";
+import { ME } from "../../__tests__/queries/me.js";
 
 describe("Graphql Query integration tests", () => {
   // DB seeded with:
@@ -1109,6 +1113,36 @@ describe("Graphql Query integration tests", () => {
       }
     } else {
       throw new Error("invalid response kind");
+    }
+  });
+
+  test("me", async () => {
+    const loginResponse = await testServer.executeOperation<LoginMutation>({
+      query: LOGIN,
+      variables: {
+        username: "author1",
+        password: "password",
+      },
+    });
+
+    if (loginResponse.body.kind === "single") {
+      const login = loginResponse.body.singleResult.data?.login;
+      const response = await testServer.executeOperation<MeQuery>({
+        query: ME,
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      });
+
+      if (response.body.kind === "single") {
+        const me = response.body.singleResult.data?.me;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(me.id).toStrictEqual(login.author.id);
+        expect(me.username).toStrictEqual(login.author.username);
+      }
     }
   });
 });

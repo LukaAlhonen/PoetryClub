@@ -3,10 +3,15 @@ import { handlePrismaError } from "../utils/prisma-error-handler.js";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import config from "../config.js";
-import { v4 } from "uuid";
 import { MyJwtPayload } from "../types/auth.js";
 import { PoemAPI } from "../datasources/poem-api.js";
+import { randomUUID } from "node:crypto";
 
+/**
+ * Verifies user is logged in and auth token is valid
+ * @param user - context
+ * @param poemAPI - PoemAPI instance
+ **/
 const verifyUser = async ({
   user,
   poemAPI,
@@ -165,7 +170,7 @@ export const Mutation: Resolvers["Mutation"] = {
 
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
-    const authVersion = v4();
+    const authVersion = randomUUID();
 
     try {
       return dataSources.poemAPI.updateAuthor({
@@ -398,7 +403,11 @@ export const Mutation: Resolvers["Mutation"] = {
     );
 
     const resfreshToken = jwt.sign(
-      { authorId: author.id },
+      {
+        authorId: author.id,
+        email: author.email,
+        authVersion: author.authVersion,
+      },
       config.JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
@@ -427,7 +436,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     // invalidate old auth verison
-    const authVersion = v4();
+    const authVersion = randomUUID();
 
     await dataSources.poemAPI.updateAuthor({
       authorId: user.authorId,

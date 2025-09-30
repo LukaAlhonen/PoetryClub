@@ -89,9 +89,9 @@ export async function createTestServer({
       const mockReq = {} as Request;
       const mockRes = {
         cookie: vi.fn(),
+        clearCookie: vi.fn(),
       } as unknown as Response;
 
-      // const context = contextValue || { user, dataSources: { poemAPI } };
       const context: MyContext =
         (contextValue as MyContext) ??
         ({
