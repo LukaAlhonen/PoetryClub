@@ -1285,4 +1285,20 @@ describe("Prisma PoemAPI Integration Tests", () => {
         .includes(testComment.id),
     );
   });
+
+  test("incrementPoemViews, succeeds", async () => {
+    const testAuthor = await poemAPI.createAuthor(createAuthorInputObject());
+
+    const testPoem = await poemAPI.createPoem(
+      createPoemInputObject({
+        authorId: testAuthor.id,
+      }),
+    );
+
+    expect(testPoem.views).toBe(0);
+    const result = await poemAPI.incrementPoemViews({ poemId: testPoem.id });
+    const updatedPoem = await poemAPI.getPoem({ id: testPoem.id });
+    expect(updatedPoem.views).toBe(1);
+    expect(result.views).toBe(1);
+  });
 });

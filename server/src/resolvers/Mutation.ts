@@ -32,10 +32,6 @@ const verifyUser = async ({
 export const Mutation: Resolvers["Mutation"] = {
   // Create
   createPoem: async (_, { input }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -57,10 +53,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   createComment: async (_, { poemId, text }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -75,10 +67,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   createCollection: async (_, { title }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -92,10 +80,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   createSavedPoem: async (_, { poemId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -109,10 +93,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   createLike: async (_, { poemId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -126,10 +106,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   createFollowedAuthor: async (_, { followingId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -144,10 +120,6 @@ export const Mutation: Resolvers["Mutation"] = {
 
   // Update
   updatePoem: async (_, { input }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     const poem = await dataSources.poemAPI.getPoem({ id: input.poemId });
@@ -164,10 +136,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   updateAuthor: async (_, { input }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     const authVersion = randomUUID();
@@ -184,10 +152,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   updateCollection: async (_, { input }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     const collection = await dataSources.poemAPI.getCollection({
@@ -207,10 +171,6 @@ export const Mutation: Resolvers["Mutation"] = {
 
   // Remove
   removeAuthor: async (_, __, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -221,10 +181,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   removePoem: async (_, { poemId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -245,10 +201,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   removeComment: async (_, { commentId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -269,10 +221,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   removeCollection: async (_, { collectionId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -295,10 +243,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   removeLike: async (_, { likeId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -319,10 +263,6 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   removeSavedPoem: async (_, { savedPoemId }, { user, dataSources }) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -349,10 +289,6 @@ export const Mutation: Resolvers["Mutation"] = {
     { followedAuthorId },
     { user, dataSources },
   ) => {
-    if (!user || user === null) {
-      throw new Error("not authenticated");
-    }
-
     await verifyUser({ user, poemAPI: dataSources.poemAPI });
 
     try {
@@ -371,6 +307,14 @@ export const Mutation: Resolvers["Mutation"] = {
       return dataSources.poemAPI.removeFollowedAuthor({ id: followedAuthorId });
     } catch (err) {
       handlePrismaError(err, "removeFollowedAuthor");
+    }
+  },
+
+  incrementPoemViews: async (_, { poemId }, { dataSources }) => {
+    try {
+      return dataSources.poemAPI.incrementPoemViews({ poemId });
+    } catch (err) {
+      handlePrismaError(err, "incrementPoemViews");
     }
   },
 

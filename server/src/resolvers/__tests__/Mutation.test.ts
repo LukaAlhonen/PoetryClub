@@ -20,6 +20,7 @@ import {
   GetLikeQuery,
   GetPoemQuery,
   GetSavedPoemQuery,
+  IncrementPoemViewsMutation,
   LoginMutation,
   LogoutMutation,
   RemoveAuthorMutation,
@@ -76,6 +77,7 @@ import { GET_LIKE } from "../../__tests__/queries/like.js";
 import { GET_POEM } from "../../__tests__/queries/poem.js";
 import { GET_SAVED_POEM } from "../../__tests__/queries/savedPoem.js";
 import { LOGOUT } from "../../__tests__/mutations/logout.js";
+import { INCREMENT_POEM_VIEWS } from "../../__tests__/mutations/incrementPoemViews.js";
 
 const testLogin = async ({
   username = "author1",
@@ -1896,6 +1898,26 @@ describe("Graphql Mutation integration tests", () => {
       }
     } else {
       throw new Error("invalid response kind");
+    }
+  });
+
+  test("incrementPoemViews", async () => {
+    const poemToUpdate = poems[0];
+    const response =
+      await testServer.executeOperation<IncrementPoemViewsMutation>({
+        query: INCREMENT_POEM_VIEWS,
+        variables: {
+          poemId: poemToUpdate.id,
+        },
+      });
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.incrementPoemViews;
+      const errors = response.body.singleResult.errors;
+
+      if (errors) console.error(errors);
+
+      expect(poem.views).toBe(1);
     }
   });
 });

@@ -1,6 +1,4 @@
 import { ApolloServer } from "@apollo/server";
-// import { typeDefs } from "./schema.js";
-// import { resolvers } from "./resolvers.js";
 import { schema } from "./schema.js";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { PoemAPI } from "./datasources/poem-api.js";
@@ -13,16 +11,16 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import http from "http";
 import { MyContext } from "./types/context.js";
 import { MyJwtPayload } from "./types/auth.js";
+// import { CacheAPI } from "./cache/cache-api.js";
 
 const prisma = new PrismaClient();
+// const cache = new CacheAPI();
 
 async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
   const server = new ApolloServer<MyContext>({
-    // typeDefs,
-    // resolvers,
     schema,
     csrfPrevention: {
       requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
