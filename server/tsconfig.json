@@ -7,7 +7,8 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "esModuleInterop": true,
-    "types": ["node", "./global.d.ts", "vitest/globals"]
+    "types": ["node", "./global.d.ts", "vitest/globals"],
+    "skipLibCheck": true
   },
   "include": ["src", "."]
 }

@@ -160,6 +160,7 @@ export type Mutation = {
   createLike: Like;
   createPoem: Poem;
   createSavedPoem: SavedPoem;
+  incrementPoemViews: Poem;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refreshToken: AuthPayload;
@@ -209,6 +210,11 @@ export type MutationCreatePoemArgs = {
 
 
 export type MutationCreateSavedPoemArgs = {
+  poemId: Scalars['ID']['input'];
+};
+
+
+export type MutationIncrementPoemViewsArgs = {
   poemId: Scalars['ID']['input'];
 };
 
@@ -629,6 +635,7 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   createLike?: Resolver<ResolversTypes['Like'], ParentType, ContextType, RequireFields<MutationCreateLikeArgs, 'poemId'>>;
   createPoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationCreatePoemArgs, 'input'>>;
   createSavedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<MutationCreateSavedPoemArgs, 'poemId'>>;
+  incrementPoemViews?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationIncrementPoemViewsArgs, 'poemId'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   refreshToken?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType>;

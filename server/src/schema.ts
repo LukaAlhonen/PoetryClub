@@ -46,6 +46,7 @@ export const typeDefs = gql`
     updatePoem(input: UpdatePoemInput!): Poem!
     updateAuthor(input: UpdateAuthorInput!): Author!
     updateCollection(input: UpdateCollectionInput!): Collection!
+    incrementPoemViews(poemId: ID!): Poem!
 
     # Remove
     removeAuthor: Author!

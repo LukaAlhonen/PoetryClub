@@ -41,6 +41,7 @@ import {
 } from "../../__tests__/queries/index.js";
 import { LOGIN } from "../../__tests__/mutations/login.js";
 import { ME } from "../../__tests__/queries/me.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 describe("Graphql Query integration tests", () => {
   // DB seeded with:
@@ -51,10 +52,12 @@ describe("Graphql Query integration tests", () => {
   // 3 followed authors
   // 4 likes
   // 4 savedPoems
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "Query" });
+  const poemAPI = new PoemAPI(prisma, cache);
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ poemAPI });
     await seed({ prisma });
   });
