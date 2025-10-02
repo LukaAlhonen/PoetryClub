@@ -11,9 +11,11 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import http from "http";
 import { MyContext } from "./types/context.js";
 import { MyJwtPayload } from "./types/auth.js";
+import { CacheAPI } from "./cache/cache-api.js";
 // import { CacheAPI } from "./cache/cache-api.js";
 
 const prisma = new PrismaClient();
+const cache = new CacheAPI();
 // const cache = new CacheAPI();
 
 async function startApolloServer() {
@@ -59,7 +61,7 @@ async function startApolloServer() {
           res,
           user,
           dataSources: {
-            poemAPI: new PoemAPI(prisma),
+            poemAPI: new PoemAPI(prisma, cache),
           },
         };
       },

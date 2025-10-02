@@ -11,6 +11,7 @@ import {
   GET_SAVED_POEM,
   GET_SAVED_POEMS,
 } from "../../__tests__/queries/index.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 describe("Graphql SavedPoem integration tests", () => {
   // DB seeded with:
@@ -21,12 +22,14 @@ describe("Graphql SavedPoem integration tests", () => {
   // 3 followed authors
   // 4 likes
   // 4 savedPoems
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "SavedPoem" });
+  const poemAPI = new PoemAPI(prisma, cache);
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   let savedPoems: NonNullable<GetSavedPoemsQuery["savedPoems"]> = [];
 
   beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ poemAPI });
     await seed({ prisma });
     const response = await testServer.executeOperation<GetSavedPoemsQuery>({

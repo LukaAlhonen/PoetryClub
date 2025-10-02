@@ -5,30 +5,30 @@ import {
   UpdatePoemInput,
   GetCollectionsFilter,
 } from "../__generated__/types.js";
-import { SafeAuthor } from "../types/extended-types.js";
+import {
+  SafeAuthor,
+  PoemWithRelations,
+  CommentWithRelations,
+  CollectionWithRelations,
+  LikeWithRelations,
+  SavedPoemWithRelations,
+  FollowedAuthorWithRelations,
+} from "../types/extended-types.js";
 import argon2 from "argon2";
 import { CacheAPI } from "../cache/cache-api.js";
-import {
-  CollectionModel,
-  CommentModel,
-  FollowedAuthorModel,
-  LikeModel,
-  PoemModel,
-  SavedPoemModel,
-} from "../models.js";
 
 /**
  * Represents a set of defined functions to interract with the prisma client
  **/
 export class PoemAPI {
-  private cache: CacheAPI;
   /**
    * Create a new PoemAPI instance
    * @param prisma - the prisma client to use
    **/
-  constructor(private prisma: PrismaClient) {
-    this.cache = new CacheAPI();
-  }
+  constructor(
+    private prisma: PrismaClient,
+    private cache: CacheAPI,
+  ) {}
 
   /**
    * Ensures no strings are empty
@@ -58,17 +58,22 @@ export class PoemAPI {
       | "savedPoem"
       | "followedAuthor";
   }) {
-    const keys = await this.cache?.sMembers({
+    const keys = await this.cache.sMembers({
       setKey: `${name}:${id}:queries`,
     });
 
+    const pipeline = this.cache.pipeline();
+
     if (keys.length > 0) {
-      const pipeline = this.cache.pipeline();
       for (const key of keys) pipeline.del(key);
       await pipeline.exec();
     }
 
-    await this.cache.del({ key: `${name}:${id}:queries` });
+    pipeline.del(`${name}:id:${id}`);
+
+    pipeline.del(`${name}:${id}:queries`);
+
+    await pipeline.exec();
   }
 
   /**
@@ -94,7 +99,14 @@ export class PoemAPI {
     cursor?: string;
     limit?: number;
     filter?: GetPoemsFilter | null;
-  } = {}) {
+  } = {}): Promise<PoemWithRelations[] | null> {
+    const cacheKey = `poems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:filter:${JSON.stringify(filter)}`;
+    const cached = await this.cache.getAll<PoemWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) {
+      return cached;
+    }
     // Add fields from filter to queryfilter if they are present
     const queryFilter: Prisma.PoemWhereInput = filter
       ? {
@@ -119,14 +131,6 @@ export class PoemAPI {
         }
       : {};
 
-    const cacheKey = `poems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:filter:${JSON.stringify(filter)}`;
-    const cached = await this.cache?.getAll<PoemModel>({
-      key: cacheKey,
-    });
-    if (cached) {
-      return cached;
-    }
-
     const queryOptions: Prisma.PoemFindManyArgs = {
       where: queryFilter,
       include: {
@@ -150,21 +154,15 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const poems = await this.prisma.poem.findMany(queryOptions);
+    const poems = (await this.prisma.poem.findMany(
+      queryOptions,
+    )) as PoemWithRelations[];
 
-    await this.cache?.hSetArray({ key: cacheKey, valueArray: poems });
+    if (poems) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: poems });
 
-    for (const poem of poems) {
-      await this.cache?.sAdd({ setKey: `poem:${poem.id}:queries`, cacheKey });
-      await this.cache.sAdd({
-        setKey: `author:${poem.authorId}:queries`,
-        cacheKey,
-      });
-      if (poem.collectionId) {
-        await this.cache.sAdd({
-          setKey: `collection:${poem.collectionId}:queries`,
-          cacheKey,
-        });
+      for (const poem of poems) {
+        await this.cache.sAdd({ setKey: `poem:${poem.id}:queries`, cacheKey });
       }
     }
 
@@ -175,10 +173,10 @@ export class PoemAPI {
    * Returns a Poem object matching the provied id
    * @param id - Poem id
    **/
-  async getPoem({ id }: { id: string }) {
+  async getPoem({ id }: { id: string }): Promise<PoemWithRelations | null> {
     const cacheKey = `poem:id:${id}`;
 
-    const cached = await this.cache?.get<PoemModel>({ key: cacheKey });
+    const cached = await this.cache.get<PoemWithRelations>({ key: cacheKey });
 
     if (cached) {
       return cached;
@@ -195,17 +193,9 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.set({ key: cacheKey, value: poem });
-    await this.cache.sAdd({ setKey: `poem:${poem.id}:queries`, cacheKey });
-    await this.cache.sAdd({
-      setKey: `author:${poem.authorId}:queries`,
-      cacheKey,
-    });
-    if (poem.collectionId) {
-      await this.cache.sAdd({
-        setKey: `collection:${poem.collectionId}:queries`,
-        cacheKey,
-      });
+    if (poem) {
+      await this.cache.set({ key: cacheKey, value: poem });
+      await this.cache.sAdd({ setKey: `poem:${poem.id}:queries`, cacheKey });
     }
 
     return poem;
@@ -254,8 +244,10 @@ export class PoemAPI {
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
 
-    await this.cache.set({ key: cacheKey, value: copy });
-    await this.cache.sAdd({ setKey: `author:${id}:queries`, cacheKey });
+    if (author) {
+      await this.cache.set({ key: cacheKey, value: copy });
+      await this.cache.sAdd({ setKey: `author:${id}:queries`, cacheKey });
+    }
 
     return copy;
   }
@@ -281,7 +273,7 @@ export class PoemAPI {
     omitAuthVersion?: boolean;
   }): Promise<SafeAuthor> {
     const cacheKey = `author:username:${username}`;
-    const cached = await this.cache?.get<SafeAuthor>({ key: cacheKey });
+    const cached = await this.cache.get<SafeAuthor>({ key: cacheKey });
     if (cached) {
       return cached;
     }
@@ -303,11 +295,13 @@ export class PoemAPI {
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
 
-    await this.cache?.set({ key: cacheKey, value: copy });
-    await this.cache?.sAdd({
-      setKey: `author:${author.id}:queries}`,
-      cacheKey,
-    });
+    if (author) {
+      await this.cache.set({ key: cacheKey, value: copy });
+      await this.cache.sAdd({
+        setKey: `author:${author.id}:queries}`,
+        cacheKey,
+      });
+    }
 
     return copy;
   }
@@ -337,7 +331,15 @@ export class PoemAPI {
     usernameContains?: string;
     limit?: number;
     cursor?: string;
-  }): Promise<SafeAuthor[]> {
+  }): Promise<SafeAuthor[] | null> {
+    const cacheKey = `authors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
+    const cached = await this.cache.getAll<SafeAuthor>({
+      key: cacheKey,
+    });
+    if (cached) {
+      return cached;
+    }
+
     const queryFilter: Prisma.AuthorWhereInput = {
       ...(usernameContains
         ? { username: { contains: usernameContains, mode: "insensitive" } }
@@ -368,15 +370,9 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `authors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
-    const cached = await this.cache?.getAll<SafeAuthor>({
-      key: cacheKey,
-    });
-    if (cached) {
-      return cached;
-    }
-
-    const authors = await this.prisma.author.findMany(queryOptions);
+    const authors = (await this.prisma.author.findMany(
+      queryOptions,
+    )) as SafeAuthor[];
 
     // remove password and authVersion from each author based on
     // omitPassword and omitAuthVersion params
@@ -387,12 +383,14 @@ export class PoemAPI {
       return copy;
     });
 
-    await this.cache.hSetArray({ key: cacheKey, valueArray: safeAuthors });
-    for (const author of safeAuthors) {
-      await this.cache?.sAdd({
-        setKey: `author:${author.id}:queries`,
-        cacheKey,
-      });
+    if (authors) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: safeAuthors });
+      for (const author of safeAuthors) {
+        await this.cache.sAdd({
+          setKey: `author:${author.id}:queries`,
+          cacheKey,
+        });
+      }
     }
 
     return safeAuthors;
@@ -402,9 +400,15 @@ export class PoemAPI {
    * Returns a comment matching the provided id
    * @param id comment id
    **/
-  async getComment({ id }: { id: string }) {
+  async getComment({
+    id,
+  }: {
+    id: string;
+  }): Promise<CommentWithRelations | null> {
     const cacheKey = `comment:id:${id}`;
-    const cached = await this.cache?.get({ key: cacheKey });
+    const cached = await this.cache.get<CommentWithRelations>({
+      key: cacheKey,
+    });
     if (cached) return cached;
 
     const comment = await this.prisma.comment.findFirst({
@@ -412,19 +416,13 @@ export class PoemAPI {
       include: { author: true, poem: true },
     });
 
-    await this.cache.set({ key: cacheKey, value: comment });
-    await this.cache.sAdd({
-      setKey: `comment:${comment.id}:queries`,
-      cacheKey,
-    });
-    await this.cache.sAdd({
-      setKey: `author:${comment.authorId}:queries`,
-      cacheKey,
-    });
-    await this.cache.sAdd({
-      setKey: `poem:${comment.poemId}:queries`,
-      cacheKey,
-    });
+    if (comment) {
+      await this.cache.set({ key: cacheKey, value: comment });
+      await this.cache.sAdd({
+        setKey: `comment:${comment.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return comment;
   }
@@ -450,7 +448,15 @@ export class PoemAPI {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }) {
+  }): Promise<CommentWithRelations[] | null> {
+    const cacheKey = `comments:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:authorId:${authorId ? authorId : "null"}:poemId:${poemId ? poemId : "null"}`;
+    const cached = await this.cache.getAll<CommentWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) {
+      return cached;
+    }
+
     const queryFilter: Prisma.CommentWhereInput = {
       ...(authorId ? { authorId } : {}),
       ...(poemId ? { poemId } : {}),
@@ -475,23 +481,27 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `comments:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:authorId:${authorId ? authorId : "null"}:poemId:${poemId ? poemId : "null"}`;
-    const cached = await this.cache?.getAll<CommentModel>({
-      key: cacheKey,
-    });
-    if (cached) {
-      return cached;
-    }
+    const comments = (await this.prisma.comment.findMany(
+      queryOptions,
+    )) as CommentWithRelations[];
 
-    const comments = await this.prisma.comment.findMany(queryOptions);
-
-    await this.cache?.hSetArray({ key: cacheKey, valueArray: comments });
-    // could optimise with pipeline
-    for (const comment of comments) {
-      await this.cache.sAdd({
-        setKey: `comment:${comment.id}:queries`,
-        cacheKey,
-      });
+    if (comments) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: comments });
+      // could optimise with pipeline
+      for (const comment of comments) {
+        await this.cache.sAdd({
+          setKey: `comment:${comment.id}:queries`,
+          cacheKey,
+        });
+        await this.cache.sAdd({
+          setKey: `author:${comment.authorId}:queries`,
+          cacheKey,
+        });
+        await this.cache.sAdd({
+          setKey: `poem:${comment.poemId}:queries`,
+          cacheKey,
+        });
+      }
     }
 
     return comments;
@@ -508,7 +518,7 @@ export class PoemAPI {
    **/
   async getCommentsCount({ poemId }: { poemId: string }) {
     const cacheKey = `commensCount:poemId:${poemId}`;
-    const cached = await this.cache?.get<number>({ key: cacheKey });
+    const cached = await this.cache.get<number>({ key: cacheKey });
     if (cached) return cached;
 
     const count = await this.prisma.comment.count({
@@ -518,6 +528,7 @@ export class PoemAPI {
     });
 
     await this.cache.set({ key: cacheKey, value: count });
+    await this.cache.sAdd({ setKey: `poem:${poemId}:queries`, cacheKey });
 
     return count;
   }
@@ -526,20 +537,28 @@ export class PoemAPI {
    * Returns a Collection object matching the provided id
    * @param id - collection id
    **/
-  async getCollection({ id }: { id: string }) {
+  async getCollection({
+    id,
+  }: {
+    id: string;
+  }): Promise<CollectionWithRelations | null> {
     const cacheKey = `collection:id:${id}`;
-    const cached = await this.cache.get<CollectionModel>({ key: cacheKey });
+    const cached = await this.cache.get<CollectionWithRelations>({
+      key: cacheKey,
+    });
     if (cached) return cached;
     const collection = await this.prisma.collection.findUnique({
       where: { id: id },
       include: { author: true, poems: true },
     });
 
-    await this.cache.set({ key: cacheKey, value: collection });
-    await this.cache.sAdd({
-      setKey: `collection:${collection.id}:queries`,
-      cacheKey,
-    });
+    if (collection) {
+      await this.cache.set({ key: cacheKey, value: collection });
+      await this.cache.sAdd({
+        setKey: `collection:${collection.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return collection;
   }
@@ -558,7 +577,13 @@ export class PoemAPI {
     limit?: number;
     cursor?: string;
     filter?: GetCollectionsFilter;
-  }) {
+  }): Promise<CollectionWithRelations[] | null> {
+    const cacheKey = `collections:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : null}:filter:${filter ? JSON.stringify(filter) : "null"}`;
+    const cached = await this.cache.getAll<CollectionWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) return cached;
+
     const queryFilter: Prisma.CollectionWhereInput = filter
       ? {
           ...(filter.authorId ? { authorId: filter.authorId } : {}),
@@ -597,18 +622,18 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `collections:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : null}:filter:${filter ? JSON.stringify(filter) : "null"}`;
-    const cached = await this.cache.getAll<CollectionModel>({ key: cacheKey });
-    if (cached) return cached;
+    const collections = (await this.prisma.collection.findMany(
+      queryOptions,
+    )) as CollectionWithRelations[];
 
-    const collections = await this.prisma.collection.findMany(queryOptions);
-
-    await this.cache.hSetArray({ key: cacheKey, valueArray: collections });
-    for (const collection of collections) {
-      await this.cache.sAdd({
-        setKey: `collection:${collection.id}:queries`,
-        cacheKey,
-      });
+    if (collections) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: collections });
+      for (const collection of collections) {
+        await this.cache.sAdd({
+          setKey: `collection:${collection.id}:queries`,
+          cacheKey,
+        });
+      }
     }
 
     return collections;
@@ -618,9 +643,9 @@ export class PoemAPI {
    * Returns a Like object matching the provided id
    * @param id - like id
    **/
-  async getLike({ id }: { id: string }) {
+  async getLike({ id }: { id: string }): Promise<LikeWithRelations | null> {
     const cacheKey = `like:id:${id}`;
-    const cached = await this.cache.get({ key: cacheKey });
+    const cached = await this.cache.get<LikeWithRelations>({ key: cacheKey });
     if (cached) return cached;
 
     const like = await this.prisma.like.findUnique({
@@ -633,8 +658,10 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.set({ key: cacheKey, value: like });
-    await this.cache.sAdd({ setKey: `like:${like.id}:queries`, cacheKey });
+    if (like) {
+      await this.cache.set({ key: cacheKey, value: like });
+      await this.cache.sAdd({ setKey: `like:${like.id}:queries`, cacheKey });
+    }
 
     return like;
   }
@@ -656,7 +683,13 @@ export class PoemAPI {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }) {
+  }): Promise<LikeWithRelations[] | null> {
+    const cacheKey = `likes:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
+    const cached = await this.cache.getAll<LikeWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) return cached;
+
     const queryFilter: Prisma.LikeWhereInput = {
       ...(authorId ? { authorId } : {}),
       ...(poemId ? { poemId } : {}),
@@ -681,15 +714,15 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `likes:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
-    const cached = await this.cache.getAll<LikeModel>({ key: cacheKey });
-    if (cached) return cached;
+    const likes = (await this.prisma.like.findMany(
+      queryOptions,
+    )) as LikeWithRelations[];
 
-    const likes = await this.prisma.like.findMany(queryOptions);
-
-    await this.cache.hSetArray({ key: cacheKey, valueArray: likes });
-    for (const like of likes) {
-      await this.cache.sAdd({ setKey: `like:${like.id}:queries`, cacheKey });
+    if (likes) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: likes });
+      for (const like of likes) {
+        await this.cache.sAdd({ setKey: `like:${like.id}:queries`, cacheKey });
+      }
     }
 
     return likes;
@@ -713,6 +746,7 @@ export class PoemAPI {
     });
 
     await this.cache.set({ key: cacheKey, value: count });
+    await this.cache.sAdd({ setKey: `poem:${poemId}:queries`, cacheKey });
 
     return count;
   }
@@ -721,9 +755,15 @@ export class PoemAPI {
    * Returns a SavedPoem object matching the provided id
    * @param id - SavedPoem id
    **/
-  async getSavedPoem({ id }: { id: string }) {
+  async getSavedPoem({
+    id,
+  }: {
+    id: string;
+  }): Promise<SavedPoemWithRelations | null> {
     const cacheKey = `savedPoem:id:${id}`;
-    const cached = await this.cache.get<SavedPoemModel>({ key: cacheKey });
+    const cached = await this.cache.get<SavedPoemWithRelations>({
+      key: cacheKey,
+    });
     if (cached) return cached;
 
     const savedPoem = await this.prisma.savedPoem.findUnique({
@@ -734,11 +774,13 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.set({ key: cacheKey, value: savedPoem });
-    await this.cache.sAdd({
-      setKey: `savedPoem:${savedPoem.id}:queries`,
-      cacheKey,
-    });
+    if (savedPoem) {
+      await this.cache.set({ key: cacheKey, value: savedPoem });
+      await this.cache.sAdd({
+        setKey: `savedPoem:${savedPoem.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return savedPoem;
   }
@@ -760,7 +802,13 @@ export class PoemAPI {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }) {
+  }): Promise<SavedPoemWithRelations[] | null> {
+    const cacheKey = `savedPoems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
+    const cached = await this.cache.getAll<SavedPoemWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) return cached;
+
     const queryFilter: Prisma.SavedPoemWhereInput = {
       ...(authorId ? { authorId } : {}),
       ...(poemId ? { poemId } : {}),
@@ -784,25 +832,25 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `savedPoems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
-    const cached = await this.cache.getAll<SavedPoemModel>({ key: cacheKey });
-    if (cached) return cached;
+    const savedPoems = (await this.prisma.savedPoem.findMany(
+      queryOptions,
+    )) as SavedPoemWithRelations[];
 
-    const savedPoems = await this.prisma.savedPoem.findMany(queryOptions);
-
-    await this.cache.hSetArray({ key: cacheKey, valueArray: savedPoems });
-    for (const savedPoem of savedPoems) {
-      await this.cache.sAdd({
-        setKey: `savedPoem:${savedPoem.id}:queries`,
-        cacheKey,
-      });
+    if (savedPoems) {
+      await this.cache.hSetArray({ key: cacheKey, valueArray: savedPoems });
+      for (const savedPoem of savedPoems) {
+        await this.cache.sAdd({
+          setKey: `savedPoem:${savedPoem.id}:queries`,
+          cacheKey,
+        });
+      }
     }
 
     return savedPoems;
   }
 
   /**
-   * Returns the number of SavedPoem objects for a Pome matching the given id
+   * Returns the number of SavedPoem objects for a Poem matching the given id
    * @param poemId - poem to filter by
    **/
   async getSavedPoemsCount({ poemId }: { poemId: string }) {
@@ -817,6 +865,7 @@ export class PoemAPI {
     });
 
     await this.cache.set({ key: cacheKey, value: count });
+    await this.cache.sAdd({ setKey: `poem:${poemId}:queries`, cacheKey });
 
     return count;
   }
@@ -825,9 +874,15 @@ export class PoemAPI {
    * Returns a FollowedAuthor object matching the given id
    * @param id - FollowedAuthor id
    **/
-  async getFollowedAuthor({ id }: { id: string }) {
+  async getFollowedAuthor({
+    id,
+  }: {
+    id: string;
+  }): Promise<FollowedAuthorWithRelations | null> {
     const cacheKey = `followedAuthor:id:${id}`;
-    const cached = await this.cache.get<FollowedAuthorModel>({ key: cacheKey });
+    const cached = await this.cache.get<FollowedAuthorWithRelations>({
+      key: cacheKey,
+    });
     if (cached) return cached;
 
     const followedAuthor = await this.prisma.followedAuthor.findUnique({
@@ -838,11 +893,13 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.set({ key: cacheKey, value: followedAuthor });
-    await this.cache.sAdd({
-      setKey: `followedAuthor:${followedAuthor.id}:queries`,
-      cacheKey,
-    });
+    if (followedAuthor) {
+      await this.cache.set({ key: cacheKey, value: followedAuthor });
+      await this.cache.sAdd({
+        setKey: `followedAuthor:${followedAuthor.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return followedAuthor;
   }
@@ -862,7 +919,13 @@ export class PoemAPI {
     followingId?: string;
     limit?: number;
     cursor?: string;
-  }) {
+  }): Promise<FollowedAuthorWithRelations[] | null> {
+    const cacheKey = `followedAuthors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:followerId:${followerId ? followerId : "null"}:followingId:${followingId ? followingId : "null"}`;
+    const cached = await this.cache.getAll<FollowedAuthorWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) return cached;
+
     const queryFilter: Prisma.FollowedAuthorWhereInput = {
       ...(followerId ? { followerId } : {}),
       ...(followingId ? { followingId } : {}),
@@ -887,20 +950,17 @@ export class PoemAPI {
       queryOptions.skip = 1;
     }
 
-    const cacheKey = `followedAuthors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:followerId:${followerId ? followerId : "null"}:followingId:${followingId ? followingId : "null"}`;
-    const cached = await this.cache.getAll<FollowedAuthorModel>({
-      key: cacheKey,
-    });
-    if (cached) return cached;
+    const followedAuthors = (await this.prisma.followedAuthor.findMany(
+      queryOptions,
+    )) as FollowedAuthorWithRelations[];
 
-    const followedAuthors =
-      await this.prisma.followedAuthor.findMany(queryOptions);
-
-    for (const followedAuthor of followedAuthors) {
-      await this.cache.sAdd({
-        setKey: `followedAuthor:${followedAuthor.id}:queries`,
-        cacheKey,
-      });
+    if (followedAuthors) {
+      for (const followedAuthor of followedAuthors) {
+        await this.cache.sAdd({
+          setKey: `followedAuthor:${followedAuthor.id}:queries`,
+          cacheKey,
+        });
+      }
     }
 
     return followedAuthors;
@@ -930,6 +990,16 @@ export class PoemAPI {
     });
 
     await this.cache.set({ key: cacheKey, value: count });
+    if (followerId)
+      await this.cache.sAdd({
+        setKey: `author:${followerId}:queries`,
+        cacheKey,
+      });
+    if (followingId)
+      await this.cache.sAdd({
+        setKey: `author:${followingId}:queries`,
+        cacheKey,
+      });
 
     return count;
   }
@@ -975,10 +1045,18 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.delByPattern({ pattern: "poem:limit:*" });
-    await this.removeRelations({ id: poem.author.id, name: "author" });
-    if (poem.inCollection)
-      await this.removeRelations({ id: poem.collectionId, name: "collection" });
+    if (poem) {
+      await this.cache.delByPattern({ pattern: "poem:limit:*" });
+      await this.cache.removeRelations({ id: poem.author.id, name: "author" });
+      if (poem.inCollection)
+        await this.cache.removeRelations({
+          id: poem.collectionId,
+          name: "collection",
+        });
+
+      const cacheKey = `poem:id:${poem.id}`;
+      await this.cache.set({ key: cacheKey, value: poem });
+    }
 
     return poem;
   }
@@ -1034,9 +1112,18 @@ export class PoemAPI {
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
 
-    const cacheKey = `author:id:${author.id}`;
-    await this.removeRelations({ id: author.id, name: "author" });
-    await this.cache.set({ key: cacheKey, value: copy });
+    if (author) {
+      // nuke all batch author queries
+      await this.cache.delByPattern({ pattern: "author:limit:*" });
+
+      // cache new author
+      const cacheKey = `author:id:${author.id}`;
+      await this.cache.set({ key: cacheKey, value: copy });
+      await this.cache.sAdd({
+        setKey: `author:${author.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return copy;
   }
@@ -1070,8 +1157,17 @@ export class PoemAPI {
       },
     });
 
-    await this.removeRelations({ id: comment.authorId, name: "author" });
-    await this.removeRelations({ id: comment.poemId, name: "poem" });
+    if (comment) {
+      await this.cache.delByPattern({ pattern: "comments:limit:*" });
+      await this.cache.removeRelations({
+        id: comment.authorId,
+        name: "author",
+      });
+      await this.cache.removeRelations({ id: comment.poemId, name: "poem" });
+
+      const cacheKey = `comment:id:${comment.id}`;
+      await this.cache.set({ key: cacheKey, value: comment });
+    }
 
     return comment;
   }
@@ -1095,8 +1191,16 @@ export class PoemAPI {
       include: { poems: true, author: true },
     });
 
-    await this.cache.delByPattern({ pattern: "collections:limit:*" });
-    await this.removeRelations({ id: collection.authorId, name: "author" });
+    if (collection) {
+      await this.cache.delByPattern({ pattern: "collections:limit:*" });
+      await this.cache.removeRelations({
+        id: collection.authorId,
+        name: "author",
+      });
+
+      const cacheKey = `collection:id:${collection.id}`;
+      await this.cache.set({ key: cacheKey, value: collection });
+    }
 
     return collection;
   }
@@ -1126,9 +1230,17 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.delByPattern({ pattern: "savedPoems:limit:*" });
-    await this.removeRelations({ id: savedPoem.poemId, name: "poem" });
-    await this.removeRelations({ id: savedPoem.authorId, name: "author" });
+    if (savedPoem) {
+      await this.cache.delByPattern({ pattern: "savedPoems:limit:*" });
+      await this.cache.removeRelations({ id: savedPoem.poemId, name: "poem" });
+      await this.cache.removeRelations({
+        id: savedPoem.authorId,
+        name: "author",
+      });
+
+      const cacheKey = `savedPoem:id:${savedPoem.id}`;
+      await this.cache.set({ key: cacheKey, value: savedPoem });
+    }
 
     return savedPoem;
   }
@@ -1152,9 +1264,14 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.delByPattern({ pattern: "like:limit:*" });
-    await this.removeRelations({ id: like.poemId, name: "poem" });
-    await this.removeRelations({ id: like.authorId, name: "author" });
+    if (like) {
+      await this.cache.delByPattern({ pattern: "like:limit:*" });
+      await this.cache.removeRelations({ id: like.poemId, name: "poem" });
+      await this.cache.removeRelations({ id: like.authorId, name: "author" });
+
+      const cacheKey = `like:id:${like.id}`;
+      await this.cache.set({ key: cacheKey, value: like });
+    }
 
     return like;
   }
@@ -1188,15 +1305,17 @@ export class PoemAPI {
       },
     });
 
-    await this.cache.delByPattern({ pattern: "followedAuthor:limit:*" });
-    await this.removeRelations({
-      id: followedAuthor.followerId,
-      name: "author",
-    });
-    await this.removeRelations({
-      id: followedAuthor.followingId,
-      name: "author",
-    });
+    if (followedAuthor) {
+      await this.cache.delByPattern({ pattern: "followedAuthor:limit:*" });
+      await this.cache.removeRelations({
+        id: followedAuthor.followerId,
+        name: "author",
+      });
+      await this.cache.removeRelations({
+        id: followedAuthor.followingId,
+        name: "author",
+      });
+    }
 
     return followedAuthor;
   }
@@ -1231,12 +1350,42 @@ export class PoemAPI {
         id: poemId,
       },
       data,
+      include: {
+        inCollection: true,
+        likes: true,
+        author: true,
+        comments: true,
+        savedBy: true,
+      },
     });
 
-    await this.cache.delByPattern({ pattern: "poems:limit:*" });
-    await this.removeRelations({ id: poem.authorId, name: "author" });
-    if (poem.collectionId)
-      await this.removeRelations({ id: poem.collectionId, name: "collection" });
+    if (poem) {
+      // clear cache
+      await this.cache.delByPattern({ pattern: "poems:limit:*" });
+      await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      await this.cache.removeRelations({ id: poem.authorId, name: "author" });
+      if (poem.collectionId)
+        await this.cache.removeRelations({
+          id: poem.collectionId,
+          name: "collection",
+        });
+      for (const comment of poem.comments) {
+        await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      }
+      for (const like of poem.likes) {
+        await this.cache.removeRelations({ id: like.id, name: "like" });
+      }
+      for (const savedPoem of poem.savedBy) {
+        await this.cache.removeRelations({
+          id: savedPoem.id,
+          name: "savedPoem",
+        });
+      }
+
+      // cache updated poem
+      const cacheKey = `poem:id:${poem.id}`;
+      await this.cache.set({ key: cacheKey, value: poem });
+    }
 
     return poem;
   }
@@ -1254,9 +1403,37 @@ export class PoemAPI {
       data: {
         views: { increment: 1 },
       },
+      include: {
+        comments: true,
+        inCollection: true,
+        author: true,
+        likes: true,
+        savedBy: true,
+      },
     });
 
-    await this.removeRelations({ id: poem.id, name: "poem" });
+    if (poem) {
+      await this.cache.delByPattern({ pattern: "poems:limit:*" });
+      await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      await this.cache.removeRelations({ id: poem.authorId, name: "author" });
+      if (poem.collectionId)
+        await this.cache.removeRelations({
+          id: poem.collectionId,
+          name: "collection",
+        });
+      for (const comment of poem.comments) {
+        await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      }
+      for (const like of poem.likes) {
+        await this.cache.removeRelations({ id: like.id, name: "like" });
+      }
+      for (const savedPoem of poem.savedBy) {
+        await this.cache.removeRelations({
+          id: savedPoem.id,
+          name: "savedPoem",
+        });
+      }
+    }
 
     return poem;
   }
@@ -1310,12 +1487,62 @@ export class PoemAPI {
       },
       data,
       omit: { password: omitPassword, authVersion: omitAuthVersion },
+      include: {
+        poems: true,
+        likedPoems: true,
+        following: true,
+        followedBy: true,
+        collections: true,
+        savedPoems: true,
+        comments: true,
+      },
     });
-    const cacheKey = `author:id:${author.id}`;
 
-    await this.removeRelations({ id: author.id, name: "author" });
-    await this.cache.set({ key: cacheKey, value: author });
-    await this.cache.sAdd({ setKey: `author:${author.id}:queries`, cacheKey });
+    if (author) {
+      const cacheKey = `author:id:${author.id}`;
+
+      await this.cache.removeRelations({ id: author.id, name: "author" });
+      await this.cache.set({ key: cacheKey, value: author });
+      await this.cache.sAdd({
+        setKey: `author:${author.id}:queries`,
+        cacheKey,
+      });
+      await this.cache.delByPattern({ pattern: "authors:limit:*" });
+
+      for (const poem of author.poems) {
+        await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      }
+      for (const likedPoem of author.likedPoems) {
+        await this.cache.removeRelations({ id: likedPoem.id, name: "like" });
+      }
+      for (const comment of author.comments) {
+        await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      }
+      for (const followedAuthor of author.following) {
+        await this.cache.removeRelations({
+          id: followedAuthor.id,
+          name: "followedAuthor",
+        });
+      }
+      for (const followedAuthor of author.followedBy) {
+        await this.cache.removeRelations({
+          id: followedAuthor.id,
+          name: "followedAuthor",
+        });
+      }
+      for (const collection of author.collections) {
+        await this.cache.removeRelations({
+          id: collection.id,
+          name: "collection",
+        });
+      }
+      for (const savedPoem of author.savedPoems) {
+        await this.cache.removeRelations({
+          id: savedPoem.id,
+          name: "savedPoem",
+        });
+      }
+    }
 
     return author;
   }
@@ -1334,15 +1561,33 @@ export class PoemAPI {
         id,
       },
       data: { title },
+      include: {
+        author: true,
+        poems: true,
+      },
     });
 
-    const cacheKey = `collection:id:${collection.id}`;
-    await this.removeRelations({ id: collection.id, name: "collection" });
-    await this.cache.set({ key: cacheKey, value: collection });
-    await this.cache.sAdd({
-      setKey: `collection:${collection.id}:queries`,
-      cacheKey,
-    });
+    if (collection) {
+      await this.cache.delByPattern({ pattern: "collections:limit:*" });
+      await this.cache.removeRelations({
+        id: collection.id,
+        name: "collection",
+      });
+      await this.cache.removeRelations({
+        id: collection.authorId,
+        name: "author",
+      });
+      for (const poem of collection.poems) {
+        await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      }
+
+      const cacheKey = `collection:id:${collection.id}`;
+      await this.cache.set({ key: cacheKey, value: collection });
+      await this.cache.sAdd({
+        setKey: `collection:${collection.id}:queries`,
+        cacheKey,
+      });
+    }
 
     return collection;
   }
@@ -1363,9 +1608,48 @@ export class PoemAPI {
         likedPoems: true,
         collections: true,
         comments: true,
+        followedBy: true,
+        following: true,
       },
       omit: { password: true },
     });
+
+    if (author) {
+      await this.cache.removeRelations({ id: author.id, name: "author" });
+      for (const poem of author.poems) {
+        await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      }
+      for (const collection of author.collections) {
+        await this.cache.removeRelations({
+          id: collection.id,
+          name: "collection",
+        });
+      }
+      for (const savedPoem of author.savedPoems) {
+        await this.cache.removeRelations({
+          id: savedPoem.id,
+          name: "savedPoem",
+        });
+      }
+      for (const likedPoem of author.likedPoems) {
+        await this.cache.removeRelations({ id: likedPoem.id, name: "like" });
+      }
+      for (const comment of author.comments) {
+        await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      }
+      for (const followedAuthor of author.followedBy) {
+        await this.cache.removeRelations({
+          id: followedAuthor.id,
+          name: "followedAuthor",
+        });
+      }
+      for (const followedAuthor of author.following) {
+        await this.cache.removeRelations({
+          id: followedAuthor.id,
+          name: "followedAuthor",
+        });
+      }
+    }
 
     return author;
   }
@@ -1380,7 +1664,33 @@ export class PoemAPI {
       where: {
         id,
       },
+      include: {
+        comments: true,
+        likes: true,
+        savedBy: true,
+      },
     });
+
+    if (poem) {
+      await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      await this.cache.removeRelations({
+        id: poem.collectionId,
+        name: "collection",
+      });
+      await this.cache.removeRelations({ id: poem.authorId, name: "author" });
+      for (const comment of poem.comments) {
+        await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      }
+      for (const like of poem.likes) {
+        await this.cache.removeRelations({ id: like.id, name: "like" });
+      }
+      for (const savedPoem of poem.savedBy) {
+        await this.cache.removeRelations({
+          id: savedPoem.id,
+          name: "savedPoem",
+        });
+      }
+    }
 
     return poem;
   }
@@ -1397,6 +1707,15 @@ export class PoemAPI {
       },
     });
 
+    if (comment) {
+      await this.cache.removeRelations({ id: comment.id, name: "comment" });
+      await this.cache.removeRelations({
+        id: comment.authorId,
+        name: "author",
+      });
+      await this.cache.removeRelations({ id: comment.poemId, name: "author" });
+    }
+
     return comment;
   }
 
@@ -1410,7 +1729,24 @@ export class PoemAPI {
       where: {
         id,
       },
+      include: {
+        poems: true,
+      },
     });
+
+    if (collection) {
+      await this.cache.removeRelations({
+        id: collection.id,
+        name: "collection",
+      });
+      await this.cache.removeRelations({
+        id: collection.authorId,
+        name: "author",
+      });
+      for (const poem of collection.poems) {
+        await this.cache.removeRelations({ id: poem.id, name: "poem" });
+      }
+    }
 
     return collection;
   }
@@ -1427,6 +1763,12 @@ export class PoemAPI {
       },
     });
 
+    if (like) {
+      await this.cache.removeRelations({ id: like.id, name: "like" });
+      await this.cache.removeRelations({ id: like.authorId, name: "author" });
+      await this.cache.removeRelations({ id: like.poemId, name: "poem" });
+    }
+
     return like;
   }
 
@@ -1442,6 +1784,18 @@ export class PoemAPI {
       },
     });
 
+    if (savedPoem) {
+      await this.cache.removeRelations({ id: savedPoem.id, name: "savedPoem" });
+      await this.cache.removeRelations({
+        id: savedPoem.authorId,
+        name: "savedPoem",
+      });
+      await this.cache.removeRelations({
+        id: savedPoem.poemId,
+        name: "savedPoem",
+      });
+    }
+
     return savedPoem;
   }
 
@@ -1456,6 +1810,21 @@ export class PoemAPI {
         id,
       },
     });
+
+    if (followedAuthor) {
+      await this.cache.removeRelations({
+        id: followedAuthor.id,
+        name: "followedAuthor",
+      });
+      await this.cache.removeRelations({
+        id: followedAuthor.followerId,
+        name: "author",
+      });
+      await this.cache.removeRelations({
+        id: followedAuthor.followingId,
+        name: "author",
+      });
+    }
 
     return followedAuthor;
   }

@@ -5,21 +5,22 @@ import { v4 } from "uuid";
 import argon2 from "argon2";
 
 import {
-  AuthorIncludes,
-  AuthorWithPasswordIncludes,
-} from "../../types/extended-types.js";
-
-import {
   createAuthorInputObject,
   createCollectionInputObject,
   createCommentInputObject,
   createPoemInputObject,
 } from "../../utils/tests/poem-api-test-utils.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 describe("Prisma PoemAPI Integration Tests", () => {
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "poemAPI" });
+  const poemAPI = new PoemAPI(prisma, cache);
 
   const testId = v4(); // for testing with invalid ids
+
+  beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
+  });
 
   test("getPoem, succeeds", async () => {
     const testAuthor = await poemAPI.createAuthor(createAuthorInputObject());
@@ -418,9 +419,9 @@ describe("Prisma PoemAPI Integration Tests", () => {
 
     // get followerIds form linus
     const followedAuthorIds = (
-      (await poemAPI.getAuthorById({
+      await poemAPI.getAuthorById({
         id: followedAuthor.id,
-      })) as AuthorIncludes
+      })
     ).followedBy.map((followedAuthor) => followedAuthor.followerId);
 
     // make sure pelle and kalle follow linus

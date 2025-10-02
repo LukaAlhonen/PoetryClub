@@ -5,14 +5,17 @@ import { PoemAPI } from "../../datasources/poem-api.js";
 import { GetLikesQuery, GetLikeQuery } from "../../__generated__/graphql.js";
 
 import { GET_LIKE, GET_LIKES } from "../../__tests__/queries/index.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 describe("Graphql Mutation integration tests", () => {
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "Like" });
+  const poemAPI = new PoemAPI(prisma, cache);
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   let likes: NonNullable<GetLikesQuery["likes"]> = [];
 
   beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ poemAPI });
     await seed({ prisma });
     const response = await testServer.executeOperation<GetLikesQuery>({

@@ -78,6 +78,7 @@ import { GET_POEM } from "../../__tests__/queries/poem.js";
 import { GET_SAVED_POEM } from "../../__tests__/queries/savedPoem.js";
 import { LOGOUT } from "../../__tests__/mutations/logout.js";
 import { INCREMENT_POEM_VIEWS } from "../../__tests__/mutations/incrementPoemViews.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 const testLogin = async ({
   username = "author1",
@@ -117,7 +118,8 @@ describe("Graphql Mutation integration tests", () => {
   // 3 followed authors
   // 4 likes
   // 4 savedPoems
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "Mutation" });
+  const poemAPI = new PoemAPI(prisma, cache);
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
   let poems: PoemModel[] = [];
   let authors: AuthorModel[] = [];
@@ -128,6 +130,7 @@ describe("Graphql Mutation integration tests", () => {
   let followedAuthors: FollowedAuthorModel[] = [];
 
   beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ poemAPI });
     const result = await seed({ prisma });
     poems = result.poems;

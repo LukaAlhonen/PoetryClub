@@ -11,6 +11,7 @@ import {
   GET_FOLLOWED_AUTHOR,
   GET_FOLLOWED_AUTHORS,
 } from "../../__tests__/queries/index.js";
+import { CacheAPI } from "../../cache/cache-api.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -21,13 +22,15 @@ describe("Graphql Mutation integration tests", () => {
   // 3 followed authors
   // 4 likes
   // 4 savedPoems
-  const poemAPI = new PoemAPI(prisma);
+  const cache = new CacheAPI({ prefix: "FollowedAuthor" });
+  const poemAPI = new PoemAPI(prisma, cache);
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   let followedAuthors: NonNullable<GetFollowedAuthorsQuery["followedAuthors"]> =
     [];
 
   beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ poemAPI });
     await seed({ prisma });
     const response = await testServer.executeOperation<GetFollowedAuthorsQuery>(
