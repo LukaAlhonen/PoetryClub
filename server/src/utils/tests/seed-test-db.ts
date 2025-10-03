@@ -9,15 +9,32 @@ import {
   SavedPoemModel,
 } from "../../models.js";
 import argon2 from "argon2";
+import {
+  AuthorWithRelations,
+  CollectionWithRelations,
+  CommentWithRelations,
+  FollowedAuthorWithRelations,
+  LikeWithRelations,
+  PoemWithRelations,
+  SavedPoemWithRelations,
+} from "../../types/extended-types.js";
 
 export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
-  const poems: PoemModel[] = [];
-  const collections: CollectionModel[] = [];
-  const authors: AuthorModel[] = [];
-  const comments: CommentModel[] = [];
-  const likes: LikeModel[] = [];
-  const savedPoems: SavedPoemModel[] = [];
-  let followedAuthors: FollowedAuthorModel[] = [];
+  // const poems: PoemModel[] = [];
+  // const collections: CollectionModel[] = [];
+  // const authors: AuthorModel[] = [];
+  // const comments: CommentModel[] = [];
+  // const likes: LikeModel[] = [];
+  // const savedPoems: SavedPoemModel[] = [];
+  // let followedAuthors: FollowedAuthorModel[] = [];
+  const poems: PoemWithRelations[] = [];
+  const collections: CollectionWithRelations[] = [];
+  const authors: AuthorWithRelations[] = [];
+  const comments: CommentWithRelations[] = [];
+  const likes: LikeWithRelations[] = [];
+  const savedPoems: SavedPoemWithRelations[] = [];
+  let followedAuthors: FollowedAuthorWithRelations[] = [];
+
   await prisma.$transaction(async (tx) => {
     const pwdHash = await argon2.hash("password", { type: argon2.argon2id });
     // create authors
@@ -29,7 +46,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
           password: pwdHash,
         },
       });
-      authors.push(author);
+      authors.push(author as AuthorWithRelations);
     }
 
     // create poems 2 poems per author and 1 collection
@@ -41,7 +58,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
           authorId: author.id,
         },
       });
-      collections.push(collection);
+      collections.push(collection as CollectionWithRelations);
 
       for (let i = 0; i < 2; i++) {
         const poem = await tx.poem.create({
@@ -52,7 +69,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
             collectionId: collection.id,
           },
         });
-        poems.push(poem);
+        poems.push(poem as PoemWithRelations);
       }
     }
 
@@ -80,7 +97,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
             authorId: poem.authorId,
           },
         });
-        comments.push(comment);
+        comments.push(comment as CommentWithRelations);
       }
     }
 
@@ -115,7 +132,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
           poemId: poem.id,
         },
       });
-      likes.push(like);
+      likes.push(like as LikeWithRelations);
 
       const savedPoem = await tx.savedPoem.create({
         data: {
@@ -123,11 +140,11 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
           authorId: poem.authorId,
         },
       });
-      savedPoems.push(savedPoem);
+      savedPoems.push(savedPoem as SavedPoemWithRelations);
     }
 
     // make all authors follow each other
-    followedAuthors = await tx.followedAuthor.createManyAndReturn({
+    followedAuthors = (await tx.followedAuthor.createManyAndReturn({
       data: [
         { followerId: authors[0].id, followingId: authors[1].id },
         { followerId: authors[0].id, followingId: authors[2].id },
@@ -145,7 +162,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
         { followerId: authors[3].id, followingId: authors[1].id },
         { followerId: authors[3].id, followingId: authors[2].id },
       ],
-    });
+    })) as FollowedAuthorWithRelations[];
   });
 
   return {

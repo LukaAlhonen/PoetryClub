@@ -1,4 +1,4 @@
-import { Resolvers } from "../types.js";
+import { Resolvers } from "../__generated__/types.js";
 import { DateScalar } from "../scalars/date-scalar.js";
 import { Query } from "./Query.js";
 import { Mutation } from "./Mutation.js";

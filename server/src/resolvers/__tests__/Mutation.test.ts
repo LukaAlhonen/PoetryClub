@@ -4,7 +4,6 @@ import {
 } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
-import { PoemAPI } from "../../datasources/poem-api.js";
 import {
   CreateAuthorMutation,
   CreateCollectionMutation,
@@ -79,6 +78,7 @@ import { GET_SAVED_POEM } from "../../__tests__/queries/savedPoem.js";
 import { LOGOUT } from "../../__tests__/mutations/logout.js";
 import { INCREMENT_POEM_VIEWS } from "../../__tests__/mutations/incrementPoemViews.js";
 import { CacheAPI } from "../../cache/cache-api.js";
+import { createServices } from "../../services/index.js";
 
 const testLogin = async ({
   username = "author1",
@@ -119,7 +119,7 @@ describe("Graphql Mutation integration tests", () => {
   // 4 likes
   // 4 savedPoems
   const cache = new CacheAPI({ prefix: "Mutation" });
-  const poemAPI = new PoemAPI(prisma, cache);
+  const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
   let poems: PoemModel[] = [];
   let authors: AuthorModel[] = [];
@@ -131,7 +131,7 @@ describe("Graphql Mutation integration tests", () => {
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
-    testServer = await createTestServer({ poemAPI });
+    testServer = await createTestServer({ services });
     const result = await seed({ prisma });
     poems = result.poems;
     authors = result.authors;
@@ -1630,6 +1630,7 @@ describe("Graphql Mutation integration tests", () => {
 
       if (errors) console.error(errors);
 
+      console.log(collection, errors);
       expect(collection).toBeDefined();
 
       // make sure collection was updated

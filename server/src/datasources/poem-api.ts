@@ -44,38 +44,6 @@ export class PoemAPI {
     });
   }
 
-  private async removeRelations({
-    id,
-    name,
-  }: {
-    id: string;
-    name:
-      | "author"
-      | "poem"
-      | "comment"
-      | "collection"
-      | "like"
-      | "savedPoem"
-      | "followedAuthor";
-  }) {
-    const keys = await this.cache.sMembers({
-      setKey: `${name}:${id}:queries`,
-    });
-
-    const pipeline = this.cache.pipeline();
-
-    if (keys.length > 0) {
-      for (const key of keys) pipeline.del(key);
-      await pipeline.exec();
-    }
-
-    pipeline.del(`${name}:id:${id}`);
-
-    pipeline.del(`${name}:${id}:queries`);
-
-    await pipeline.exec();
-  }
-
   /**
    * Returns an array of Poem objects,
    * optionally filter by authorId, authorNameContains, collectionId, textContains, titleContains

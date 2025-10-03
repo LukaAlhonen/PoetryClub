@@ -1,12 +1,11 @@
 import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
-import { PoemAPI } from "../../datasources/poem-api.js";
 import { GetPoemQuery, GetPoemsQuery } from "../../__generated__/graphql.js";
-import { TestServer } from "../../utils/tests/apollo-test-server.js";
 
 import { GET_POEM, GET_POEMS } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
+import { createServices } from "../../services/index.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -18,14 +17,14 @@ describe("Graphql Mutation integration tests", () => {
   // 4 likes
   // 4 savedPoems
   const cache = new CacheAPI({ prefix: "Poem" });
-  const poemAPI = new PoemAPI(prisma, cache);
+  const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   let poems: NonNullable<GetPoemsQuery["poems"]> = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
-    testServer = await createTestServer({ poemAPI });
+    testServer = await createTestServer({ services });
     await seed({ prisma });
     const response = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,

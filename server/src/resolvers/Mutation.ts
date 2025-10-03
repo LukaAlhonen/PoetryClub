@@ -4,7 +4,7 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import config from "../config.js";
 import { MyJwtPayload } from "../types/auth.js";
-import { PoemAPI } from "../datasources/poem-api.js";
+import { AuthorService } from "../services/author.service.js";
 import { randomUUID } from "node:crypto";
 
 /**
@@ -14,13 +14,13 @@ import { randomUUID } from "node:crypto";
  **/
 const verifyUser = async ({
   user,
-  poemAPI,
+  authorService,
 }: {
   user: MyJwtPayload;
-  poemAPI: PoemAPI;
+  authorService: AuthorService;
 }) => {
   if (!user) throw new Error("not authenticated");
-  const author = await poemAPI.getAuthorById({
+  const author = await authorService.getAuthorById({
     id: user.authorId,
     omitAuthVersion: false,
   });
@@ -31,11 +31,11 @@ const verifyUser = async ({
 
 export const Mutation: Resolvers["Mutation"] = {
   // Create
-  createPoem: async (_, { input }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createPoem: async (_, { input }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createPoem({
+      return services.poemService.createPoem({
         ...input,
         authorId: user.authorId,
       });
@@ -44,19 +44,23 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createAuthor: (_, { input }, { dataSources }) => {
+  createAuthor: (_, { input }, { dataSources, services }) => {
     try {
-      return dataSources.poemAPI.createAuthor(input);
+      return services.authorService.createAuthor(input);
     } catch (err) {
       handlePrismaError(err, "createAuthor");
     }
   },
 
-  createComment: async (_, { poemId, text }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createComment: async (
+    _,
+    { poemId, text },
+    { user, dataSources, services },
+  ) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createComment({
+      return services.commentService.createComment({
         poemId,
         text,
         authorId: user.authorId,
@@ -66,11 +70,11 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createCollection: async (_, { title }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createCollection: async (_, { title }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createCollection({
+      return services.collectionService.createCollection({
         title,
         authorId: user.authorId,
       });
@@ -79,11 +83,11 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createSavedPoem: async (_, { poemId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createSavedPoem: async (_, { poemId }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createSavedPoem({
+      return services.savedPoemService.createSavedPoem({
         poemId,
         authorId: user.authorId,
       });
@@ -92,11 +96,11 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createLike: async (_, { poemId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createLike: async (_, { poemId }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createLike({
+      return services.likeService.createLike({
         poemId,
         authorId: user.authorId,
       });
@@ -105,11 +109,15 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createFollowedAuthor: async (_, { followingId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  createFollowedAuthor: async (
+    _,
+    { followingId },
+    { user, dataSources, services },
+  ) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.createFollowedAuthor({
+      return services.followedAuthorService.createFollowedAuthor({
         authorId: user.authorId,
         followingId,
       });
@@ -119,29 +127,29 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   // Update
-  updatePoem: async (_, { input }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  updatePoem: async (_, { input }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
-    const poem = await dataSources.poemAPI.getPoem({ id: input.poemId });
+    const poem = await services.poemService.getPoem({ id: input.poemId });
 
     if (poem.authorId !== user.authorId) {
       throw new Error("not authorised");
     }
 
     try {
-      return dataSources.poemAPI.updatePoem(input);
+      return services.poemService.updatePoem(input);
     } catch (err) {
       handlePrismaError(err, "updatePoem");
     }
   },
 
-  updateAuthor: async (_, { input }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  updateAuthor: async (_, { input }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     const authVersion = randomUUID();
 
     try {
-      return dataSources.poemAPI.updateAuthor({
+      return services.authorService.updateAuthor({
         authorId: user.authorId,
         authVersion,
         ...input,
@@ -151,10 +159,10 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  updateCollection: async (_, { input }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  updateCollection: async (_, { input }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
-    const collection = await dataSources.poemAPI.getCollection({
+    const collection = await services.collectionService.getCollection({
       id: input.id,
     });
 
@@ -163,28 +171,28 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.updateCollection(input);
+      return services.collectionService.updateCollection(input);
     } catch (err) {
       handlePrismaError(err, "updateCollection");
     }
   },
 
   // Remove
-  removeAuthor: async (_, __, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removeAuthor: async (_, __, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return dataSources.poemAPI.removeAuthor({ id: user.authorId });
+      return services.authorService.removeAuthor({ id: user.authorId });
     } catch (err) {
       handlePrismaError(err, "removeAuthor");
     }
   },
 
-  removePoem: async (_, { poemId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removePoem: async (_, { poemId }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const poem = await dataSources.poemAPI.getPoem({ id: poemId });
+      const poem = await services.poemService.getPoem({ id: poemId });
 
       if (poem.authorId !== user.authorId) {
         throw new Error("not authorised");
@@ -194,17 +202,19 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removePoem({ id: poemId });
+      return services.poemService.removePoem({ id: poemId });
     } catch (err) {
       handlePrismaError(err, "removePoem");
     }
   },
 
-  removeComment: async (_, { commentId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removeComment: async (_, { commentId }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const comment = await dataSources.poemAPI.getComment({ id: commentId });
+      const comment = await services.commentService.getComment({
+        id: commentId,
+      });
 
       if (comment.authorId !== user.authorId) {
         throw new Error("not authorised");
@@ -214,17 +224,21 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removeComment({ id: commentId });
+      return services.commentService.removeComment({ id: commentId });
     } catch (err) {
       handlePrismaError(err, "removeComment");
     }
   },
 
-  removeCollection: async (_, { collectionId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removeCollection: async (
+    _,
+    { collectionId },
+    { user, dataSources, services },
+  ) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const collection = await dataSources.poemAPI.getCollection({
+      const collection = await services.collectionService.getCollection({
         id: collectionId,
       });
 
@@ -236,17 +250,17 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removeCollection({ id: collectionId });
+      return services.collectionService.removeCollection({ id: collectionId });
     } catch (err) {
       handlePrismaError(err, "removeCollection");
     }
   },
 
-  removeLike: async (_, { likeId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removeLike: async (_, { likeId }, { user, dataSources, services }) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const like = await dataSources.poemAPI.getLike({ id: likeId });
+      const like = await services.likeService.getLike({ id: likeId });
 
       if (like.authorId !== user.authorId) {
         throw new Error("not authorised");
@@ -256,17 +270,21 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removeLike({ id: likeId });
+      return services.likeService.removeLike({ id: likeId });
     } catch (err) {
       handlePrismaError(err, "removeLike");
     }
   },
 
-  removeSavedPoem: async (_, { savedPoemId }, { user, dataSources }) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+  removeSavedPoem: async (
+    _,
+    { savedPoemId },
+    { user, dataSources, services },
+  ) => {
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const savedPoem = await dataSources.poemAPI.getSavedPoem({
+      const savedPoem = await services.savedPoemService.getSavedPoem({
         id: savedPoemId,
       });
 
@@ -278,7 +296,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removeSavedPoem({ id: savedPoemId });
+      return services.savedPoemService.removeSavedPoem({ id: savedPoemId });
     } catch (err) {
       handlePrismaError(err, "removeSavedPoem");
     }
@@ -287,14 +305,15 @@ export const Mutation: Resolvers["Mutation"] = {
   removeFollowedAuthor: async (
     _,
     { followedAuthorId },
-    { user, dataSources },
+    { user, dataSources, services },
   ) => {
-    await verifyUser({ user, poemAPI: dataSources.poemAPI });
+    await verifyUser({ user, authorService: services.authorService });
 
     try {
-      const followedAuthor = await dataSources.poemAPI.getFollowedAuthor({
-        id: followedAuthorId,
-      });
+      const followedAuthor =
+        await services.followedAuthorService.getFollowedAuthor({
+          id: followedAuthorId,
+        });
 
       if (followedAuthor.followerId !== user.authorId) {
         throw new Error("not authorised");
@@ -304,23 +323,29 @@ export const Mutation: Resolvers["Mutation"] = {
     }
 
     try {
-      return dataSources.poemAPI.removeFollowedAuthor({ id: followedAuthorId });
+      return services.followedAuthorService.removeFollowedAuthor({
+        id: followedAuthorId,
+      });
     } catch (err) {
       handlePrismaError(err, "removeFollowedAuthor");
     }
   },
 
-  incrementPoemViews: async (_, { poemId }, { dataSources }) => {
+  incrementPoemViews: async (_, { poemId }, { dataSources, services }) => {
     try {
-      return dataSources.poemAPI.incrementPoemViews({ poemId });
+      return services.poemService.incrementPoemViews({ poemId });
     } catch (err) {
       handlePrismaError(err, "incrementPoemViews");
     }
   },
 
   // auth
-  login: async (_, { username, password }, { dataSources, req, res }) => {
-    const author = await dataSources.poemAPI.getAuthorByUsername({
+  login: async (
+    _,
+    { username, password },
+    { dataSources, services, req, res },
+  ) => {
+    const author = await services.authorService.getAuthorByUsername({
       username,
       omitPassword: false,
       omitAuthVersion: false,
@@ -366,15 +391,15 @@ export const Mutation: Resolvers["Mutation"] = {
     return { token: accessToken, author };
   },
 
-  signup: async (_, { input }, { dataSources }) => {
+  signup: async (_, { input }, { dataSources, services }) => {
     try {
-      return dataSources.poemAPI.createAuthor(input);
+      return services.authorService.createAuthor(input);
     } catch (err) {
       handlePrismaError(err, "createAuthor");
     }
   },
 
-  logout: async (_, __, { res, user, dataSources }) => {
+  logout: async (_, __, { res, user, dataSources, services }) => {
     if (!user) {
       return true;
     }
@@ -382,7 +407,7 @@ export const Mutation: Resolvers["Mutation"] = {
     // invalidate old auth verison
     const authVersion = randomUUID();
 
-    await dataSources.poemAPI.updateAuthor({
+    await services.authorService.updateAuthor({
       authorId: user.authorId,
       authVersion,
     });
@@ -397,7 +422,7 @@ export const Mutation: Resolvers["Mutation"] = {
     return true;
   },
 
-  refreshToken: async (_, __, { req, dataSources }) => {
+  refreshToken: async (_, __, { req, dataSources, services }) => {
     const token = req.cookies.refreshToken;
     if (!token) throw new Error("no refresh token");
 
@@ -407,7 +432,7 @@ export const Mutation: Resolvers["Mutation"] = {
         authVersion: string;
       };
 
-      const author = await dataSources.poemAPI.getAuthorById({
+      const author = await services.authorService.getAuthorById({
         id: payload.authorId,
         omitAuthVersion: false,
       });

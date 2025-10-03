@@ -10,6 +10,7 @@ import { DocumentNode } from "graphql";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { MyJwtPayload } from "../../types/auth.js";
 import { Request, Response } from "express";
+import { Services } from "../../services/index.js";
 
 export interface TestServer {
   server: ApolloServer<MyContext>;
@@ -45,9 +46,9 @@ export interface ExecuteOperationResult<TData = any> {
 }
 
 export async function createTestServer({
-  poemAPI,
+  services,
 }: {
-  poemAPI: PoemAPI;
+  services: Services;
 }): Promise<TestServer> {
   const server = new ApolloServer<MyContext>({
     typeDefs,
@@ -98,7 +99,7 @@ export async function createTestServer({
           req: mockReq,
           res: mockRes,
           user,
-          dataSources: { poemAPI },
+          services,
         } as MyContext);
 
       return server.executeOperation<TData>(
