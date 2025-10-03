@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id          String           @id @default(uuid()) @db.Uuid
+  username    String           @unique
+  email       String           @unique
+  password    String
+  poems       Poem[]           @relation("AuthoredPoems")
+  collections Collection[]
+  comments    Comment[]
+  likedPoems  Like[]
+  savedPoems  SavedPoem[]      @relation("SavedPoems")
+  dateJoined  DateTime         @default(now()) @db.Timestamp(6)
+  followedBy  FollowedAuthor[] @relation("FollowedByAuthors")
+  following   FollowedAuthor[] @relation("FollowedAuthors")
+  authVersion String           @default(uuid()) @db.Uuid
+}
+
+model FollowedAuthor {
+  id           String   @id @default(uuid()) @db.Uuid
+  follower     Author   @relation("FollowedAuthors", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId   String   @db.Uuid
+  following    Author   @relation("FollowedByAuthors", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId  String   @db.Uuid
+  dateFollowed DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([followerId, followingId])
+}
+
+model Poem {
+  id            String      @id @default(uuid()) @db.Uuid
+  title         String
+  text          String
+  datePublished DateTime    @default(now()) @db.Timestamp(6)
+  author        Author      @relation("AuthoredPoems", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String      @db.Uuid
+  comments      Comment[]
+  likes         Like[]
+  inCollection  Collection? @relation(fields: [collectionId], references: [id])
+  collectionId  String?     @db.Uuid
+  savedBy       SavedPoem[]
+  views         Int         @default(0)
+}
+
+model SavedPoem {
+  id        String   @id @default(uuid()) @db.Uuid
+  author    Author   @relation("SavedPoems", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String   @db.Uuid
+  poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId    String   @db.Uuid
+  dateSaved DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([authorId, poemId])
+}
+
+model Collection {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  author      Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String   @db.Uuid
+  poems       Poem[]
+  dateCreated DateTime @default(now()) @db.Timestamp(6)
+}
+
+model Comment {
+  id            String   @id @default(uuid()) @db.Uuid
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String   @db.Uuid
+  poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId        String   @db.Uuid
+  text          String
+  datePublished DateTime @default(now()) @db.Timestamp(6)
+}
+
+model Like {
+  id            String   @id @default(uuid()) @db.Uuid
+  poem          Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  poemId        String   @db.Uuid
+  author        Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String   @db.Uuid
+  datePublished DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([authorId, poemId])
+}
