@@ -25,6 +25,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+        env:
+          DATABASE_URLS: ${{ secrets.DATABASE_URL  }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          APOLLO_SERVER_PORT: ${{ vars.APOLLO_SERVER_PORT }}
       - run: rm -rf package-lock.json node_modules
       - run: npm install
       - name: Generate prisma client
