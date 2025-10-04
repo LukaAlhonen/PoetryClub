@@ -31,6 +31,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - name: Debug env vars
+        run: |
+          echo "DATABASE_URL length: ${#DATABASE_URL}"
+          echo "JWT_SECRET length: ${#JWT_SECRET}"
+          echo "REDIS_URL length: ${#REDIS_URL}"
+          echo "APOLLO_SERVER_PORT: $APOLLO_SERVER_PORT"
+        shell: bash
       - run: rm -rf package-lock.json node_modules
       - run: npm install
       - name: Generate prisma client
