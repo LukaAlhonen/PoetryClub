@@ -1,31 +1,23 @@
 import { Resolvers } from "../__generated__/types.js";
 
 export const Query: Resolvers["Query"] = {
-  poem: (_, { id }, { dataSources, services }) => {
-    // return dataSources, services.poemAPI.getPoem({ id });
+  poem: (_, { id }, { services }) => {
     return services.poemService.getPoem({ id });
   },
 
-  poems: (_, { limit, cursor, filter }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getPoems({ cursor, limit, filter });
+  poems: (_, { limit, cursor, filter }, { services }) => {
     return services.poemService.getPoems({ cursor, limit, filter });
   },
 
-  authorById: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getAuthorById({ id });
+  authorById: (_, { id }, { services }) => {
     return services.authorService.getAuthorById({ id });
   },
 
   authors: (
     _,
     { limit, cursor, usernameContains },
-    { dataSources, services },
+    { services },
   ) => {
-    // return dataSources.poemAPI.getAuthors({
-    //   limit,
-    //   cursor,
-    //   usernameContains,
-    // });
     return services.authorService.getAuthors({
       limit,
       cursor,
@@ -33,22 +25,15 @@ export const Query: Resolvers["Query"] = {
     });
   },
 
-  comment: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getComment({ id });
+  comment: (_, { id }, { services }) => {
     return services.commentService.getComment({ id });
   },
 
   comments: (
     _,
     { limit, cursor, authorId, poemId },
-    { dataSources, services },
+    { services },
   ) => {
-    // return dataSources.poemAPI.getComments({
-    //   limit,
-    //   cursor,
-    //   authorId,
-    //   poemId,
-    // });
     return services.commentService.getComments({
       limit,
       cursor,
@@ -57,55 +42,41 @@ export const Query: Resolvers["Query"] = {
     });
   },
 
-  authorByUsername: (_, { username }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getAuthorByUsername({
-    //   username,
-    // });
+  authorByUsername: (_, { username }, { services }) => {
     return services.authorService.getAuthorByUsername({
       username,
     });
   },
 
-  collection: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getCollection({ id });
+  collection: (_, { id }, { services }) => {
     return services.collectionService.getCollection({ id });
   },
 
-  collections: (_, { limit, cursor, filter }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getCollections({ limit, cursor, filter });
+  collections: (_, { limit, cursor, filter }, { services }) => {
     return services.collectionService.getCollections({ limit, cursor, filter });
   },
 
-  like: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getLike({ id });
+  like: (_, { id }, { services }) => {
     return services.likeService.getLike({ id });
   },
 
   likes: (
     _,
     { limit, cursor, authorId, poemId },
-    { dataSources, services },
+    { services },
   ) => {
-    // return dataSources.poemAPI.getLikes({ limit, cursor, authorId, poemId });
     return services.likeService.getLikes({ limit, cursor, authorId, poemId });
   },
 
-  savedPoem: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getSavedPoem({ id });
+  savedPoem: (_, { id }, { services }) => {
     return services.savedPoemService.getSavedPoem({ id });
   },
 
   savedPoems: (
     _,
     { limit, cursor, authorId, poemId },
-    { dataSources, services },
+    { services },
   ) => {
-    // return dataSources.poemAPI.getSavedPoems({
-    //   limit,
-    //   cursor,
-    //   authorId,
-    //   poemId,
-    // });
     return services.savedPoemService.getSavedPoems({
       limit,
       cursor,
@@ -114,22 +85,15 @@ export const Query: Resolvers["Query"] = {
     });
   },
 
-  followedAuthor: (_, { id }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getFollowedAuthor({ id });
+  followedAuthor: (_, { id }, { services }) => {
     return services.followedAuthorService.getFollowedAuthor({ id });
   },
 
   followedAuthors: (
     _,
     { limit, cursor, followerId, followingId },
-    { dataSources, services },
+    { services },
   ) => {
-    // return dataSources.poemAPI.getFollowedAuthors({
-    //   limit,
-    //   cursor,
-    //   followerId,
-    //   followingId,
-    // });
     return services.followedAuthorService.getFollowedAuthors({
       limit,
       cursor,
@@ -138,15 +102,11 @@ export const Query: Resolvers["Query"] = {
     });
   },
 
-  me: async (_, __, { user, dataSources, services }) => {
+  me: async (_, __, { user, services }) => {
     if (!user || user === null) {
       throw new Error("Not authenticated");
     }
 
-    // const author = await dataSources.poemAPI.getAuthorById({
-    //   id: user.authorId,
-    //   omitAuthVersion: false,
-    // });
     const author = await services.authorService.getAuthorById({
       id: user.authorId,
       omitAuthVersion: false,

@@ -1,7 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { schema } from "./schema.js";
 import { PrismaClient } from "../generated/prisma/index.js";
-import { PoemAPI } from "./datasources/poem-api.js";
 import jwt from "jsonwebtoken";
 import config from "./config.js";
 import express from "express";
@@ -59,9 +58,6 @@ async function startApolloServer() {
           req,
           res,
           user,
-          dataSources: {
-            poemAPI: new PoemAPI(prisma, cache),
-          },
           services: createServices({ prisma, cache }),
         };
       },

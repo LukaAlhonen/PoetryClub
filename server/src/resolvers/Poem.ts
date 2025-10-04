@@ -1,18 +1,18 @@
 import { Resolvers } from "../__generated__/types.js";
 
 export const Poem: Resolvers["Poem"] = {
-  author: ({ authorId }, _, { dataSources, services }) => {
+  author: ({ authorId }, _, { services }) => {
     return services.authorService.getAuthorById({
       id: authorId,
     });
   },
 
-  inCollection: ({ collectionId }, _, { dataSources, services }) => {
+  inCollection: ({ collectionId }, _, { services }) => {
     if (!collectionId) return null;
     return services.collectionService.getCollection({ id: collectionId });
   },
 
-  comments: ({ id }, { limit, cursor }, { dataSources, services }) => {
+  comments: ({ id }, { limit, cursor }, { services }) => {
     return services.commentService.getComments({
       poemId: id,
       limit,
@@ -20,11 +20,11 @@ export const Poem: Resolvers["Poem"] = {
     });
   },
 
-  commentsCount: ({ id }, _, { dataSources, services }) => {
+  commentsCount: ({ id }, _, { services }) => {
     return services.poemService.getCommentsCount({ poemId: id });
   },
 
-  likes: ({ id }, { limit, cursor }, { dataSources, services }) => {
+  likes: ({ id }, { limit, cursor }, { services }) => {
     return services.likeService.getLikes({
       limit,
       cursor,
@@ -32,11 +32,11 @@ export const Poem: Resolvers["Poem"] = {
     });
   },
 
-  likesCount: ({ id }, _, { dataSources, services }) => {
+  likesCount: ({ id }, _, { services }) => {
     return services.poemService.getLikesCount({ poemId: id });
   },
 
-  savedBy: ({ id }, { limit, cursor }, { dataSources, services }) => {
+  savedBy: ({ id }, { limit, cursor }, { services }) => {
     return services.savedPoemService.getSavedPoems({
       limit,
       cursor,
@@ -44,7 +44,7 @@ export const Poem: Resolvers["Poem"] = {
     });
   },
 
-  savedByCount: ({ id }, _, { dataSources, services }) => {
+  savedByCount: ({ id }, _, { services }) => {
     return services.poemService.getSavedPoemsCount({ poemId: id });
   },
 };

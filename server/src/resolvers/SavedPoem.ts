@@ -1,12 +1,12 @@
 import { Resolvers } from "../__generated__/types.js";
 export const SavedPoem: Resolvers["SavedPoem"] = {
-  author: ({ authorId }, _, { dataSources, services }) => {
+  author: ({ authorId }, _, { services }) => {
     return services.authorService.getAuthorById({
       id: authorId,
     });
   },
 
-  poem: ({ poemId }, _, { dataSources, services }) => {
+  poem: ({ poemId }, _, { services }) => {
     return services.poemService.getPoem({ id: poemId });
   },
 };

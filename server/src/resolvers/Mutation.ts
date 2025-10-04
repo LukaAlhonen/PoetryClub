@@ -31,7 +31,7 @@ const verifyUser = async ({
 
 export const Mutation: Resolvers["Mutation"] = {
   // Create
-  createPoem: async (_, { input }, { user, dataSources, services }) => {
+  createPoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -44,7 +44,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createAuthor: (_, { input }, { dataSources, services }) => {
+  createAuthor: (_, { input }, { services }) => {
     try {
       return services.authorService.createAuthor(input);
     } catch (err) {
@@ -55,7 +55,7 @@ export const Mutation: Resolvers["Mutation"] = {
   createComment: async (
     _,
     { poemId, text },
-    { user, dataSources, services },
+    { user, services },
   ) => {
     await verifyUser({ user, authorService: services.authorService });
 
@@ -70,7 +70,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createCollection: async (_, { title }, { user, dataSources, services }) => {
+  createCollection: async (_, { title }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -83,7 +83,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createSavedPoem: async (_, { poemId }, { user, dataSources, services }) => {
+  createSavedPoem: async (_, { poemId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -96,7 +96,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createLike: async (_, { poemId }, { user, dataSources, services }) => {
+  createLike: async (_, { poemId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -112,7 +112,7 @@ export const Mutation: Resolvers["Mutation"] = {
   createFollowedAuthor: async (
     _,
     { followingId },
-    { user, dataSources, services },
+    { user, services },
   ) => {
     await verifyUser({ user, authorService: services.authorService });
 
@@ -127,7 +127,7 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   // Update
-  updatePoem: async (_, { input }, { user, dataSources, services }) => {
+  updatePoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     const poem = await services.poemService.getPoem({ id: input.poemId });
@@ -143,7 +143,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  updateAuthor: async (_, { input }, { user, dataSources, services }) => {
+  updateAuthor: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     const authVersion = randomUUID();
@@ -159,7 +159,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  updateCollection: async (_, { input }, { user, dataSources, services }) => {
+  updateCollection: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     const collection = await services.collectionService.getCollection({
@@ -178,7 +178,7 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   // Remove
-  removeAuthor: async (_, __, { user, dataSources, services }) => {
+  removeAuthor: async (_, __, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -188,7 +188,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removePoem: async (_, { poemId }, { user, dataSources, services }) => {
+  removePoem: async (_, { poemId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -208,7 +208,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removeComment: async (_, { commentId }, { user, dataSources, services }) => {
+  removeComment: async (_, { commentId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -233,7 +233,7 @@ export const Mutation: Resolvers["Mutation"] = {
   removeCollection: async (
     _,
     { collectionId },
-    { user, dataSources, services },
+    { user, services },
   ) => {
     await verifyUser({ user, authorService: services.authorService });
 
@@ -256,7 +256,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removeLike: async (_, { likeId }, { user, dataSources, services }) => {
+  removeLike: async (_, { likeId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -279,7 +279,7 @@ export const Mutation: Resolvers["Mutation"] = {
   removeSavedPoem: async (
     _,
     { savedPoemId },
-    { user, dataSources, services },
+    { user, services },
   ) => {
     await verifyUser({ user, authorService: services.authorService });
 
@@ -305,7 +305,7 @@ export const Mutation: Resolvers["Mutation"] = {
   removeFollowedAuthor: async (
     _,
     { followedAuthorId },
-    { user, dataSources, services },
+    { user, services },
   ) => {
     await verifyUser({ user, authorService: services.authorService });
 
@@ -331,7 +331,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  incrementPoemViews: async (_, { poemId }, { dataSources, services }) => {
+  incrementPoemViews: async (_, { poemId }, { services }) => {
     try {
       return services.poemService.incrementPoemViews({ poemId });
     } catch (err) {
@@ -343,7 +343,7 @@ export const Mutation: Resolvers["Mutation"] = {
   login: async (
     _,
     { username, password },
-    { dataSources, services, req, res },
+    { services, req, res },
   ) => {
     const author = await services.authorService.getAuthorByUsername({
       username,
@@ -391,7 +391,7 @@ export const Mutation: Resolvers["Mutation"] = {
     return { token: accessToken, author };
   },
 
-  signup: async (_, { input }, { dataSources, services }) => {
+  signup: async (_, { input }, { services }) => {
     try {
       return services.authorService.createAuthor(input);
     } catch (err) {
@@ -399,7 +399,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  logout: async (_, __, { res, user, dataSources, services }) => {
+  logout: async (_, __, { res, user, services }) => {
     if (!user) {
       return true;
     }
@@ -422,7 +422,7 @@ export const Mutation: Resolvers["Mutation"] = {
     return true;
   },
 
-  refreshToken: async (_, __, { req, dataSources, services }) => {
+  refreshToken: async (_, __, { req, services }) => {
     const token = req.cookies.refreshToken;
     if (!token) throw new Error("no refresh token");
 

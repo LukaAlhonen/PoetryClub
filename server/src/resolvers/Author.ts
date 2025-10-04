@@ -1,14 +1,7 @@
 import { Resolvers } from "../__generated__/types.js";
 
 export const Author: Resolvers["Author"] = {
-  poems: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getPoems({
-    //   limit,
-    //   cursor,
-    //   filter: {
-    //     authorId: id,
-    //   },
-    // });
+  poems: ({ id }, { limit, cursor }, { services }) => {
     return services.poemService.getPoems({
       limit,
       cursor,
@@ -18,12 +11,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  savedPoems: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getSavedPoems({
-    //   limit,
-    //   cursor,
-    //   authorId: id,
-    // });
+  savedPoems: ({ id }, { limit, cursor }, { services }) => {
     return services.savedPoemService.getSavedPoems({
       limit,
       cursor,
@@ -31,12 +19,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  comments: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getComments({
-    //   limit,
-    //   cursor,
-    //   authorId: id,
-    // });
+  comments: ({ id }, { limit, cursor }, { services }) => {
     return services.commentService.getComments({
       limit,
       cursor,
@@ -44,14 +27,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  collections: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getCollections({
-    //   limit,
-    //   cursor,
-    //   filter: {
-    //     authorId: id,
-    //   },
-    // });
+  collections: ({ id }, { limit, cursor }, { services }) => {
     return services.collectionService.getCollections({
       limit,
       cursor,
@@ -61,12 +37,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  likedPoems: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getLikes({
-    //   limit,
-    //   cursor,
-    //   authorId: id,
-    // });
+  likedPoems: ({ id }, { limit, cursor }, { services }) => {
     return services.likeService.getLikes({
       limit,
       cursor,
@@ -74,12 +45,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  followedBy: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getFollowedAuthors({
-    //   limit,
-    //   cursor,
-    //   followingId: id,
-    // });
+  followedBy: ({ id }, { limit, cursor }, { services }) => {
     return services.followedAuthorService.getFollowedAuthors({
       limit,
       cursor,
@@ -87,21 +53,13 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  followedByCount: ({ id }, _, { dataSources, services }) => {
-    // return dataSources.poemAPI.getFollowedAuthorsCount({
-    //   followingId: id,
-    // });
+  followedByCount: ({ id }, _, { services }) => {
     return services.authorService.getFollowedAuthorsCount({
       followingId: id,
     });
   },
 
-  following: ({ id }, { limit, cursor }, { dataSources, services }) => {
-    // return dataSources.poemAPI.getFollowedAuthors({
-    //   limit,
-    //   cursor,
-    //   followerId: id,
-    // });
+  following: ({ id }, { limit, cursor }, { services }) => {
     return services.followedAuthorService.getFollowedAuthors({
       limit,
       cursor,
@@ -109,10 +67,7 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  followingCount: ({ id }, _, { dataSources, services }) => {
-    // return dataSources.poemAPI.getFollowedAuthorsCount({
-    //   followerId: id,
-    // });
+  followingCount: ({ id }, _, { services }) => {
     return services.authorService.getFollowedAuthorsCount({
       followerId: id,
     });
