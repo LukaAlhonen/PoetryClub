@@ -14,6 +14,7 @@ import {
   CreateSavedPoemMutation,
   GetAuthorByIdQuery,
   GetCollectionQuery,
+  GetCollectionsQuery,
   GetCommentQuery,
   GetFollowedAuthorQuery,
   GetLikeQuery,
@@ -59,15 +60,6 @@ import {
   UPDATE_COLLECTION,
   UPDATE_POEM,
 } from "../../__tests__/mutations/index.js";
-import {
-  AuthorModel,
-  CollectionModel,
-  CommentModel,
-  FollowedAuthorModel,
-  LikeModel,
-  PoemModel,
-  SavedPoemModel,
-} from "../../models.js";
 import { GET_AUTHOR_BY_ID } from "../../__tests__/queries/authorById.js";
 import { GET_COLLECTION } from "../../__tests__/queries/collection.js";
 import { GET_COMMENT } from "../../__tests__/queries/comment.js";
@@ -79,6 +71,8 @@ import { LOGOUT } from "../../__tests__/mutations/logout.js";
 import { INCREMENT_POEM_VIEWS } from "../../__tests__/mutations/incrementPoemViews.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { GET_COLLECTIONS } from "../../__tests__/queries/collections.js";
+import { AuthorWithRelations, CollectionWithRelations, CommentWithRelations, FollowedAuthorWithRelations, LikeWithRelations, PoemWithRelations, SavedPoemWithRelations } from "../../types/extended-types.js";
 
 const testLogin = async ({
   username = "author1",
@@ -121,13 +115,13 @@ describe("Graphql Mutation integration tests", () => {
   const cache = new CacheAPI({ prefix: "Mutation" });
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
-  let poems: PoemModel[] = [];
-  let authors: AuthorModel[] = [];
-  let collections: CollectionModel[] = [];
-  let comments: CommentModel[] = [];
-  let likes: LikeModel[] = [];
-  let savedPoems: SavedPoemModel[] = [];
-  let followedAuthors: FollowedAuthorModel[] = [];
+  let poems: PoemWithRelations[] = [];
+  let authors: AuthorWithRelations[] = [];
+  let collections: CollectionWithRelations[] = [];
+  let comments: CommentWithRelations[] = [];
+  let likes: LikeWithRelations[] = [];
+  let savedPoems: SavedPoemWithRelations[] = [];
+  let followedAuthors: FollowedAuthorWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
@@ -141,8 +135,10 @@ describe("Graphql Mutation integration tests", () => {
     savedPoems = result.savedPoems;
     followedAuthors = result.followedAuthors;
   });
+
   afterAll(async () => {
     await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
   });
 
   test("login, succeeds", async () => {
@@ -1542,6 +1538,8 @@ describe("Graphql Mutation integration tests", () => {
       const author = response.body.singleResult.data?.updateAuthor;
       const errors = response.body.singleResult.errors;
 
+      if (errors) console.error(errors)
+
       expect(author).toBeDefined();
       expect(errors).toBeUndefined();
 
@@ -1904,6 +1902,53 @@ describe("Graphql Mutation integration tests", () => {
       throw new Error("invalid response kind");
     }
   });
+
+  test("updatePoem, with invalid collectionId", async () => {
+    const login = await testLogin({ testServer });
+    const poemToUpdate = poems.filter((poem) => poem.authorId === login.author.id)[0]
+
+    // get collection that does not belong to author
+    const collectionsResponse = await testServer.executeOperation<GetCollectionsQuery>({
+      query: GET_COLLECTIONS
+    })
+    if (collectionsResponse.body.kind === "single") {
+      const collections = collectionsResponse.body.singleResult.data?.collections;
+
+      const collection = collections.filter((collection) =>
+        collection.author.id !== login.author.id && poemToUpdate.collectionId !== collection.id
+      )[0]
+
+      const response = await testServer.executeOperation<UpdatePoemMutation>({
+        query: UPDATE_POEM,
+        variables: {
+          id: poemToUpdate.id,
+          collectionId: collection.id
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        }
+      })
+
+      if (response.body.kind === "single") {
+        expect(response.body.singleResult.data).toBeUndefined();
+        expect(response.body.singleResult.errors).toBeDefined();
+
+        // make sure poem was not updated
+        const poemResponse = await testServer.executeOperation<GetPoemQuery>({
+          query: GET_POEM,
+          variables: {
+            id: poemToUpdate.id
+          }
+        })
+
+        if (poemResponse.body.kind === "single") {
+          const poem = poemResponse.body.singleResult.data?.poem;
+
+          expect(poem.inCollection.id).toStrictEqual(poemToUpdate.collectionId)
+        }
+      }
+    }
+  })
 
   test("incrementPoemViews", async () => {
     const poemToUpdate = poems[0];
