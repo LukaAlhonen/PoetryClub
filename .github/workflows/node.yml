@@ -18,7 +18,7 @@ jobs:
         node-version: [22.x, 24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL  }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       REDIS_URL: ${{ secrets.REDIS_URL }}
