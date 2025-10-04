@@ -31,6 +31,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> server/.env
+          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> server/.env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> server/.env
+          echo "APOLLO_SERVER_PORT=${{ vars.APOLLO_SERVER_PORT }}" >> server/.env
       - name: Debug env vars
         run: |
           echo "DATABASE_URL length: ${#DATABASE_URL}"
