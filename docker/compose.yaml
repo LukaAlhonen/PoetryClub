@@ -3,7 +3,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
@@ -13,7 +13,7 @@ services:
     image: redis
     restart: always
     ports:
-      - "127.0.0.1:6379:6379"
+      - "6379:6379"
     command: redis-server /usr/local/etc/redis/redis-full.conf --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis-cache:/data
