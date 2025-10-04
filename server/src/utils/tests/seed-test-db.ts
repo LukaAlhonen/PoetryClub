@@ -1,13 +1,4 @@
 import { PrismaClient } from "../../../generated/prisma/index.js";
-import {
-  AuthorModel,
-  CollectionModel,
-  CommentModel,
-  FollowedAuthorModel,
-  LikeModel,
-  PoemModel,
-  SavedPoemModel,
-} from "../../models.js";
 import argon2 from "argon2";
 import {
   AuthorWithRelations,
@@ -20,13 +11,6 @@ import {
 } from "../../types/extended-types.js";
 
 export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
-  // const poems: PoemModel[] = [];
-  // const collections: CollectionModel[] = [];
-  // const authors: AuthorModel[] = [];
-  // const comments: CommentModel[] = [];
-  // const likes: LikeModel[] = [];
-  // const savedPoems: SavedPoemModel[] = [];
-  // let followedAuthors: FollowedAuthorModel[] = [];
   const poems: PoemWithRelations[] = [];
   const collections: CollectionWithRelations[] = [];
   const authors: AuthorWithRelations[] = [];
@@ -74,20 +58,6 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
     }
 
     // Create 2 comments per poem
-    // await Promise.all(
-    //   poems.flatMap((poem) =>
-    //     Array.from({ length: 2 }).map((_, i) =>
-    //       tx.comment.create({
-    //         data: {
-    //           poemId: poem.id,
-    //           text: `comment ${i}`,
-    //           authorId: poem.authorId,
-    //         },
-    //       }),
-    //     ),
-    //   ),
-    // );
-
     for (const poem of poems) {
       for (let i = 0; i < 2; ++i) {
         const comment = await tx.comment.create({
@@ -102,29 +72,7 @@ export const seed = async ({ prisma }: { prisma: PrismaClient }) => {
     }
 
     // Create 1 like per poem
-    // await Promise.all(
-    //   poems.flatMap(async (poem) => {
-    //     await tx.like.create({
-    //       data: {
-    //         authorId: poem.authorId,
-    //         poemId: poem.id,
-    //       },
-    //     });
-    //   }),
-    // );
-
     // Create 1 savedPoem per poem
-    // await Promise.all(
-    //   poems.flatMap(async (poem) => {
-    //     await tx.savedPoem.create({
-    //       data: {
-    //         authorId: poem.authorId,
-    //         poemId: poem.id,
-    //       },
-    //     });
-    //   }),
-    // );
-
     for (const poem of poems) {
       const like = await tx.like.create({
         data: {

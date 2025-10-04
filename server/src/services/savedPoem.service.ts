@@ -63,7 +63,7 @@ export class SavedPoemService {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }): Promise<SavedPoemWithRelations[] | null> {
+  } = {}): Promise<SavedPoemWithRelations[] | null> {
     const cacheKey = `savedPoems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
     const cached = await this.cache.getAll<SavedPoemWithRelations>({
       key: cacheKey,

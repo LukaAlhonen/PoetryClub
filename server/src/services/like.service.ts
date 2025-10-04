@@ -56,7 +56,7 @@ export class LikeService {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }): Promise<LikeWithRelations[] | null> {
+  } = {}): Promise<LikeWithRelations[] | null> {
     const cacheKey = `likes:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
     const cached = await this.cache.getAll<LikeWithRelations>({
       key: cacheKey,

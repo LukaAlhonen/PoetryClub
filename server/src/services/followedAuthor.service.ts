@@ -61,7 +61,7 @@ export class FollowedAuthorService {
     followingId?: string;
     limit?: number;
     cursor?: string;
-  }): Promise<FollowedAuthorWithRelations[] | null> {
+  } = {}): Promise<FollowedAuthorWithRelations[] | null> {
     const cacheKey = `followedAuthors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:followerId:${followerId ? followerId : "null"}:followingId:${followingId ? followingId : "null"}`;
     const cached = await this.cache.getAll<FollowedAuthorWithRelations>({
       key: cacheKey,

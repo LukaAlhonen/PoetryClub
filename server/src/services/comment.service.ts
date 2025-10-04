@@ -64,7 +64,7 @@ export class CommentService {
     poemId?: string;
     limit?: number;
     cursor?: string;
-  }): Promise<CommentWithRelations[] | null> {
+  } = {}): Promise<CommentWithRelations[] | null> {
     const cacheKey = `comments:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:authorId:${authorId ? authorId : "null"}:poemId:${poemId ? poemId : "null"}`;
     const cached = await this.cache.getAll<CommentWithRelations>({
       key: cacheKey,
