@@ -25,5 +25,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci --workspaces
+      - run: rm -rf package.lock.json node_modules
+      - run: npm install
       - run: npm test --workspaces
