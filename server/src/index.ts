@@ -1,8 +1,7 @@
 import { ApolloServer } from "@apollo/server";
 import { schema } from "./schema.js";
 import { PrismaClient } from "../generated/prisma/index.js";
-import { PoemAPI } from "./datasources/poem-api.js";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config from "./config.js";
 import express from "express";
 import { expressMiddleware } from "@as-integrations/express5";
@@ -12,11 +11,10 @@ import http from "http";
 import { MyContext } from "./types/context.js";
 import { MyJwtPayload } from "./types/auth.js";
 import { CacheAPI } from "./cache/cache-api.js";
-// import { CacheAPI } from "./cache/cache-api.js";
+import { createServices } from "./services/index.js";
 
 const prisma = new PrismaClient();
 const cache = new CacheAPI();
-// const cache = new CacheAPI();
 
 async function startApolloServer() {
   const app = express();
@@ -60,9 +58,7 @@ async function startApolloServer() {
           req,
           res,
           user,
-          dataSources: {
-            poemAPI: new PoemAPI(prisma, cache),
-          },
+          services: createServices({ prisma, cache }),
         };
       },
     }),

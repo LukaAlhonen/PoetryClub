@@ -1,8 +1,8 @@
 import { Resolvers } from "../__generated__/types.js";
 
 export const Author: Resolvers["Author"] = {
-  poems: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getPoems({
+  poems: ({ id }, { limit, cursor }, { services }) => {
+    return services.poemService.getPoems({
       limit,
       cursor,
       filter: {
@@ -11,24 +11,24 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  savedPoems: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getSavedPoems({
+  savedPoems: ({ id }, { limit, cursor }, { services }) => {
+    return services.savedPoemService.getSavedPoems({
       limit,
       cursor,
       authorId: id,
     });
   },
 
-  comments: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getComments({
+  comments: ({ id }, { limit, cursor }, { services }) => {
+    return services.commentService.getComments({
       limit,
       cursor,
       authorId: id,
     });
   },
 
-  collections: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getCollections({
+  collections: ({ id }, { limit, cursor }, { services }) => {
+    return services.collectionService.getCollections({
       limit,
       cursor,
       filter: {
@@ -37,38 +37,38 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  likedPoems: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getLikes({
+  likedPoems: ({ id }, { limit, cursor }, { services }) => {
+    return services.likeService.getLikes({
       limit,
       cursor,
       authorId: id,
     });
   },
 
-  followedBy: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getFollowedAuthors({
+  followedBy: ({ id }, { limit, cursor }, { services }) => {
+    return services.followedAuthorService.getFollowedAuthors({
       limit,
       cursor,
       followingId: id,
     });
   },
 
-  followedByCount: ({ id }, _, { dataSources }) => {
-    return dataSources.poemAPI.getFollowedAuthorsCount({
+  followedByCount: ({ id }, _, { services }) => {
+    return services.authorService.getFollowedAuthorsCount({
       followingId: id,
     });
   },
 
-  following: ({ id }, { limit, cursor }, { dataSources }) => {
-    return dataSources.poemAPI.getFollowedAuthors({
+  following: ({ id }, { limit, cursor }, { services }) => {
+    return services.followedAuthorService.getFollowedAuthors({
       limit,
       cursor,
       followerId: id,
     });
   },
 
-  followingCount: ({ id }, _, { dataSources }) => {
-    return dataSources.poemAPI.getFollowedAuthorsCount({
+  followingCount: ({ id }, _, { services }) => {
+    return services.authorService.getFollowedAuthorsCount({
       followerId: id,
     });
   },

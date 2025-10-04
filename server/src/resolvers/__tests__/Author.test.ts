@@ -1,7 +1,6 @@
 import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
-import { PoemAPI } from "../../datasources/poem-api.js";
 import {
   GetAuthorsQuery,
   GetAuthorByIdQuery,
@@ -12,6 +11,7 @@ import {
   GET_AUTHOR_BY_ID,
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
+import { createServices } from "../../services/index.js";
 
 describe("Graphql Author integration tests", () => {
   // DB seeded with:
@@ -23,14 +23,14 @@ describe("Graphql Author integration tests", () => {
   // 4 likes
   // 4 savedPoems
   const cache = new CacheAPI({ prefix: "Author" });
-  const poemAPI = new PoemAPI(prisma, cache);
+  const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
   let authors: NonNullable<GetAuthorsQuery["authors"]> = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
-    testServer = await createTestServer({ poemAPI });
+    testServer = await createTestServer({ services });
     await seed({ prisma });
     const response = await testServer.executeOperation<GetAuthorsQuery>({
       query: GET_AUTHORS,
