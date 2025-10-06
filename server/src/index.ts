@@ -22,25 +22,25 @@ async function startApolloServer() {
 
   const server = new ApolloServer<MyContext>({
     schema,
-    csrfPrevention: {
-      requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
-    },
+    // csrfPrevention: {
+    //   requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
+    // },
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
   await server.start();
 
   const corsOptions: cors.CorsOptions = {
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
+    origin: true,
+    credentials: true,
+    // methods: ["GET", "POST", "OPTIONS"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
   };
 
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(corsOptions),
     express.json(),
+    cors<cors.CorsRequest>(corsOptions),
     expressMiddleware<MyContext>(server, {
       context: async ({ req, res }) => {
         const token = req.headers.authorization || "";
