@@ -16,4 +16,7 @@ export default defineConfig({
       "src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
   },
+  server: {
+    allowedHosts: ["ubuntubox.local"],
+  },
 });
