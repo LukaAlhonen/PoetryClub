@@ -155,6 +155,7 @@ export type Mutation = {
   createLike: Like;
   createPoem: Poem;
   createSavedPoem: SavedPoem;
+  incrementPoemViews: Poem;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
   refreshToken: AuthPayload;
@@ -204,6 +205,11 @@ export type MutationCreatePoemArgs = {
 
 
 export type MutationCreateSavedPoemArgs = {
+  poemId: Scalars['ID']['input'];
+};
+
+
+export type MutationIncrementPoemViewsArgs = {
   poemId: Scalars['ID']['input'];
 };
 
