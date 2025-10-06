@@ -5,6 +5,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 const client = new ApolloClient({
   uri: "http://ubuntubox.local:4000",
+  credentials: "include",
   cache: new InMemoryCache(),
 });
 

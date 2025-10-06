@@ -31,7 +31,8 @@ async function startApolloServer() {
   await server.start();
 
   const corsOptions: cors.CorsOptions = {
-    origin: "*",
+    origin: true,
+    credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
     optionsSuccessStatus: 204,
