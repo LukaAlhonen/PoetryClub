@@ -41,6 +41,7 @@ describe("Graphql Author integration tests", () => {
   });
   afterAll(async () => {
     await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
   });
 
   test("poems, without pagination", async () => {

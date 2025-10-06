@@ -42,6 +42,7 @@ describe("Graphql SavedPoem integration tests", () => {
   });
   afterAll(async () => {
     await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
   });
 
   test("author", async () => {

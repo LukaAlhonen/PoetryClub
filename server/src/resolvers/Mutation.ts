@@ -34,6 +34,14 @@ export const Mutation: Resolvers["Mutation"] = {
   createPoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
+    // make sure collection belongs to author
+    if(input.collectionId) {
+      const collection = await services.collectionService.getCollection({id: input.collectionId})
+      if (collection.authorId !== user.authorId) {
+        throw new Error(`cannot add poem to collection`)
+      }
+    }
+
     try {
       return services.poemService.createPoem({
         ...input,
@@ -129,6 +137,14 @@ export const Mutation: Resolvers["Mutation"] = {
   // Update
   updatePoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
+
+    // make sure collection belongs to author
+    if (input.collectionId) {
+      const collection = await services.collectionService.getCollection({id: input.collectionId})
+      if (collection.authorId !== user.authorId) {
+        throw new Error(`cannot add poem to collection`)
+      }
+    }
 
     const poem = await services.poemService.getPoem({ id: input.poemId });
 

@@ -63,6 +63,7 @@ describe("Graphql Query integration tests", () => {
   });
   afterAll(async () => {
     await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
   });
 
   test("poems, without filter or pagination, succeeds", async () => {

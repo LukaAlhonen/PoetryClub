@@ -45,6 +45,7 @@ describe("Graphql Mutation integration tests", () => {
   });
   afterAll(async () => {
     await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
   });
 
   test("follower", async () => {
