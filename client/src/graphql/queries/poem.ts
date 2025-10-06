@@ -1,6 +1,6 @@
-import { gql } from "graphql-tag";
+import { gql } from "../../__generated__";
 
-export const GET_POEM = gql`
+export const GET_POEM = gql(`
   query GetPoem(
     $poemId: ID!
     $commentsLimit: Int
@@ -22,5 +22,6 @@ export const GET_POEM = gql`
         savedBy(limit: $savedByLimit, cursor: $savedByCursor) {
             ...SavedByFragment
         }
+    }
   }
-`;
+`);

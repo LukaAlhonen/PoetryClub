@@ -6,5 +6,6 @@ export const LIKE_FRAGMENT = gql(`
         author {
             ...AuthorSimpleFragment
         }
+        datePublished
     }
 `);

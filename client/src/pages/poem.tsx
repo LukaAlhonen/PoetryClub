@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { GET_POEM } from "../queries";
+import { GET_POEM } from "../graphql/queries/poem";
 import { useQuery } from "@apollo/client";
 import PoemDetail from "../components/poem-detail";
 import { Layout } from "../components";
