@@ -34,7 +34,6 @@ async function startApolloServer() {
     origin: "*",
     credentials: true,
     methods: ['GET','POST','OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
   };
 
   app.use(
