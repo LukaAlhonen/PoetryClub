@@ -19,6 +19,7 @@ import {
   GetFollowedAuthorQuery,
   GetLikeQuery,
   GetPoemQuery,
+  GetPoemsQuery,
   GetSavedPoemQuery,
   IncrementPoemViewsMutation,
   LoginMutation,
@@ -73,6 +74,7 @@ import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
 import { GET_COLLECTIONS } from "../../__tests__/queries/collections.js";
 import { AuthorWithRelations, CollectionWithRelations, CommentWithRelations, FollowedAuthorWithRelations, LikeWithRelations, PoemWithRelations, SavedPoemWithRelations } from "../../types/extended-types.js";
+import { GET_POEMS } from "../../__tests__/queries/poems.js";
 
 const testLogin = async ({
   username = "author1",
@@ -304,6 +306,58 @@ describe("Graphql Mutation integration tests", () => {
       throw new Error("invalid response kind");
     }
   });
+
+  test("createPoem, with invalid collectionId", async () => {
+    const login = await testLogin({testServer})
+
+    // get collection that does not belong to author
+    const collectionsResponse = await testServer.executeOperation<GetCollectionsQuery>({
+      query: GET_COLLECTIONS
+    })
+    if (collectionsResponse.body.kind === "single") {
+      const collections = collectionsResponse.body.singleResult.data?.collections;
+
+      const collection = collections.filter((collection) =>
+        collection.author.id !== login.author.id
+      )[0]
+
+      const response = await testServer.executeOperation<CreatePoemMutation>({
+        query: CREATE_POEM,
+        variables: {
+          input: {
+            title: "failedPoem1",
+            text: "123456633!",
+            collectionId: collection.id,
+          }
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        }
+      })
+
+      if (response.body.kind === "single") {
+        expect(response.body.singleResult.data).toBeNull();
+        expect(response.body.singleResult.errors).toBeDefined();
+
+        // make sure poem was not created
+        const result2 = await testServer.executeOperation<GetPoemsQuery>({
+          query: GET_POEMS,
+          variables: {
+            filter: {
+              titleContains: "failedPoem1"
+            }
+          }
+        })
+
+        if (result2.body.kind === "single") {
+          const poems = result2.body.singleResult.data?.poems;
+
+          expect(poems).toHaveLength(0);
+          expect(poems).toStrictEqual([])
+        }
+      }
+    }
+  })
 
   test("createAuthor", async () => {
     const username = "luka";
