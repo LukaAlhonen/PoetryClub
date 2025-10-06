@@ -34,11 +34,13 @@ async function startApolloServer() {
     origin: "*",
     credentials: true,
     methods: ['GET','POST','OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   };
+
+  app.use(cors<cors.CorsRequest>(corsOptions))
 
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(corsOptions),
     express.json(),
     expressMiddleware<MyContext>(server, {
       context: async ({ req, res }) => {
