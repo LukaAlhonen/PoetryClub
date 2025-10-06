@@ -7,5 +7,6 @@ export const LIKED_POEM_FRAGMENT = gql(`
             id
             ...PoemFragment
         }
+        datePublished
     }
 `);

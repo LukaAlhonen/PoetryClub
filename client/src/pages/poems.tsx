@@ -1,7 +1,7 @@
 import { Layout } from "../components";
 import { useQuery } from "@apollo/client";
 import PoemCard from "../containers/poem-card";
-import { GET_POEMS } from "../queries";
+import { GET_POEMS } from "../graphql/queries/poems";
 import QueryResult from "../components/query-result";
 import styled from "@emotion/styled";
 import colors from "../colors";

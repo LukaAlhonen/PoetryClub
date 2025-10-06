@@ -7,5 +7,6 @@ export const COMMENT_FRAGMENT = gql(`
         author {
             ...AuthorSimpleFragment
         }
+        datePublished
     }
 `);
