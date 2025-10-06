@@ -15,7 +15,7 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   /** Custom date scalar */
-  Date: { input: unknown; output: unknown; }
+  Date: { input: any; output: any; }
 };
 
 export type AuthPayload = {
@@ -449,14 +449,14 @@ export type UpdatePoemInput = {
 
 export type AuthorSimpleFragmentFragment = { __typename?: 'Author', id: string, username: string } & { ' $fragmentName'?: 'AuthorSimpleFragmentFragment' };
 
-export type AuthorFragmentFragment = { __typename?: 'Author', id: string, username: string, dateJoined: unknown, followedByCount: number, followingCount: number } & { ' $fragmentName'?: 'AuthorFragmentFragment' };
+export type AuthorFragmentFragment = { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number } & { ' $fragmentName'?: 'AuthorFragmentFragment' };
 
-export type CollectionFragmentFragment = { __typename?: 'Collection', id: string, title: string, dateCreated: unknown, author: (
+export type CollectionFragmentFragment = { __typename?: 'Collection', id: string, title: string, dateCreated: any, author: (
     { __typename?: 'Author' }
     & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
   ) } & { ' $fragmentName'?: 'CollectionFragmentFragment' };
 
-export type CommentFragmentFragment = { __typename?: 'Comment', id: string, text: string, datePublished: unknown, author: (
+export type CommentFragmentFragment = { __typename?: 'Comment', id: string, text: string, datePublished: any, author: (
     { __typename?: 'Author' }
     & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
   ) } & { ' $fragmentName'?: 'CommentFragmentFragment' };
@@ -471,17 +471,17 @@ export type FollowingFragmentFragment = { __typename?: 'FollowedAuthor', id: str
     & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
   ) } & { ' $fragmentName'?: 'FollowingFragmentFragment' };
 
-export type LikeFragmentFragment = { __typename?: 'Like', id: string, datePublished: unknown, author: (
+export type LikeFragmentFragment = { __typename?: 'Like', id: string, datePublished: any, author: (
     { __typename?: 'Author' }
     & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
   ) } & { ' $fragmentName'?: 'LikeFragmentFragment' };
 
-export type LikedPoemFragmentFragment = { __typename?: 'Like', id: string, datePublished: unknown, poem: (
+export type LikedPoemFragmentFragment = { __typename?: 'Like', id: string, datePublished: any, poem: (
     { __typename?: 'Poem', id: string }
     & { ' $fragmentRefs'?: { 'PoemFragmentFragment': PoemFragmentFragment } }
   ) } & { ' $fragmentName'?: 'LikedPoemFragmentFragment' };
 
-export type PoemFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: (
+export type PoemFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: (
     { __typename?: 'Author' }
     & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
   ), inCollection?: { __typename?: 'Collection', id: string, title: string } | null } & { ' $fragmentName'?: 'PoemFragmentFragment' };
@@ -701,7 +701,7 @@ export type GetCommentQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentQuery = { __typename?: 'Query', comment: { __typename?: 'Comment', id: string, text: string, datePublished: unknown, poem: (
+export type GetCommentQuery = { __typename?: 'Query', comment: { __typename?: 'Comment', id: string, text: string, datePublished: any, poem: (
       { __typename?: 'Poem' }
       & { ' $fragmentRefs'?: { 'PoemFragmentFragment': PoemFragmentFragment } }
     ), author: (
@@ -834,7 +834,7 @@ export type GetSavedPoemQueryVariables = Exact<{
 }>;
 
 
-export type GetSavedPoemQuery = { __typename?: 'Query', savedPoem: { __typename?: 'SavedPoem', id: string, dateSaved: unknown, author: (
+export type GetSavedPoemQuery = { __typename?: 'Query', savedPoem: { __typename?: 'SavedPoem', id: string, dateSaved: any, author: (
       { __typename?: 'Author', id: string }
       & { ' $fragmentRefs'?: { 'AuthorSimpleFragmentFragment': AuthorSimpleFragmentFragment } }
     ), poem: (
@@ -850,7 +850,7 @@ export type GetSavedPoemsQueryVariables = Exact<{
 }>;
 
 
-export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: unknown, poem: (
+export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: any, poem: (
       { __typename?: 'Poem' }
       & { ' $fragmentRefs'?: { 'PoemFragmentFragment': PoemFragmentFragment } }
     ), author: (

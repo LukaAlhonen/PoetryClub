@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import colors from "../colors";
 import { useFragment, type FragmentType } from "../__generated__";
-import { POEM_CARD_FRAGMENT } from "../fragments/poem-card.fragment";
+import { POEM_FRAGMENT } from "../graphql/fragments/poem.fragment";
 import { dateFormatter } from "../utils/formatters";
 
 import CommentsIcon from "../assets/icons/comment.svg?react";
@@ -11,11 +11,11 @@ import ViewsIcon from "../assets/icons/eye.svg?react";
 import ArrowIcon from "../assets/icons/arrow-right.svg?react";
 
 interface PoemCardProps {
-  poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
+  poem?: FragmentType<typeof POEM_FRAGMENT>;
 }
 
 const PoemCard = (props: PoemCardProps) => {
-  const poem = useFragment(POEM_CARD_FRAGMENT, props.poem);
+  const poem = useFragment(POEM_FRAGMENT, props.poem);
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
     : "loading...";

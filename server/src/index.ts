@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import config from "./config.js";
 import express from "express";
 import { expressMiddleware } from "@as-integrations/express5";
-import cors from "cors";
+// import cors from "cors";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import http from "http";
 import { MyContext } from "./types/context.js";
@@ -30,17 +30,17 @@ async function startApolloServer() {
 
   await server.start();
 
-  const corsOptions: cors.CorsOptions = {
-    origin: true,
-    credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  };
+  // const corsOptions: cors.CorsOptions = {
+  //   origin: true,
+  //   credentials: true,
+  //   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  //   preflightContinue: false,
+  //   optionsSuccessStatus: 204,
+  // };
 
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(corsOptions),
+    // cors<cors.CorsRequest>(corsOptions),
     express.json(),
     expressMiddleware<MyContext>(server, {
       context: async ({ req, res }) => {

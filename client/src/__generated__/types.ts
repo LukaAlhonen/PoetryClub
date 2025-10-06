@@ -12,7 +12,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  Date: { input: unknown; output: unknown; }
+  Date: { input: any; output: any; }
 };
 
 export type AuthPayload = {
@@ -446,21 +446,21 @@ export type UpdatePoemInput = {
 
 export type AuthorSimpleFragmentFragment = { __typename?: 'Author', id: string, username: string };
 
-export type AuthorFragmentFragment = { __typename?: 'Author', id: string, username: string, dateJoined: unknown, followedByCount: number, followingCount: number };
+export type AuthorFragmentFragment = { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number };
 
-export type CollectionFragmentFragment = { __typename?: 'Collection', id: string, title: string, dateCreated: unknown, author: { __typename?: 'Author', id: string, username: string } };
+export type CollectionFragmentFragment = { __typename?: 'Collection', id: string, title: string, dateCreated: any, author: { __typename?: 'Author', id: string, username: string } };
 
-export type CommentFragmentFragment = { __typename?: 'Comment', id: string, text: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } };
+export type CommentFragmentFragment = { __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } };
 
 export type FollowedByFragmentFragment = { __typename?: 'FollowedAuthor', id: string, follower: { __typename?: 'Author', id: string, username: string } };
 
 export type FollowingFragmentFragment = { __typename?: 'FollowedAuthor', id: string, following: { __typename?: 'Author', id: string, username: string } };
 
-export type LikeFragmentFragment = { __typename?: 'Like', id: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } };
+export type LikeFragmentFragment = { __typename?: 'Like', id: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } };
 
-export type LikedPoemFragmentFragment = { __typename?: 'Like', id: string, datePublished: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
+export type LikedPoemFragmentFragment = { __typename?: 'Like', id: string, datePublished: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
 
-export type PoemFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null };
+export type PoemFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null };
 
 export type SavedByFragmentFragment = { __typename?: 'SavedPoem', id: string, author: { __typename?: 'Author', id: string, username: string } };
 
@@ -593,7 +593,7 @@ export type GetAuthorByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthorByIdQuery = { __typename?: 'Query', authorById: { __typename?: 'Author', id: string, username: string, dateJoined: unknown, followedByCount: number, followingCount: number, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, likedPoems: Array<{ __typename?: 'Like', id: string, datePublished: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }>, collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: unknown, author: { __typename?: 'Author', id: string, username: string } }> } };
+export type GetAuthorByIdQuery = { __typename?: 'Query', authorById: { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, likedPoems: Array<{ __typename?: 'Like', id: string, datePublished: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }>, collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: any, author: { __typename?: 'Author', id: string, username: string } }> } };
 
 export type GetAuthorByUsernameQueryVariables = Exact<{
   username: Scalars['String']['input'];
@@ -606,7 +606,7 @@ export type GetAuthorByUsernameQueryVariables = Exact<{
 }>;
 
 
-export type GetAuthorByUsernameQuery = { __typename?: 'Query', authorByUsername: { __typename?: 'Author', id: string, username: string, dateJoined: unknown, followedByCount: number, followingCount: number, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, likedPoems: Array<{ __typename?: 'Like', id: string, datePublished: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }>, collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: unknown, author: { __typename?: 'Author', id: string, username: string } }> } };
+export type GetAuthorByUsernameQuery = { __typename?: 'Query', authorByUsername: { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, likedPoems: Array<{ __typename?: 'Like', id: string, datePublished: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }>, collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: any, author: { __typename?: 'Author', id: string, username: string } }> } };
 
 export type GetAuthorsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -622,7 +622,7 @@ export type GetCollectionQueryVariables = Exact<{
 }>;
 
 
-export type GetCollectionQuery = { __typename?: 'Query', collection: { __typename?: 'Collection', id: string, title: string, dateCreated: unknown, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, author: { __typename?: 'Author', id: string, username: string } } };
+export type GetCollectionQuery = { __typename?: 'Query', collection: { __typename?: 'Collection', id: string, title: string, dateCreated: any, poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }>, author: { __typename?: 'Author', id: string, username: string } } };
 
 export type GetCollectionsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -631,14 +631,14 @@ export type GetCollectionsQueryVariables = Exact<{
 }>;
 
 
-export type GetCollectionsQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: unknown, author: { __typename?: 'Author', id: string, username: string } }> };
+export type GetCollectionsQuery = { __typename?: 'Query', collections: Array<{ __typename?: 'Collection', id: string, title: string, dateCreated: any, author: { __typename?: 'Author', id: string, username: string } }> };
 
 export type GetCommentQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetCommentQuery = { __typename?: 'Query', comment: { __typename?: 'Comment', id: string, text: string, datePublished: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } } };
+export type GetCommentQuery = { __typename?: 'Query', comment: { __typename?: 'Comment', id: string, text: string, datePublished: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } } };
 
 export type GetCommentsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -648,7 +648,7 @@ export type GetCommentsQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsQuery = { __typename?: 'Query', comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } }> };
+export type GetCommentsQuery = { __typename?: 'Query', comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }> };
 
 export type GetFollowedAuthorQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -680,7 +680,7 @@ export type GetLikeQueryVariables = Exact<{
 }>;
 
 
-export type GetLikeQuery = { __typename?: 'Query', like: { __typename?: 'Like', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } } };
+export type GetLikeQuery = { __typename?: 'Query', like: { __typename?: 'Like', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } } };
 
 export type GetLikedPoemsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -690,7 +690,7 @@ export type GetLikedPoemsQueryVariables = Exact<{
 }>;
 
 
-export type GetLikedPoemsQuery = { __typename?: 'Query', likes: Array<{ __typename?: 'Like', id: string, datePublished: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }> };
+export type GetLikedPoemsQuery = { __typename?: 'Query', likes: Array<{ __typename?: 'Like', id: string, datePublished: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } }> };
 
 export type GetLikesForPoemQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -700,7 +700,7 @@ export type GetLikesForPoemQueryVariables = Exact<{
 }>;
 
 
-export type GetLikesForPoemQuery = { __typename?: 'Query', likes: Array<{ __typename?: 'Like', id: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } }> };
+export type GetLikesForPoemQuery = { __typename?: 'Query', likes: Array<{ __typename?: 'Like', id: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }> };
 
 export type GetPoemQueryVariables = Exact<{
   poemId: Scalars['ID']['input'];
@@ -713,7 +713,7 @@ export type GetPoemQueryVariables = Exact<{
 }>;
 
 
-export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } }>, likes: Array<{ __typename?: 'Like', id: string, datePublished: unknown, author: { __typename?: 'Author', id: string, username: string } }>, savedBy: Array<{ __typename?: 'SavedPoem', id: string, author: { __typename?: 'Author', id: string, username: string } }>, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
+export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }>, likes: Array<{ __typename?: 'Like', id: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }>, savedBy: Array<{ __typename?: 'SavedPoem', id: string, author: { __typename?: 'Author', id: string, username: string } }>, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
 
 export type GetPoemsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -722,14 +722,14 @@ export type GetPoemsQueryVariables = Exact<{
 }>;
 
 
-export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }> };
+export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }> };
 
 export type GetSavedPoemQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetSavedPoemQuery = { __typename?: 'Query', savedPoem: { __typename?: 'SavedPoem', id: string, dateSaved: unknown, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } } };
+export type GetSavedPoemQuery = { __typename?: 'Query', savedPoem: { __typename?: 'SavedPoem', id: string, dateSaved: any, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } } };
 
 export type GetSavedPoemsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -739,4 +739,4 @@ export type GetSavedPoemsQueryVariables = Exact<{
 }>;
 
 
-export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: unknown, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: unknown, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } }> };
+export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } }> };

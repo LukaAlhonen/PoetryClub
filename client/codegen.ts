@@ -15,14 +15,14 @@ const config: CodegenConfig = {
       },
       config: {
         useTypeImports: true,
-        defaultScalarType: "unknown"
+        // defaultScalarType: "unknown"
       },
     },
     "./src/__generated__/types.ts": {
       plugins: ["typescript", "typescript-operations"],
-      config: {
-        defaultScalarType: "unknown"
-      },
+      // config: {
+        // defaultScalarType: "unknown"
+      // },
     },
   },
 };

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { useFragment, type FragmentType } from "../__generated__";
-import { POEM_DETAIL_FRAGMENT } from "../fragments/poem-detail.fragment";
+import { POEM_FRAGMENT } from "../graphql/fragments/poem.fragment";
 import { dateFormatter } from "../utils/formatters";
 import { Link } from "react-router-dom";
 
@@ -10,11 +10,11 @@ import UserIcon from "../assets/icons/user.svg?react";
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
   // component should already make sure that no null or undefined data is passed to this component
-  poem?: FragmentType<typeof POEM_DETAIL_FRAGMENT> | null;
+  poem?: FragmentType<typeof POEM_FRAGMENT> | null;
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
-  const poem = useFragment(POEM_DETAIL_FRAGMENT, props.poem);
+  const poem = useFragment(POEM_FRAGMENT, props.poem);
 
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
