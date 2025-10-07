@@ -1,10 +1,11 @@
 import { useParams } from "react-router-dom";
-import { GET_POEM } from "../graphql/queries/poem";
+import { GET_POEM } from "./poem.graphql";
 import { useQuery } from "@apollo/client";
-import PoemDetail from "../components/poem-detail";
-import { Layout } from "../components";
-import QueryResult from "../components/query-result";
+import PoemDetail from "../../components/PoemDetail/poem-detail";
+import { Layout } from "../../components";
+import QueryResult from "../../components/query-result";
 import styled from "@emotion/styled";
+
 
 const Poem = () => {
   const { poemId = "" } = useParams();
@@ -20,12 +21,14 @@ const Poem = () => {
       </div>
     );
 
-  if (error)
+  if (error) {
+    console.log(error)
     return (
       <div>
         <h1>{error.message}</h1>
       </div>
     );
+  }
 
   return (
     <Layout>

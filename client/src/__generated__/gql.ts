@@ -14,6 +14,8 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n": typeof types.PoemCardFragmentFragmentDoc,
+    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": typeof types.PoemDetailFragmentFragmentDoc,
     "\n    fragment AuthorSimpleFragment on Author {\n        id\n        username\n    }\n": typeof types.AuthorSimpleFragmentFragmentDoc,
     "\n    fragment AuthorFragment on Author {\n        id\n        username\n        dateJoined\n        followedByCount\n        followingCount\n    }\n": typeof types.AuthorFragmentFragmentDoc,
     "\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n": typeof types.CollectionFragmentFragmentDoc,
@@ -54,12 +56,14 @@ type Documents = {
     "\n    query GetLike ($id: ID!) {\n        like (id: $id) {\n           id\n           author {\n               id\n               ...AuthorSimpleFragment\n           }\n           poem {\n               id\n               ...PoemFragment\n           }\n        }\n    }\n": typeof types.GetLikeDocument,
     "\n    query GetLikedPoems ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikedPoemFragment\n        }\n    }\n": typeof types.GetLikedPoemsDocument,
     "\n    query GetLikesForPoem ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikeFragment\n        }\n    }\n": typeof types.GetLikesForPoemDocument,
-    "\n  query GetPoem(\n    $poemId: ID!\n    $commentsLimit: Int\n    $commentsCursor: ID\n    $likesLimit: Int\n    $likesCursor: ID\n    $savedByLimit: Int\n    $savedByCursor: ID\n  ) {\n    poem(id: $poemId) {\n        id\n        ...PoemFragment\n        comments(limit: $commentsLimit, cursor: $commentsCursor) {\n            ...CommentFragment\n        }\n        likes(limit: $likesLimit, cursor: $likesCursor) {\n            ...LikeFragment\n        }\n        savedBy(limit: $savedByLimit, cursor: $savedByCursor) {\n            ...SavedByFragment\n        }\n    }\n  }\n": typeof types.GetPoemDocument,
-    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemFragment\n    }\n  }\n": typeof types.GetPoemsDocument,
     "\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n": typeof types.GetSavedPoemDocument,
     "\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n": typeof types.GetSavedPoemsDocument,
+    "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": typeof types.GetPoemDocument,
+    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": typeof types.GetPoemsDocument,
 };
 const documents: Documents = {
+    "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n": types.PoemCardFragmentFragmentDoc,
+    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": types.PoemDetailFragmentFragmentDoc,
     "\n    fragment AuthorSimpleFragment on Author {\n        id\n        username\n    }\n": types.AuthorSimpleFragmentFragmentDoc,
     "\n    fragment AuthorFragment on Author {\n        id\n        username\n        dateJoined\n        followedByCount\n        followingCount\n    }\n": types.AuthorFragmentFragmentDoc,
     "\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n": types.CollectionFragmentFragmentDoc,
@@ -100,10 +104,10 @@ const documents: Documents = {
     "\n    query GetLike ($id: ID!) {\n        like (id: $id) {\n           id\n           author {\n               id\n               ...AuthorSimpleFragment\n           }\n           poem {\n               id\n               ...PoemFragment\n           }\n        }\n    }\n": types.GetLikeDocument,
     "\n    query GetLikedPoems ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikedPoemFragment\n        }\n    }\n": types.GetLikedPoemsDocument,
     "\n    query GetLikesForPoem ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikeFragment\n        }\n    }\n": types.GetLikesForPoemDocument,
-    "\n  query GetPoem(\n    $poemId: ID!\n    $commentsLimit: Int\n    $commentsCursor: ID\n    $likesLimit: Int\n    $likesCursor: ID\n    $savedByLimit: Int\n    $savedByCursor: ID\n  ) {\n    poem(id: $poemId) {\n        id\n        ...PoemFragment\n        comments(limit: $commentsLimit, cursor: $commentsCursor) {\n            ...CommentFragment\n        }\n        likes(limit: $likesLimit, cursor: $likesCursor) {\n            ...LikeFragment\n        }\n        savedBy(limit: $savedByLimit, cursor: $savedByCursor) {\n            ...SavedByFragment\n        }\n    }\n  }\n": types.GetPoemDocument,
-    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemFragment\n    }\n  }\n": types.GetPoemsDocument,
     "\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n": types.GetSavedPoemDocument,
     "\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n": types.GetSavedPoemsDocument,
+    "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": types.GetPoemDocument,
+    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": types.GetPoemsDocument,
 };
 
 /**
@@ -120,6 +124,14 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n"): (typeof documents)["\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"): (typeof documents)["\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -283,19 +295,19 @@ export function gql(source: "\n    query GetLikesForPoem ($limit: Int $cursor: I
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetPoem(\n    $poemId: ID!\n    $commentsLimit: Int\n    $commentsCursor: ID\n    $likesLimit: Int\n    $likesCursor: ID\n    $savedByLimit: Int\n    $savedByCursor: ID\n  ) {\n    poem(id: $poemId) {\n        id\n        ...PoemFragment\n        comments(limit: $commentsLimit, cursor: $commentsCursor) {\n            ...CommentFragment\n        }\n        likes(limit: $likesLimit, cursor: $likesCursor) {\n            ...LikeFragment\n        }\n        savedBy(limit: $savedByLimit, cursor: $savedByCursor) {\n            ...SavedByFragment\n        }\n    }\n  }\n"): (typeof documents)["\n  query GetPoem(\n    $poemId: ID!\n    $commentsLimit: Int\n    $commentsCursor: ID\n    $likesLimit: Int\n    $likesCursor: ID\n    $savedByLimit: Int\n    $savedByCursor: ID\n  ) {\n    poem(id: $poemId) {\n        id\n        ...PoemFragment\n        comments(limit: $commentsLimit, cursor: $commentsCursor) {\n            ...CommentFragment\n        }\n        likes(limit: $likesLimit, cursor: $likesCursor) {\n            ...LikeFragment\n        }\n        savedBy(limit: $savedByLimit, cursor: $savedByCursor) {\n            ...SavedByFragment\n        }\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemFragment\n    }\n  }\n"): (typeof documents)["\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemFragment\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n"): (typeof documents)["\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n"): (typeof documents)["\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n"): (typeof documents)["\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n"): (typeof documents)["\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

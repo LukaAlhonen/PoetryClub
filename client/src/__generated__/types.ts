@@ -444,6 +444,10 @@ export type UpdatePoemInput = {
   views?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null };
+
+export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } };
+
 export type AuthorSimpleFragmentFragment = { __typename?: 'Author', id: string, username: string };
 
 export type AuthorFragmentFragment = { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number };
@@ -702,28 +706,6 @@ export type GetLikesForPoemQueryVariables = Exact<{
 
 export type GetLikesForPoemQuery = { __typename?: 'Query', likes: Array<{ __typename?: 'Like', id: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }> };
 
-export type GetPoemQueryVariables = Exact<{
-  poemId: Scalars['ID']['input'];
-  commentsLimit?: InputMaybe<Scalars['Int']['input']>;
-  commentsCursor?: InputMaybe<Scalars['ID']['input']>;
-  likesLimit?: InputMaybe<Scalars['Int']['input']>;
-  likesCursor?: InputMaybe<Scalars['ID']['input']>;
-  savedByLimit?: InputMaybe<Scalars['Int']['input']>;
-  savedByCursor?: InputMaybe<Scalars['ID']['input']>;
-}>;
-
-
-export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }>, likes: Array<{ __typename?: 'Like', id: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }>, savedBy: Array<{ __typename?: 'SavedPoem', id: string, author: { __typename?: 'Author', id: string, username: string } }>, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
-
-export type GetPoemsQueryVariables = Exact<{
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  cursor?: InputMaybe<Scalars['ID']['input']>;
-  filter?: InputMaybe<GetPoemsFilter>;
-}>;
-
-
-export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }> };
-
 export type GetSavedPoemQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -740,3 +722,19 @@ export type GetSavedPoemsQueryVariables = Exact<{
 
 
 export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } }> };
+
+export type GetPoemQueryVariables = Exact<{
+  poemId: Scalars['ID']['input'];
+}>;
+
+
+export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } } };
+
+export type GetPoemsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  cursor?: InputMaybe<Scalars['ID']['input']>;
+  filter?: InputMaybe<GetPoemsFilter>;
+}>;
+
+
+export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }> };
