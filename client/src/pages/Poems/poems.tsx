@@ -1,10 +1,10 @@
-import { Layout } from "../components";
+import { Layout } from "../../components";
 import { useQuery } from "@apollo/client";
-import PoemCard from "../containers/poem-card";
-import { GET_POEMS } from "../graphql/queries/poems";
-import QueryResult from "../components/query-result";
+import PoemCard from "../../components/PoemCard/poem-card";
+import { GET_POEMS } from "./poems.graphql";
+import QueryResult from "../../components/query-result";
 import styled from "@emotion/styled";
-import colors from "../colors";
+import colors from "../../colors";
 
 const Poems = () => {
   const { loading, error, data } = useQuery(GET_POEMS);

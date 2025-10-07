@@ -6,13 +6,13 @@ import {
 } from "@testing-library/react";
 import type { ReactElement } from "react";
 
-const renderMockProvider = (
+const renderMockProvider = ({ component, mocks = [], options}: {
   component: ReactElement,
-  mocks: MockedResponse[] = [],
+  mocks?: MockedResponse[],
   options?: RenderOptions,
-): RenderResult => {
+  }): RenderResult => {
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider mocks={mocks}>
       {component}
     </MockedProvider>,
     options,
