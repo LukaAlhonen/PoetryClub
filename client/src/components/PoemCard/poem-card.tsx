@@ -158,6 +158,7 @@ const UsernameContainer = styled(Link)({
 });
 
 const TextContainer = styled.div({
+  whiteSpace: "pre-wrap",
   position: "relative",
   height: "20em",
   overflow: "hidden",
