@@ -6,6 +6,7 @@ import SearchIcon from "../assets/icons/search.svg?react";
 import ComposeIcon from "../assets/icons/plus.svg?react";
 import UserIcon from "../assets/icons/user.svg?react";
 import BookMarksIcon from "../assets/icons/book-alt.svg?react";
+import colors from "../colors";
 
 const LeftNav = () => {
   return (
@@ -49,6 +50,7 @@ const NavContainer = styled.div({
   alignSelf: "start",
   zIndex: 10,
   padding: "1em 1em 0 1em",
+  // padding: "1em",
   height: "100%",
   borderRight: "2px solid gray",
 });
@@ -66,18 +68,20 @@ const BottomNav = styled.div({
 
 const NavLink = styled(Link)({
   textDecoration: "none",
-  color: "blue",
+  color: colors.backgroundBlack,
+  background: colors.textEggshell,
   marginBottom: "1em",
-  padding: "0.35em",
+  padding: "0.5em",
   display: "flex",
   alignItems: "center",
   gap: "1em",
   boxSizing: "border-box",
-  border: "0.15em solid gray",
+  // border: `0.15em solid ${colors.textEggshell}`,
   borderRadius: "0.6em",
-  transition: "color 0.15s ease",
+  transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: "red",
+    color: colors.textEggshell,
+    background: colors.wineRed,
   },
 });
 
