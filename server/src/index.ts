@@ -22,9 +22,9 @@ async function startApolloServer() {
 
   const server = new ApolloServer<MyContext>({
     schema,
-    // csrfPrevention: {
-    //   requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
-    // },
+    csrfPrevention: {
+      requestHeaders: ["X-Apollo-Operation-Name", "apollo-require-preflight"],
+    },
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
@@ -33,8 +33,10 @@ async function startApolloServer() {
   const corsOptions: cors.CorsOptions = {
     origin: true,
     credentials: true,
+    preflightContinue: false,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     // methods: ["GET", "POST", "OPTIONS"],
-    // allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   };
 
   app.use(
