@@ -32,23 +32,22 @@ const LeftNav = () => {
       <BottomNav>
         { user ? (
           <>
-        <NavLink to="/">
-          <BookMarksButton />
-          Bookmarks
-        </NavLink>
-        <NavLink to="/">
-          <UserButton />
-          Profile
-        </NavLink>
+            <NavLink to="/">
+              <BookMarksButton />
+              Bookmarks
+            </NavLink>
+            <NavLink to="/">
+              <UserButton />
+              Profile
+            </NavLink>
             <NavLink onClick={logout} to="/">
               <LogoutButton/>
-          Logout
-        </NavLink>
+              Logout
+            </NavLink>
           </>
         ) : (
           <>
-        <NavLink to="/login"><LoginButton />Login</NavLink>
-
+            <NavLink to="/login"><LoginButton />Login</NavLink>
           </>
         )
         }
@@ -94,7 +93,6 @@ const NavLink = styled(Link)({
   alignItems: "center",
   gap: "1em",
   boxSizing: "border-box",
-  // border: `0.15em solid ${colors.textEggshell}`,
   borderRadius: "0.6em",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
