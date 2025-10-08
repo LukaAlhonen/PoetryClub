@@ -108,12 +108,12 @@ const PoemTitle = styled(Link)({
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",
   backgroundRepeat: "no-repeat",
-  backgroundSize: "0% 2px", // 👈 start hidden
+  backgroundSize: "0% 0.2em", // 👈 start hidden
   transition: "none",
 
   "&:hover": {
     transition: "color 0.2s ease, background-size 0.2s ease",
-    backgroundSize: "100% 2px", // 👈 expands left → right
+    backgroundSize: "100% 0.2em", // 👈 expands left → right
     color: colors.wineRed,
   },
   "& h3": {
@@ -141,7 +141,7 @@ const UsernameContainer = styled(Link)({
   borderRadius: "0.5em",
   color: colors.backgroundBlack,
   background: colors.textEggshell,
-  transition: "color 0.2s ease, border 0.2s ease, background 0.2s ease",
+  transition: "color 0.2s ease, background 0.2s ease, border 0.2s ease",
   marginRight: "auto",
   fontWeight: "bold",
   alignItems: "center",
@@ -149,8 +149,8 @@ const UsernameContainer = styled(Link)({
   border: `0.15em solid ${colors.backgroundBlack}`,
   "&:hover": {
     color: colors.textEggshell,
-    border: `0.15em solid ${colors.wineRed}`,
-    background: colors.wineRed
+    background: colors.wineRed,
+    border: `0.15em solid ${colors.wineRed}`
   },
   "&:hover path": {
     fill: colors.textEggshell
@@ -158,6 +158,8 @@ const UsernameContainer = styled(Link)({
 });
 
 const TextContainer = styled.div({
+  display: "flex",
+  alignSelf: "center",
   whiteSpace: "pre-wrap",
   position: "relative",
   height: "20em",
@@ -170,7 +172,7 @@ const TextContainer = styled.div({
     bottom: 0,
     left: 0,
     width: "100%",
-    height: "5em",
+    height: "10em",
     background: `linear-gradient(
       to bottom,
       rgba(220, 226, 220, 0) 0%,
@@ -181,13 +183,15 @@ const TextContainer = styled.div({
 });
 
 const PoemLink = styled(Link)({
+  paddingLeft: "1em",
   position: "absolute",
-  bottom: "0.4em",
+  bottom: "0.7em",
   left: "50%",
   transform: "translateX(-50%)",
   textAlign: "center",
+  textWrap: "nowrap",
+  fontSize: "1.2em",
   zIndex: 2,
-  // textShadow: "0 1px 2px black",
   fontWeight: "bold",
   cursor: "pointer",
 
@@ -195,6 +199,10 @@ const PoemLink = styled(Link)({
   "&:hover": {
     transform: "translateX(-50%) translateY(-3px)",
     color: colors.wineRed,
+  },
+  "&:hover svg": {
+    transform: "scaleX(1)",
+    opacity: 1,
   },
 
   display: "flex",
@@ -284,8 +292,11 @@ const UserButton = styled(UserIcon)({
 
 const Arrow = styled(ArrowIcon)({
   width: "1em",
+  opacity: 0,
+  transform: "scaleX(0)",
   height: "1em",
   fill: "currentcolor",
+  transition: "transform 0.15s ease"
 });
 
 const HoverContainer = styled.div({

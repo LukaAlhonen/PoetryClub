@@ -14,6 +14,10 @@ export const POEM_DETAIL_FRAGMENT = gql(`
             id
             username
         }
+        comments {
+            id
+            ...CommentFragment
+        }
         views
         likesCount
         commentsCount

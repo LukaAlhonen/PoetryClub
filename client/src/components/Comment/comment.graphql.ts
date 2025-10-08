@@ -5,7 +5,8 @@ export const COMMENT_FRAGMENT = gql(`
         id
         text
         author {
-            ...AuthorSimpleFragment
+            id
+            username
         }
         datePublished
     }
