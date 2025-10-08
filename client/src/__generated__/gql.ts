@@ -14,12 +14,12 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            id\n            username\n        }\n        datePublished\n    }\n": typeof types.CommentFragmentFragmentDoc,
     "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n": typeof types.PoemCardFragmentFragmentDoc,
-    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": typeof types.PoemDetailFragmentFragmentDoc,
+    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        comments {\n            id\n            ...CommentFragment\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": typeof types.PoemDetailFragmentFragmentDoc,
     "\n    fragment AuthorSimpleFragment on Author {\n        id\n        username\n    }\n": typeof types.AuthorSimpleFragmentFragmentDoc,
     "\n    fragment AuthorFragment on Author {\n        id\n        username\n        dateJoined\n        followedByCount\n        followingCount\n    }\n": typeof types.AuthorFragmentFragmentDoc,
     "\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n": typeof types.CollectionFragmentFragmentDoc,
-    "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n": typeof types.CommentFragmentFragmentDoc,
     "\n    fragment FollowedByFragment on FollowedAuthor {\n        id\n        follower {\n            ...AuthorSimpleFragment\n        }\n    }\n": typeof types.FollowedByFragmentFragmentDoc,
     "\n    fragment FollowingFragment on FollowedAuthor {\n        id\n        following {\n            ...AuthorSimpleFragment\n        }\n    }\n": typeof types.FollowingFragmentFragmentDoc,
     "\n    fragment LikeFragment on Like {\n        id\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n": typeof types.LikeFragmentFragmentDoc,
@@ -62,12 +62,12 @@ type Documents = {
     "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": typeof types.GetPoemsDocument,
 };
 const documents: Documents = {
+    "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            id\n            username\n        }\n        datePublished\n    }\n": types.CommentFragmentFragmentDoc,
     "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n": types.PoemCardFragmentFragmentDoc,
-    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": types.PoemDetailFragmentFragmentDoc,
+    "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        comments {\n            id\n            ...CommentFragment\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n": types.PoemDetailFragmentFragmentDoc,
     "\n    fragment AuthorSimpleFragment on Author {\n        id\n        username\n    }\n": types.AuthorSimpleFragmentFragmentDoc,
     "\n    fragment AuthorFragment on Author {\n        id\n        username\n        dateJoined\n        followedByCount\n        followingCount\n    }\n": types.AuthorFragmentFragmentDoc,
     "\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n": types.CollectionFragmentFragmentDoc,
-    "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n": types.CommentFragmentFragmentDoc,
     "\n    fragment FollowedByFragment on FollowedAuthor {\n        id\n        follower {\n            ...AuthorSimpleFragment\n        }\n    }\n": types.FollowedByFragmentFragmentDoc,
     "\n    fragment FollowingFragment on FollowedAuthor {\n        id\n        following {\n            ...AuthorSimpleFragment\n        }\n    }\n": types.FollowingFragmentFragmentDoc,
     "\n    fragment LikeFragment on Like {\n        id\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n": types.LikeFragmentFragmentDoc,
@@ -127,11 +127,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            id\n            username\n        }\n        datePublished\n    }\n"): (typeof documents)["\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            id\n            username\n        }\n        datePublished\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n"): (typeof documents)["\n    fragment PoemCardFragment on Poem {\n        id\n        title\n        text\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n        inCollection {\n           id\n           title\n        }\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"): (typeof documents)["\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"];
+export function gql(source: "\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        comments {\n            id\n            ...CommentFragment\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"): (typeof documents)["\n    fragment PoemDetailFragment on Poem {\n        id\n        title\n        text\n        inCollection {\n            id\n            title\n        }\n        datePublished\n        author {\n            id\n            username\n        }\n        comments {\n            id\n            ...CommentFragment\n        }\n        views\n        likesCount\n        commentsCount\n        savedByCount\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -144,10 +148,6 @@ export function gql(source: "\n    fragment AuthorFragment on Author {\n        
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n"): (typeof documents)["\n    fragment CollectionFragment on Collection {\n        id\n        title\n        dateCreated\n        author {\n            ...AuthorSimpleFragment\n        }\n    }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n"): (typeof documents)["\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            ...AuthorSimpleFragment\n        }\n        datePublished\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -2,13 +2,15 @@ import styled from "@emotion/styled";
 import { useFragment, type FragmentType } from "../../__generated__";
 import { POEM_DETAIL_FRAGMENT } from "./poem-detail.graphql";
 import { dateFormatter } from "../../utils/formatters";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import Comment from "../Comment/comment";
+import colors from "../../colors";
+import { useState, useEffect, useRef } from "react";
 
 import UserIcon from "../../assets/icons/user.svg?react";
 import CommentsIcon from "../../assets/icons/comment.svg?react";
 import LikesIcons from "../../assets/icons/heart2.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
-import colors from "../../colors";
 
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
@@ -17,11 +19,40 @@ interface PoemDetailProps {
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
+  const [displayComments, setDisplayComments] = useState(true)
+  const [hasToggled, setHasToggled] = useState(false)
+
   const poem = useFragment(POEM_DETAIL_FRAGMENT, props.poem);
 
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
     : "loading...";
+
+  const commentSectionRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  const toggleComments = () => {
+    if (poem?.comments.length !== 0) {
+      setHasToggled(true)
+      setDisplayComments((s) => !s)
+    }
+  };
+
+  useEffect(() => {
+    if (hasToggled && displayComments && commentSectionRef.current) {
+      commentSectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [displayComments, hasToggled]);
+
+  useEffect(() => {
+    if (location.hash === "#comments" && commentSectionRef.current) {
+      setDisplayComments(true)
+      commentSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location])
 
   // TODO: create 404 page to redirect to
   if (!poem) {
@@ -68,11 +99,16 @@ const PoemDetail = (props: PoemDetailProps) => {
               {poem?.commentsCount}
             </span>
             <HoverContainer>
-              <CommentsButton />
+              <CommentsButton open={displayComments} onClick={toggleComments}/>
             </HoverContainer>
           </StatsContainer>
         </PoemFooter>
       </PoemContainer>
+      <CommentSection ref={commentSectionRef} open={displayComments}>
+        {poem?.comments.map((comment) => (
+          <Comment key={comment.id} comment={comment} />
+        ))}
+      </CommentSection>
     </PoemDetailContainer>
   );
 };
@@ -112,7 +148,7 @@ const PoemHeader = styled.div({
 });
 
 const PoemTitle = styled.div({
-  textDecoration: "none",
+  textDecoration: "underline",
   // alignSelf: "center",
   color: colors.backgroundBlack,
   marginBottom: "2em"
@@ -125,33 +161,6 @@ const PoemSubHeader = styled.div({
   justifyContent: "space-between",
   alignItems: "center",
 });
-
-// const UsernameContainer = styled(Link)({
-//   "& h5": {
-//     margin: "0",
-//     fontSize: "15px",
-//   },
-//   textDecoration: "none",
-//   boxSizing: "border-box",
-//   padding: "0.2em",
-//   borderRadius: "0.5em",
-//   color: colors.backgroundBlack,
-//   background: colors.textEggshell,
-//   transition: "color 0.2s ease, border 0.2s ease, background 0.2s ease",
-//   marginRight: "auto",
-//   fontWeight: "bold",
-//   alignItems: "center",
-//   display: "flex",
-//   border: `0.15em solid ${colors.backgroundBlack}`,
-//   "&:hover": {
-//     color: colors.textEggshell,
-//     border: `0.15em solid ${colors.wineRed}`,
-//     background: colors.wineRed
-//   },
-//   "&:hover path": {
-//     fill: colors.textEggshell
-//   },
-// });
 
 const AuthorContainer = styled(Link)({
   "& h5": {
@@ -234,16 +243,16 @@ const svgButtonStyles = {
   height: "1em",
 };
 
-const CommentsButton = styled(CommentsIcon)({
+const CommentsButton = styled(CommentsIcon)<{open?: boolean}>(({ open }) =>({
   ...svgButtonStyles,
   "& path": {
-    fill: colors.backgroundBlack,
+    fill: open ? colors.wineRed : colors.backgroundBlack,
     transition: "fill 0.15s ease",
   },
   "&:hover path": {
     fill: colors.wineRed,
   },
-});
+}));
 
 const LikesButton = styled(LikesIcons)({
   ...svgButtonStyles,
@@ -256,7 +265,7 @@ const LikesButton = styled(LikesIcons)({
   },
 });
 
-const ViewsButton = styled(ViewsIcon)({
+const ViewsButton = styled(ViewsIcon) ({
   ...svgButtonStyles,
   "& path": {
     fill: colors.backgroundBlack
@@ -268,3 +277,17 @@ const HoverContainer = styled.div({
     cursor: "pointer"
   }
 })
+
+const CommentSection = styled.div<{ open?: boolean }>(({ open }) => ({
+  marginTop: "1em",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "end",
+  transformOrigin: "top",
+  transform: open ? "scaleY(1)" : "scaleY(0)",
+  transition: "transform 0.1s ease",
+  height: open ? "auto" : 0,
+  overflow: "hidden",
+  position: open ? "relative" : "absolute",
+  pointerEvents: open ? "auto" : "none",
+}));

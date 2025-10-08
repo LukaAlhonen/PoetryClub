@@ -13,6 +13,7 @@ const GlobalStyles = () => {
         {
           html: {
             height: "100%",
+            scrollBehavior: "smooth"
           },
 
           body: {

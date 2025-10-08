@@ -66,30 +66,12 @@ const TitleContainer = styled(Link)({
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",
   backgroundRepeat: "no-repeat",
-  backgroundSize: "0% 2px", // 👈 start hidden
+  backgroundSize: "0% 0.1em", // 👈 start hidden
   transition: "none",
 
   "&:hover": {
   transition: "color 0.2s ease, background-size 0.2s ease",
-    backgroundSize: "100% 2px", // 👈 expands left → right
+    backgroundSize: "100% 0.1em", // 👈 expands left → right
     color: colors.wineRed,
   },
 })
-
-// textDecoration: "none",
-// transition: "color 0.2s ease, background-size 0.2s ease",
-// color: colors.backgroundBlack,
-// position: "relative",
-// backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
-// backgroundPosition: "0 100%",
-// backgroundRepeat: "no-repeat",
-// backgroundSize: "0% 2px", // 👈 start hidden
-
-// "&:hover": {
-//   backgroundSize: "100% 2px", // 👈 expands left → right
-//   color: colors.wineRed,
-// },
-// "& h3": {
-//   display: "inline",
-//   margin: "0",
-// }
