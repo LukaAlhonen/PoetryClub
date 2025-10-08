@@ -61,23 +61,35 @@ const HeaderContainer = styled.div({
 
 const TitleContainer = styled(Link)({
   textDecoration: "none",
-  transition: "color 0.2s ease",
   color: colors.textEggshell,
   position: "relative",
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: "-0.01em",
-    left: "0",
-    width: "0%",
-    borderBottom: `2px solid ${colors.wineRed}`,
-    transition: "none"
-  },
-  "&:hover::after": {
-    width: "100%",
-    transition: "width 0.2s ease",
-  },
+  backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
+  backgroundPosition: "0 100%",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "0% 2px", // 👈 start hidden
+  transition: "none",
+
   "&:hover": {
-    color: colors.wineRed
-  }
+  transition: "color 0.2s ease, background-size 0.2s ease",
+    backgroundSize: "100% 2px", // 👈 expands left → right
+    color: colors.wineRed,
+  },
 })
+
+// textDecoration: "none",
+// transition: "color 0.2s ease, background-size 0.2s ease",
+// color: colors.backgroundBlack,
+// position: "relative",
+// backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
+// backgroundPosition: "0 100%",
+// backgroundRepeat: "no-repeat",
+// backgroundSize: "0% 2px", // 👈 start hidden
+
+// "&:hover": {
+//   backgroundSize: "100% 2px", // 👈 expands left → right
+//   color: colors.wineRed,
+// },
+// "& h3": {
+//   display: "inline",
+//   margin: "0",
+// }
