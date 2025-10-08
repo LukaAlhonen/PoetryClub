@@ -2,15 +2,15 @@ import styled from "@emotion/styled";
 import { useFragment, type FragmentType } from "../../__generated__";
 import { POEM_DETAIL_FRAGMENT } from "./poem-detail.graphql";
 import { dateFormatter } from "../../utils/formatters";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Comment from "../Comment/comment";
+import colors from "../../colors";
+import { useState, useEffect, useRef } from "react";
 
 import UserIcon from "../../assets/icons/user.svg?react";
 import CommentsIcon from "../../assets/icons/comment.svg?react";
 import LikesIcons from "../../assets/icons/heart2.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
-import colors from "../../colors";
-import { useState, useEffect, useRef } from "react";
 
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
@@ -29,6 +29,7 @@ const PoemDetail = (props: PoemDetailProps) => {
     : "loading...";
 
   const commentSectionRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
   const toggleComments = () => {
     if (poem?.comments.length !== 0) {
@@ -45,6 +46,13 @@ const PoemDetail = (props: PoemDetailProps) => {
       });
     }
   }, [displayComments, hasToggled]);
+
+  useEffect(() => {
+    if (location.hash === "#comments" && commentSectionRef.current) {
+      setDisplayComments(true)
+      commentSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location])
 
   // TODO: create 404 page to redirect to
   if (!poem) {

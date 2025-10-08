@@ -59,7 +59,9 @@ const PoemCard = (props: PoemCardProps) => {
             {poem?.commentsCount}
           </span>
           <HoverContainer>
-            <CommentsButton />
+            <Link to={poem ? `/poem/${poem?.id}#comments` : "#"}>
+              <CommentsButton />
+            </Link>
           </HoverContainer>
         </StatsContainer>
       </PoemFooter>
