@@ -25,13 +25,15 @@ const Poems = () => {
 export default Poems;
 
 const PoemsContainer = styled.div({
-  background: colors.background2,
-  overflowY: "scroll",
+  background: colors.backgroundBlack,
+  // overflowY: "scroll",
+  overflowY: "visible",
   overflowX: "hidden",
   display: "grid",
   gap: "1em",
   width: "100%",
-  height: "calc(100vh - 5em)",
+  // height: "calc(100vh - 5em)",
+  minHeight: "100vh",
   gridTemplateColumns: "repeat(auto-fit, minmax(20em, 1fr))",
   justifyContent: "center",
   padding: "1em",

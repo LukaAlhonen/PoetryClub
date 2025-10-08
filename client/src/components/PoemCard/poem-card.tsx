@@ -3,13 +3,13 @@ import styled from "@emotion/styled";
 import colors from "../../colors";
 import { useFragment, type FragmentType } from "../../__generated__";
 import { POEM_CARD_FRAGMENT } from "./poem-card.graphql";
-// import { POEM_FRAGMENT } from "../graphql/fragments/poem.fragment";
 import { dateFormatter } from "../../utils/formatters";
 
 import CommentsIcon from "../../assets/icons/comment.svg?react";
 import LikesIcons from "../../assets/icons/heart2.svg?react";
-import ViewsIcon from "../../assets/icons/eye.svg?react";
+import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import ArrowIcon from "../../assets/icons/arrow-right.svg?react";
+import UserIcon from "../../assets/icons/user.svg?react";
 
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
@@ -28,8 +28,8 @@ const PoemCard = (props: PoemCardProps) => {
           <h3>{poem?.title ?? "loading..."}</h3>
         </PoemTitle>
         <PoemSubHeader>
-          <ProfilePictureContainer></ProfilePictureContainer>
           <UsernameContainer to="/">
+            <UserButton></UserButton>
             {poem?.author?.username ?? "loading..."}
           </UsernameContainer>
           <h5>{date}</h5>
@@ -43,7 +43,6 @@ const PoemCard = (props: PoemCardProps) => {
       </TextContainer>
       <PoemFooter>
         <TagsContainer>
-          {/*<h5>#tag|#tag|#tag</h5>*/}
           <ViewsButton />
           <span data-testid="views">
             {poem?.views}
@@ -53,11 +52,15 @@ const PoemCard = (props: PoemCardProps) => {
           <span data-testid="likesCount">
             {poem?.likesCount}
           </span>
-          <LikesButton />
+          <HoverContainer>
+            <LikesButton />
+          </HoverContainer>
           <span data-testid="commentsCount">
             {poem?.commentsCount}
           </span>
-          <CommentsButton />
+          <HoverContainer>
+            <CommentsButton />
+          </HoverContainer>
         </StatsContainer>
       </PoemFooter>
     </PoemContainer>
@@ -75,14 +78,14 @@ const PoemContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   alignItems: "stretch",
-  maxHeight: "20em",
+  maxHeight: "30em",
   minHeight: "8.5em",
-  height: "20em",
   boxSizing: "border-box",
   wordWrap: "break-word",
   overflowWrap: "break-word",
-  background: colors.secondary,
-  color: colors.primary,
+  background: colors.textEggshell,
+  color: colors.backgroundBlack,
+  borderRadius: "0.6em"
 });
 
 const PoemHeader = styled.div({
@@ -90,28 +93,39 @@ const PoemHeader = styled.div({
     margin: "0 0 5px 0px",
     fontSize: "25px",
   },
-  background: colors.accent,
-  padding: "5px 10px 5px 10px",
-  color: colors.secondary,
+  background: colors.textEggshell,
+  padding: "1em 1em 0 1em",
+  color: colors.backgroundBlack,
   width: "100%",
+  boxSizing: "border-box",
+  borderBottom: "0.15em solid gray"
 });
 
 const PoemTitle = styled(Link)({
   textDecoration: "none",
-  color: colors.secondary,
-  // position: "relative",
-  // "&::after": {
-  //   content: '""',
-  //   position: "absolute",
-  //   bottom: "-2em",
-  //   left: "0",
-  //   width: "100%",
-  //   borderBottom: "2px solid white",
-  //   transition: "width 0.4s ease",
-  // },
-  // "&:hover::after": {
-  //   width: "100%",
-  // },
+  transition: "color 0.2s ease",
+  color: colors.backgroundBlack,
+  position: "relative",
+  "&:hover": {
+    color: colors.wineRed
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: "-0.01em",
+    left: "0",
+    width: "0%",
+    borderBottom: `2px solid ${colors.wineRed}`,
+    transition: "none"
+  },
+  "&:hover::after": {
+    width: "100%",
+    transition: "width 0.2s ease",
+  },
+  "& h3": {
+    display: "inline",
+    margin: "0",
+  }
 });
 
 const PoemSubHeader = styled.div({
@@ -122,22 +136,31 @@ const PoemSubHeader = styled.div({
   alignItems: "center",
 });
 
-const ProfilePictureContainer = styled.div({
-  borderRadius: "50%",
-  background: "white",
-  width: "40px",
-  height: "40px",
-  marginRight: "10px",
-});
-
 const UsernameContainer = styled(Link)({
   "& h5": {
     margin: "0",
     fontSize: "15px",
   },
   textDecoration: "none",
-  color: colors.secondary,
+  boxSizing: "border-box",
+  padding: "0.2em",
+  borderRadius: "0.5em",
+  color: colors.backgroundBlack,
+  background: colors.textEggshell,
+  transition: "color 0.2s ease, border 0.2s ease, background 0.2s ease",
   marginRight: "auto",
+  fontWeight: "bold",
+  alignItems: "center",
+  display: "flex",
+  border: `0.15em solid ${colors.backgroundBlack}`,
+  "&:hover": {
+    color: colors.textEggshell,
+    border: `0.15em solid ${colors.wineRed}`,
+    background: colors.wineRed
+  },
+  "&:hover path": {
+    fill: colors.textEggshell
+  },
 });
 
 const TextContainer = styled.div({
@@ -155,8 +178,8 @@ const TextContainer = styled.div({
     height: "5em",
     background: `linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.9) 90%
+      rgba(220, 226, 220, 0) 0%,
+      rgba(220, 226, 220, 1.0) 100%
     )`,
     pointerEvents: "none",
   },
@@ -176,7 +199,7 @@ const PoemLink = styled(Link)({
   transition: "transform 0.2s ease-out, color 0.15s ease",
   "&:hover": {
     transform: "translateX(-50%) translateY(-3px)",
-    color: "red",
+    color: colors.wineRed,
   },
 
   display: "flex",
@@ -184,7 +207,7 @@ const PoemLink = styled(Link)({
   justifyContent: "center",
   gap: "4px",
   textDecoration: "none",
-  color: "blue",
+  color: colors.foregroundBlack,
 });
 
 const PoemFooter = styled.div({
@@ -194,10 +217,12 @@ const PoemFooter = styled.div({
   flexDirection: "row",
   justifyContent: "space-evenly",
   alignItems: "center",
-  borderTop: `2px solid ${colors.background2}`,
+  borderTop: `0.15em solid gray`,
   "& h5": {
     margin: 0,
   },
+  background: colors.textEggshell,
+  color: colors.backgroundBlack
 });
 
 const TagsContainer = styled.div({
@@ -225,31 +250,51 @@ const svgButtonStyles = {
 const CommentsButton = styled(CommentsIcon)({
   ...svgButtonStyles,
   "& path": {
-    fill: "black",
+    fill: colors.backgroundBlack,
     transition: "fill 0.15s ease",
   },
   "&:hover path": {
-    fill: "red",
+    fill: colors.wineRed,
   },
 });
 
 const LikesButton = styled(LikesIcons)({
   ...svgButtonStyles,
   "& path": {
-    fill: "black",
+    fill: colors.backgroundBlack,
     transition: "fill 0.15s ease",
   },
   "&:hover path": {
-    fill: "red",
+    fill: colors.wineRed,
   },
 });
 
 const ViewsButton = styled(ViewsIcon)({
   ...svgButtonStyles,
+  "& path": {
+    fill: colors.backgroundBlack
+  }
 });
+
+const UserButton = styled(UserIcon)({
+  height: "1.5em",
+  width: "1.5em",
+  transition: "fill 0.2s ease",
+  margin: "0 0.5em 0 0",
+  "& path": {
+    fill: colors.backgroundBlack,
+    transition: "fill 0.2s ease"
+  }
+})
 
 const Arrow = styled(ArrowIcon)({
   width: "1em",
   height: "1em",
   fill: "currentcolor",
 });
+
+const HoverContainer = styled.div({
+  ":hover": {
+    cursor: "pointer"
+  }
+})
