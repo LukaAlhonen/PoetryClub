@@ -1,4 +1,6 @@
-import { type MockedResponse, MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
+import { MockLink } from "@apollo/client/testing";
+import { AuthProvider } from "../context/auth-provider";
 import {
   render,
   type RenderOptions,
@@ -8,13 +10,15 @@ import type { ReactElement } from "react";
 
 const renderMockProvider = ({ component, mocks = [], options}: {
   component: ReactElement,
-  mocks?: MockedResponse[],
+  mocks?: MockLink.MockedResponse[],
   options?: RenderOptions,
   }): RenderResult => {
   return render(
-    <MockedProvider mocks={mocks}>
-      {component}
-    </MockedProvider>,
+    <AuthProvider>
+      <MockedProvider mocks={mocks}>
+        {component}
+      </MockedProvider>
+    </AuthProvider>,
     options,
   );
 };
