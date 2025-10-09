@@ -3,7 +3,6 @@ import styled from "@emotion/styled";
 import LeftNav from "./left-nav";
 import colors from "../colors";
 import { Link } from "react-router-dom";
-// import colors from "../colors";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (

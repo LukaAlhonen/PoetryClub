@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { GET_POEM } from "./poem.graphql";
-import { useQuery } from "@apollo/client";
+// import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import PoemDetail from "../../components/PoemDetail/poem-detail";
 import { Layout } from "../../components";
 import QueryResult from "../../components/query-result";

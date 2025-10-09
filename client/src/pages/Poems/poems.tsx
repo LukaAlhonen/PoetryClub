@@ -1,5 +1,5 @@
 import { Layout } from "../../components";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import PoemCard from "../../components/PoemCard/poem-card";
 import { GET_POEMS } from "./poems.graphql";
 import QueryResult from "../../components/query-result";

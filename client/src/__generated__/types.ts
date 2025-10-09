@@ -723,6 +723,14 @@ export type GetSavedPoemsQueryVariables = Exact<{
 
 export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } }> };
 
+export type LoginMutationVariables = Exact<{
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', token: string, author: { __typename?: 'Author', id: string, username: string } } };
+
 export type GetPoemQueryVariables = Exact<{
   poemId: Scalars['ID']['input'];
 }>;

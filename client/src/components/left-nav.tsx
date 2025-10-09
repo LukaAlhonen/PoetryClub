@@ -1,14 +1,18 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/use-auth";
 
 import HomeIcon from "../assets/icons/home.svg?react";
 import SearchIcon from "../assets/icons/search.svg?react";
 import ComposeIcon from "../assets/icons/plus.svg?react";
 import UserIcon from "../assets/icons/user.svg?react";
 import BookMarksIcon from "../assets/icons/book-alt.svg?react";
+import LoginIcon from "../assets/icons/user-add.svg?react";
+import LogoutIcon from "../assets/icons/exit.svg?react";
 import colors from "../colors";
 
 const LeftNav = () => {
+  const { user, logout } = useAuth();
   return (
     <NavContainer>
       <TopNav>
@@ -26,14 +30,27 @@ const LeftNav = () => {
         </NavLink>
       </TopNav>
       <BottomNav>
-        <NavLink to="/">
-          <BookMarksButton />
-          Bookmarks
-        </NavLink>
-        <NavLink to="/login">
-          <UserButton />
-          Login
-        </NavLink>
+        { user ? (
+          <>
+            <NavLink to="/">
+              <BookMarksButton />
+              Bookmarks
+            </NavLink>
+            <NavLink to="/">
+              <UserButton />
+              Profile
+            </NavLink>
+            <NavLink onClick={logout} to="/">
+              <LogoutButton/>
+              Logout
+            </NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login"><LoginButton />Login</NavLink>
+          </>
+        )
+        }
       </BottomNav>
     </NavContainer>
   );
@@ -76,7 +93,6 @@ const NavLink = styled(Link)({
   alignItems: "center",
   gap: "1em",
   boxSizing: "border-box",
-  // border: `0.15em solid ${colors.textEggshell}`,
   borderRadius: "0.6em",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
@@ -112,3 +128,11 @@ const BookMarksButton = styled(BookMarksIcon)({
 const UserButton = styled(UserIcon)({
   ...navImg,
 });
+
+const LoginButton = styled(LoginIcon)({
+  ...navImg
+})
+
+const LogoutButton = styled(LogoutIcon)({
+  ...navImg
+})

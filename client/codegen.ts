@@ -4,8 +4,6 @@ const config: CodegenConfig = {
   schema: "http://192.168.1.209:4000/graphql",
   documents: [
     "./src/**/*.{ts,tsx,graphql}",
-    "./src/**/*.{ts,tsx,graphql}",
-    "./src/**/*.{ts,tsx,graphql}"
   ],
   generates: {
     "./src/__generated__/": {

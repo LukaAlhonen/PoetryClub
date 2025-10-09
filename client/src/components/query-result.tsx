@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import { ApolloError } from "@apollo/client";
 import type { ReactNode } from "react";
 import Spinner from "./spinner";
+import type { ErrorLike } from "@apollo/client";
 
 interface QueryResultProps {
   loading: boolean;
-  error?: ApolloError | null;
+  error?: ErrorLike | null;
   data?: unknown;
   children: ReactNode;
 }
