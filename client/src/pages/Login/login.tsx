@@ -93,7 +93,6 @@ const LoginForm = styled.form({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  // alignItems: "center"
 })
 
 const InputContainer = styled.div({
@@ -106,7 +105,6 @@ const InputContainer = styled.div({
   },
   marginBottom: "1em",
   alignItems: "stretch",
-  // maxWidth: "30em"
 })
 
 const LoginInput = styled.input({

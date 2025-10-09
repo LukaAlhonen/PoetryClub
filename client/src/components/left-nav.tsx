@@ -24,10 +24,12 @@ const LeftNav = () => {
           <SearchButton />
           Search
         </NavLink>
+        {user ? (
         <NavLink to="/compose">
           <ComposeButton />
           New Poem
         </NavLink>
+        ): (<></>)}
       </TopNav>
       <BottomNav>
         { user ? (
@@ -85,6 +87,7 @@ const BottomNav = styled.div({
 
 const NavLink = styled(Link)({
   textDecoration: "none",
+  width: "9em",
   color: colors.backgroundBlack,
   background: colors.textEggshell,
   marginBottom: "1em",

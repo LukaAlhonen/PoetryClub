@@ -25,8 +25,11 @@ const verifyUser = async ({
     omitAuthVersion: false,
   });
   if (!author) throw new Error("user not found");
-  if (!(author.authVersion === user.authVersion))
+  if (!(author.authVersion === user.authVersion)) {
+    console.log(author.authVersion);
+    console.log(user.authVersion)
     throw new Error("token no longer valid");
+  }
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -462,7 +465,7 @@ export const Mutation: Resolvers["Mutation"] = {
           email: author.email,
           authVersion: author.authVersion,
         },
-        config.JWT_REFRESH_SECRET,
+        config.JWT_SECRET,
         { expiresIn: "15m" },
       );
 
