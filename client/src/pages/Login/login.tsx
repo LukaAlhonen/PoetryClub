@@ -25,7 +25,7 @@ const Login = () => {
 
   // console.log(data, loading, error)
   if (data) {
-    localStorage.setItem("authToken", data.login.token)
+    localStorage.setItem("token", data.login.token)
     localStorage.setItem("username", JSON.stringify(data.login.author.username))
   }
 
