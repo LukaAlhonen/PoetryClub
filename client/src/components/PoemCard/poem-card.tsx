@@ -72,7 +72,7 @@ const PoemCard = (props: PoemCardProps) => {
 export default PoemCard;
 
 const PoemContainer = styled.div({
-  minWidth: "20em",
+  minWidth: "10em",
   maxWidth: "30em",
   width: "100%",
   justifySelf: "center",
@@ -81,7 +81,7 @@ const PoemContainer = styled.div({
   flexDirection: "column",
   alignItems: "stretch",
   maxHeight: "30em",
-  minHeight: "8.5em",
+  height: "30em",
   boxSizing: "border-box",
   wordWrap: "break-word",
   overflowWrap: "break-word",
@@ -98,7 +98,7 @@ const PoemHeader = styled.div({
   background: colors.textEggshell,
   padding: "1em 1em 0 1em",
   color: colors.backgroundBlack,
-  width: "100%",
+  // width: "100%",
   boxSizing: "border-box",
   borderBottom: "0.15em solid gray"
 });
@@ -125,7 +125,7 @@ const PoemTitle = styled(Link)({
 });
 
 const PoemSubHeader = styled.div({
-  width: "100%",
+  // width: "100%",
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
@@ -160,13 +160,17 @@ const UsernameContainer = styled(Link)({
 });
 
 const TextContainer = styled.div({
+  flexGrow: 1,
+  minHeight: 0,
+  overflow: "hidden",
   display: "flex",
   alignSelf: "center",
   whiteSpace: "pre-wrap",
+  wordBreak: "break-word",
   position: "relative",
-  height: "20em",
-  overflow: "hidden",
-  padding: "0.4em 0.4em 0 0.4em",
+  padding: "0.4em 0.4em 2em 0.4em",
+  justifyContent: "flex-start",
+  width: "100%",
 
   "&::after": {
     content: '""',
@@ -185,12 +189,13 @@ const TextContainer = styled.div({
 });
 
 const PoemLink = styled(Link)({
-  paddingLeft: "1em",
+  // paddingLeft: "1em",
   position: "absolute",
   bottom: "0.7em",
+  // marginTop: "auto",
   left: "50%",
   transform: "translateX(-50%)",
-  textAlign: "center",
+  // textAlign: "center",
   textWrap: "nowrap",
   fontSize: "1.2em",
   zIndex: 2,

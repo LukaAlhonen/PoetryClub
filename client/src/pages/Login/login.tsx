@@ -24,10 +24,10 @@ const Login = () => {
   }, [data, login, navigate])
 
   // console.log(data, loading, error)
-  if (data) {
-    localStorage.setItem("authToken", data.login.token)
-    localStorage.setItem("username", JSON.stringify(data.login.author.username))
-  }
+  // if (data) {
+  //   localStorage.setItem("token", data.login.token)
+  //   localStorage.setItem("username", JSON.stringify(data.login.author.username))
+  // }
 
   if (error) {
     return <div>{error.message}</div>
@@ -93,7 +93,6 @@ const LoginForm = styled.form({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  // alignItems: "center"
 })
 
 const InputContainer = styled.div({
@@ -106,7 +105,6 @@ const InputContainer = styled.div({
   },
   marginBottom: "1em",
   alignItems: "stretch",
-  // maxWidth: "30em"
 })
 
 const LoginInput = styled.input({

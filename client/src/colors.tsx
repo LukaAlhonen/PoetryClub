@@ -10,7 +10,8 @@ const colors = {
   backgroundBlack: "#181c18",
   foregroundBlack: "#1e211e",
   textEggshell: "#dce2dc",
-  wineRed: "#911431"
+  wineRed: "#911431",
+  white2: "#f2f2f2"
 };
 
 export default colors;

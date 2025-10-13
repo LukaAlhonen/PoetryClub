@@ -25,8 +25,9 @@ const verifyUser = async ({
     omitAuthVersion: false,
   });
   if (!author) throw new Error("user not found");
-  if (!(author.authVersion === user.authVersion))
+  if (!(author.authVersion === user.authVersion)) {
     throw new Error("token no longer valid");
+  }
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -35,10 +36,12 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     // make sure collection belongs to author
-    if(input.collectionId) {
-      const collection = await services.collectionService.getCollection({id: input.collectionId})
+    if (input.collectionId) {
+      const collection = await services.collectionService.getCollection({
+        id: input.collectionId,
+      });
       if (collection.authorId !== user.authorId) {
-        throw new Error(`cannot add poem to collection`)
+        throw new Error(`cannot add poem to collection`);
       }
     }
 
@@ -60,11 +63,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createComment: async (
-    _,
-    { poemId, text },
-    { user, services },
-  ) => {
+  createComment: async (_, { poemId, text }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -117,11 +116,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  createFollowedAuthor: async (
-    _,
-    { followingId },
-    { user, services },
-  ) => {
+  createFollowedAuthor: async (_, { followingId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -140,9 +135,11 @@ export const Mutation: Resolvers["Mutation"] = {
 
     // make sure collection belongs to author
     if (input.collectionId) {
-      const collection = await services.collectionService.getCollection({id: input.collectionId})
+      const collection = await services.collectionService.getCollection({
+        id: input.collectionId,
+      });
       if (collection.authorId !== user.authorId) {
-        throw new Error(`cannot add poem to collection`)
+        throw new Error(`cannot add poem to collection`);
       }
     }
 
@@ -246,11 +243,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removeCollection: async (
-    _,
-    { collectionId },
-    { user, services },
-  ) => {
+  removeCollection: async (_, { collectionId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -292,11 +285,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removeSavedPoem: async (
-    _,
-    { savedPoemId },
-    { user, services },
-  ) => {
+  removeSavedPoem: async (_, { savedPoemId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -318,11 +307,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  removeFollowedAuthor: async (
-    _,
-    { followedAuthorId },
-    { user, services },
-  ) => {
+  removeFollowedAuthor: async (_, { followedAuthorId }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
@@ -356,11 +341,7 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   // auth
-  login: async (
-    _,
-    { username, password },
-    { services, req, res },
-  ) => {
+  login: async (_, { username, password }, { services, req, res }) => {
     const author = await services.authorService.getAuthorByUsername({
       username,
       omitPassword: false,
@@ -399,8 +380,8 @@ export const Mutation: Resolvers["Mutation"] = {
 
     res.cookie("refreshToken", resfreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 1000,
     });
 
@@ -431,8 +412,8 @@ export const Mutation: Resolvers["Mutation"] = {
     // clear refresh cookie
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "none",
     });
 
     return true;
@@ -462,7 +443,7 @@ export const Mutation: Resolvers["Mutation"] = {
           email: author.email,
           authVersion: author.authVersion,
         },
-        config.JWT_REFRESH_SECRET,
+        config.JWT_SECRET,
         { expiresIn: "15m" },
       );
 
