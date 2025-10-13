@@ -61,7 +61,6 @@ export const typeDefs = gql`
     login(username: String!, password: String!): AuthPayload!
     signup(input: CreateAuthorInput!): Author!
     logout: Boolean!
-    refreshToken: AuthPayload!
   }
 
   type Author {

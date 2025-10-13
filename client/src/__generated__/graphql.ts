@@ -161,7 +161,6 @@ export type Mutation = {
   incrementPoemViews: Poem;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
-  refreshToken: AuthPayload;
   removeAuthor: Author;
   removeCollection: Collection;
   removeComment: Comment;

@@ -25,36 +25,10 @@ const authLink = new SetContextLink(({ headers }) => {
 })
 
 // handle token refresh
-const errorLink = new ErrorLink(({ error, operation, forward}) => {
+const errorLink = new ErrorLink(({ error }) => {
   if (CombinedGraphQLErrors.is(error)) {
     error.errors.forEach(({ message, locations, path}) => {
       console.log(`[GraphQL error]: Message: ${message}, Locations: ${locations}, Path: ${path}`);
-      if (message.includes("not authenticated")) {
-        return fetch("http://192.168.1.209:4000/graphql", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: `mutation { refreshToken { token author { id } } }`}),
-        })
-        .then(res => res.json())
-        .then(data => {
-          console.log("data:")
-          console.log(data)
-          const newToken = data.data.refreshToken.token;
-          // token = newToken;
-          localStorage.setItem("token", newToken);
-
-          // retry failed request with new token
-          operation.setContext(({ headers = {} }) => ({
-            headers: {
-              ...headers,
-              Authorization: `Bearer ${newToken}`,
-            }
-          }))
-
-          return forward(operation)
-        })
-      }
     })
   }
 })

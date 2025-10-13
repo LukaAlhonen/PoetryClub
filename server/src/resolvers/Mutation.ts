@@ -341,7 +341,7 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   // auth
-  login: async (_, { username, password }, { services, req, res }) => {
+  login: async (_, { username, password }, { services }) => {
     const author = await services.authorService.getAuthorByUsername({
       username,
       omitPassword: false,
@@ -365,25 +365,8 @@ export const Mutation: Resolvers["Mutation"] = {
         authVersion: author.authVersion,
       },
       config.JWT_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "1d" },
     );
-
-    const resfreshToken = jwt.sign(
-      {
-        authorId: author.id,
-        email: author.email,
-        authVersion: author.authVersion,
-      },
-      config.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" },
-    );
-
-    res.cookie("refreshToken", resfreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 1000,
-    });
 
     return { token: accessToken, author };
   },
@@ -396,7 +379,7 @@ export const Mutation: Resolvers["Mutation"] = {
     }
   },
 
-  logout: async (_, __, { res, user, services }) => {
+  logout: async (_, __, { user, services }) => {
     if (!user) {
       return true;
     }
@@ -409,47 +392,6 @@ export const Mutation: Resolvers["Mutation"] = {
       authVersion,
     });
 
-    // clear refresh cookie
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "none",
-    });
-
     return true;
-  },
-
-  refreshToken: async (_, __, { req, services }) => {
-    const token = req.cookies.refreshToken;
-    if (!token) throw new Error("no refresh token");
-
-    try {
-      const payload = jwt.verify(token, config.JWT_REFRESH_SECRET) as {
-        authorId: string;
-        authVersion: string;
-      };
-
-      const author = await services.authorService.getAuthorById({
-        id: payload.authorId,
-        omitAuthVersion: false,
-      });
-      if (!author) throw new Error("User not found");
-      if (!(author.authVersion === payload.authVersion))
-        throw new Error("token no longer valid");
-
-      const newAccessToken = jwt.sign(
-        {
-          authorId: author.id,
-          email: author.email,
-          authVersion: author.authVersion,
-        },
-        config.JWT_SECRET,
-        { expiresIn: "15m" },
-      );
-
-      return { token: newAccessToken, author };
-    } catch (err) {
-      handlePrismaError(err, "refreshToken");
-    }
   },
 };
