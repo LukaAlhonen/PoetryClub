@@ -25,8 +25,9 @@ const verifyUser = async ({
     omitAuthVersion: false,
   });
   if (!author) throw new Error("user not found");
-  if (!(author.authVersion === user.authVersion))
+  if (!(author.authVersion === user.authVersion)) {
     throw new Error("token no longer valid");
+  }
 };
 
 export const Mutation: Resolvers["Mutation"] = {

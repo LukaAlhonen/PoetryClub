@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Poem from "./Poem/poem";
 import Poems from "./Poems/poems";
-import ComposePoem from "./compose-poem";
+import ComposePoem from "./ComposePoem/compose-poem";
 import UserProfile from "./user-profile";
 import Search from "./search";
 import Login from "./Login/login";

@@ -497,13 +497,6 @@ export type CreateLikeMutationVariables = Exact<{
 
 export type CreateLikeMutation = { __typename?: 'Mutation', createLike: { __typename?: 'Like', id: string } };
 
-export type CreatePoemMutationVariables = Exact<{
-  input: CreatePoemInput;
-}>;
-
-
-export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string } };
-
 export type CreateSavedPoemMutationVariables = Exact<{
   poemId: Scalars['ID']['input'];
 }>;
@@ -722,6 +715,13 @@ export type GetSavedPoemsQueryVariables = Exact<{
 
 
 export type GetSavedPoemsQuery = { __typename?: 'Query', savedPoems: Array<{ __typename?: 'SavedPoem', id: string, dateSaved: any, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }, author: { __typename?: 'Author', id: string, username: string } }> };
+
+export type CreatePoemMutationVariables = Exact<{
+  input: CreatePoemInput;
+}>;
+
+
+export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String']['input'];

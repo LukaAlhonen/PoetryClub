@@ -12,6 +12,7 @@ import { MyContext } from "./types/context.js";
 import { MyJwtPayload } from "./types/auth.js";
 import { CacheAPI } from "./cache/cache-api.js";
 import { createServices } from "./services/index.js";
+import cookieParser from "cookie-parser";
 
 const prisma = new PrismaClient();
 const cache = new CacheAPI();
@@ -38,6 +39,8 @@ async function startApolloServer() {
     // methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   };
+
+  app.use(cookieParser());
 
   app.use(
     "/graphql",
