@@ -32,7 +32,7 @@ export class AuthorService {
     omitPassword?: boolean;
     omitAuthVersion?: boolean;
   }): Promise<SafeAuthor> {
-    const cacheKey = `author:id:${id}`;
+    const cacheKey = `author:id:${id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
 
     const cached = await this.cache.get<SafeAuthor>({ key: cacheKey });
     if (cached) {
@@ -84,7 +84,7 @@ export class AuthorService {
     omitPassword?: boolean;
     omitAuthVersion?: boolean;
   }): Promise<SafeAuthor> {
-    const cacheKey = `author:username:${username}`;
+    const cacheKey = `author:username:${username}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
     const cached = await this.cache.get<SafeAuthor>({ key: cacheKey });
     if (cached) {
       return cached;
@@ -144,7 +144,7 @@ export class AuthorService {
     limit?: number;
     cursor?: string;
   } = {}): Promise<SafeAuthor[] | null> {
-    const cacheKey = `authors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
+    const cacheKey = `authors:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
     const cached = await this.cache.getAll<SafeAuthor>({
       key: cacheKey,
     });
@@ -302,7 +302,7 @@ export class AuthorService {
       await this.cache.delByPattern({ pattern: "author:limit:*" });
 
       // cache new author
-      const cacheKey = `author:id:${author.id}`;
+      const cacheKey = `author:id:${author.id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
       await this.cache.set({ key: cacheKey, value: copy });
       await this.cache.sAdd({
         setKey: `author:${author.id}:queries`,
@@ -374,7 +374,7 @@ export class AuthorService {
     });
 
     if (author) {
-      const cacheKey = `author:id:${author.id}`;
+      const cacheKey = `author:id:${author.id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
 
       await this.cache.removeRelations({ id: author.id, name: "author" });
       await this.cache.set({ key: cacheKey, value: author });
