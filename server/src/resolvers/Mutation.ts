@@ -26,10 +26,6 @@ const verifyUser = async ({
   });
   if (!author) throw new Error("user not found");
   if (!(author.authVersion === user.authVersion)) {
-    console.log("complete author:");
-    console.log(author);
-    console.log("author:", author.authVersion);
-    console.log("user:", user.authVersion);
     throw new Error("token no longer valid");
   }
 };
@@ -424,10 +420,7 @@ export const Mutation: Resolvers["Mutation"] = {
   },
 
   refreshToken: async (_, __, { req, services }) => {
-    console.log(req.cookies);
     const token = req.cookies.refreshToken;
-    console.log(JSON.stringify(req.cookies));
-    console.log(JSON.stringify(req.signedCookies));
     if (!token) throw new Error("no refresh token");
 
     try {
