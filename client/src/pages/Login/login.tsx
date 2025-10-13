@@ -24,10 +24,10 @@ const Login = () => {
   }, [data, login, navigate])
 
   // console.log(data, loading, error)
-  if (data) {
-    localStorage.setItem("token", data.login.token)
-    localStorage.setItem("username", JSON.stringify(data.login.author.username))
-  }
+  // if (data) {
+  //   localStorage.setItem("token", data.login.token)
+  //   localStorage.setItem("username", JSON.stringify(data.login.author.username))
+  // }
 
   if (error) {
     return <div>{error.message}</div>

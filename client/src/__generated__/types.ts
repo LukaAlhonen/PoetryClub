@@ -721,7 +721,7 @@ export type CreatePoemMutationVariables = Exact<{
 }>;
 
 
-export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string } };
+export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String']['input'];

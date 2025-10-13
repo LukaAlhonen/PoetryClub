@@ -57,7 +57,7 @@ type Documents = {
     "\n    query GetLikesForPoem ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikeFragment\n        }\n    }\n": typeof types.GetLikesForPoemDocument,
     "\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n": typeof types.GetSavedPoemDocument,
     "\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n": typeof types.GetSavedPoemsDocument,
-    "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n      }\n    }\n": typeof types.CreatePoemDocument,
+    "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n": typeof types.CreatePoemDocument,
     "\n    mutation Login($username: String!, $password: String!) {\n      login(username: $username, password: $password) {\n        token\n        author {\n          id\n          username\n        }\n      }\n    }\n": typeof types.LoginDocument,
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": typeof types.GetPoemDocument,
     "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": typeof types.GetPoemsDocument,
@@ -106,7 +106,7 @@ const documents: Documents = {
     "\n    query GetLikesForPoem ($limit: Int $cursor: ID $poemId: ID $authorId: ID) {\n        likes(limit: $limit cursor: $cursor poemId: $poemId authorId: $authorId) {\n            id\n            ...LikeFragment\n        }\n    }\n": types.GetLikesForPoemDocument,
     "\n    query GetSavedPoem ($id: ID!) {\n        savedPoem(id: $id) {\n            id\n            author {\n                id\n                ...AuthorSimpleFragment\n            }\n            poem {\n                id\n                ...PoemFragment\n            }\n            dateSaved\n        }\n    }\n": types.GetSavedPoemDocument,
     "\n    query GetSavedPoems ($limit: Int, $cursor: ID, $poemId: ID, $authorId: ID) {\n        savedPoems(limit: $limit, cursor: $cursor, poemId: $poemId, authorId: $authorId) {\n            id\n            poem {\n                ...PoemFragment\n            }\n            author {\n                ...AuthorSimpleFragment\n            }\n            dateSaved\n        }\n    }\n": types.GetSavedPoemsDocument,
-    "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n      }\n    }\n": types.CreatePoemDocument,
+    "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n": types.CreatePoemDocument,
     "\n    mutation Login($username: String!, $password: String!) {\n      login(username: $username, password: $password) {\n        token\n        author {\n          id\n          username\n        }\n      }\n    }\n": types.LoginDocument,
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": types.GetPoemDocument,
     "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": types.GetPoemsDocument,
@@ -301,7 +301,7 @@ export function gql(source: "\n    query GetSavedPoems ($limit: Int, $cursor: ID
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n      }\n    }\n"): (typeof documents)["\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n      }\n    }\n"];
+export function gql(source: "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n"): (typeof documents)["\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

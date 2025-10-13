@@ -12,10 +12,10 @@ const link = new HttpLink({
   credentials: "include"
 })
 
-let token = localStorage.getItem("token")
+// let token = localStorage.getItem("token")
 
 const authLink = new SetContextLink(({ headers }) => {
-  // const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
   return {
     headers: {
       ...headers,
@@ -38,8 +38,10 @@ const errorLink = new ErrorLink(({ error, operation, forward}) => {
         })
         .then(res => res.json())
         .then(data => {
+          console.log("data:")
+          console.log(data)
           const newToken = data.data.refreshToken.token;
-          token = newToken;
+          // token = newToken;
           localStorage.setItem("token", newToken);
 
           // retry failed request with new token
