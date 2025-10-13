@@ -5,6 +5,7 @@ import { GET_POEMS } from "./poems.graphql";
 import QueryResult from "../../components/query-result";
 import styled from "@emotion/styled";
 import colors from "../../colors";
+// import type { GetPoemsQuery, GetPoemsQueryVariables } from "../../__generated__/types";
 
 const Poems = () => {
   const { loading, error, data } = useQuery(GET_POEMS);

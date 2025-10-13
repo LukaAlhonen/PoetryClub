@@ -7,15 +7,36 @@ import { useMutation } from "@apollo/client/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/spinner";
+// import { useApolloClient } from "@apollo/client/react";
+import { GET_POEMS } from "../Poems/poems.graphql";
 
 const ComposePoem = () => {
   const [text, setText] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [createPoemMutation, { data, loading, error }] = useMutation<CreatePoemMutation, CreatePoemMutationVariables>(CREATE_POEM)
+  const [createPoemMutation, { data, loading, error }] = useMutation<CreatePoemMutation, CreatePoemMutationVariables>(CREATE_POEM, {
+    update(cache, { data }) {
+      const cachedPoems = cache.readQuery({ query: GET_POEMS });
+      if (cachedPoems && data) {
+        cache.writeQuery({
+          query: GET_POEMS,
+          data: {
+            poems: [ data.createPoem, ...cachedPoems.poems]
+          }
+        })
+      }
+    }
+  })
   const navigate = useNavigate();
+  // const client = useApolloClient();
 
   useEffect(() => {
     if (data?.createPoem.id) {
+      // client.writeQuery({
+      //   query: GET_POEMS,
+      //   data: {
+      //     poems: [data.createPoem]
+      //   }
+      // })
       setText("");
       setTitle("");
       navigate(`/poem/${data.createPoem.id}`)
