@@ -5,7 +5,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 export const typeDefs = gql`
   scalar Date
   type Query {
-    poems(limit: Int, cursor: ID, filter: GetPoemsFilter): [Poem!]!
+    poems(first: Int, after: ID, filter: GetPoemsFilter): PoemsConnection!
     poem(id: ID!): Poem!
     authorById(id: ID!): Author!
     authors(limit: Int, cursor: ID, usernameContains: String): [Author!]!
@@ -180,6 +180,24 @@ export const typeDefs = gql`
   input UpdateCollectionInput {
     id: String!
     title: String!
+  }
+
+  type PageInfo {
+      hasNextPage: Boolean!
+      hasPreviousPage: Boolean!
+      startCursor: String
+      endCursor: String
+      pageSize: Int
+  }
+
+  type PoemsEdge {
+      node: Poem
+      cursor: String!
+  }
+
+  type PoemsConnection {
+      edges: [PoemsEdge!]!
+      pageInfo: PageInfo!
   }
 `;
 

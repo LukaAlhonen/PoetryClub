@@ -9,8 +9,8 @@ export const Collection: Resolvers["Collection"] = {
 
   poems: ({ id }, { limit, cursor }, { services }) => {
     return services.poemService.getPoems({
-      limit,
-      cursor,
+      first: limit,
+      after: cursor,
       filter: {
         collectionId: id,
       },

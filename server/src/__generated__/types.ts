@@ -163,7 +163,6 @@ export type Mutation = {
   incrementPoemViews: Poem;
   login: AuthPayload;
   logout: Scalars['Boolean']['output'];
-  refreshToken: AuthPayload;
   removeAuthor: Author;
   removeCollection: Collection;
   removeComment: Comment;
@@ -274,6 +273,15 @@ export type MutationUpdatePoemArgs = {
   input: UpdatePoemInput;
 };
 
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  pageSize?: Maybe<Scalars['Int']['output']>;
+  startCursor?: Maybe<Scalars['String']['output']>;
+};
+
 export type Poem = {
   __typename?: 'Poem';
   author: Author;
@@ -309,6 +317,18 @@ export type PoemSavedByArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type PoemsConnection = {
+  __typename?: 'PoemsConnection';
+  edges: Array<PoemsEdge>;
+  pageInfo: PageInfo;
+};
+
+export type PoemsEdge = {
+  __typename?: 'PoemsEdge';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<Poem>;
+};
+
 export type Query = {
   __typename?: 'Query';
   authorById: Author;
@@ -324,7 +344,7 @@ export type Query = {
   likes: Array<Like>;
   me: Author;
   poem: Poem;
-  poems: Array<Poem>;
+  poems: PoemsConnection;
   savedPoem: SavedPoem;
   savedPoems: Array<SavedPoem>;
 };
@@ -404,9 +424,9 @@ export type QueryPoemArgs = {
 
 
 export type QueryPoemsArgs = {
-  cursor?: InputMaybe<Scalars['ID']['input']>;
+  after?: InputMaybe<Scalars['ID']['input']>;
   filter?: InputMaybe<GetPoemsFilter>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -537,7 +557,10 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Like: ResolverTypeWrapper<LikeModel>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
   Poem: ResolverTypeWrapper<PoemModel>;
+  PoemsConnection: ResolverTypeWrapper<Omit<PoemsConnection, 'edges'> & { edges: Array<ResolversTypes['PoemsEdge']> }>;
+  PoemsEdge: ResolverTypeWrapper<Omit<PoemsEdge, 'node'> & { node?: Maybe<ResolversTypes['Poem']> }>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   SavedPoem: ResolverTypeWrapper<SavedPoemModel>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -563,7 +586,10 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   Like: LikeModel;
   Mutation: Record<PropertyKey, never>;
+  PageInfo: PageInfo;
   Poem: PoemModel;
+  PoemsConnection: Omit<PoemsConnection, 'edges'> & { edges: Array<ResolversParentTypes['PoemsEdge']> };
+  PoemsEdge: Omit<PoemsEdge, 'node'> & { node?: Maybe<ResolversParentTypes['Poem']> };
   Query: Record<PropertyKey, never>;
   SavedPoem: SavedPoemModel;
   String: Scalars['String']['output'];
@@ -638,7 +664,6 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   incrementPoemViews?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationIncrementPoemViewsArgs, 'poemId'>>;
   login?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'password' | 'username'>>;
   logout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  refreshToken?: Resolver<ResolversTypes['AuthPayload'], ParentType, ContextType>;
   removeAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType>;
   removeCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationRemoveCollectionArgs, 'collectionId'>>;
   removeComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationRemoveCommentArgs, 'commentId'>>;
@@ -650,6 +675,14 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   updateAuthor?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<MutationUpdateAuthorArgs, 'input'>>;
   updateCollection?: Resolver<ResolversTypes['Collection'], ParentType, ContextType, RequireFields<MutationUpdateCollectionArgs, 'input'>>;
   updatePoem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<MutationUpdatePoemArgs, 'input'>>;
+};
+
+export type PageInfoResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
+  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  pageSize?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
 export type PoemResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Poem'] = ResolversParentTypes['Poem']> = {
@@ -668,6 +701,16 @@ export type PoemResolvers<ContextType = MyContext, ParentType extends ResolversP
   views?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
+export type PoemsConnectionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['PoemsConnection'] = ResolversParentTypes['PoemsConnection']> = {
+  edges?: Resolver<Array<ResolversTypes['PoemsEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+};
+
+export type PoemsEdgeResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['PoemsEdge'] = ResolversParentTypes['PoemsEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<Maybe<ResolversTypes['Poem']>, ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   authorById?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<QueryAuthorByIdArgs, 'id'>>;
   authorByUsername?: Resolver<ResolversTypes['Author'], ParentType, ContextType, RequireFields<QueryAuthorByUsernameArgs, 'username'>>;
@@ -682,7 +725,7 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
   likes?: Resolver<Array<ResolversTypes['Like']>, ParentType, ContextType, Partial<QueryLikesArgs>>;
   me?: Resolver<ResolversTypes['Author'], ParentType, ContextType>;
   poem?: Resolver<ResolversTypes['Poem'], ParentType, ContextType, RequireFields<QueryPoemArgs, 'id'>>;
-  poems?: Resolver<Array<ResolversTypes['Poem']>, ParentType, ContextType, Partial<QueryPoemsArgs>>;
+  poems?: Resolver<ResolversTypes['PoemsConnection'], ParentType, ContextType, Partial<QueryPoemsArgs>>;
   savedPoem?: Resolver<ResolversTypes['SavedPoem'], ParentType, ContextType, RequireFields<QuerySavedPoemArgs, 'id'>>;
   savedPoems?: Resolver<Array<ResolversTypes['SavedPoem']>, ParentType, ContextType, Partial<QuerySavedPoemsArgs>>;
 };
@@ -703,7 +746,10 @@ export type Resolvers<ContextType = MyContext> = {
   FollowedAuthor?: FollowedAuthorResolvers<ContextType>;
   Like?: LikeResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
   Poem?: PoemResolvers<ContextType>;
+  PoemsConnection?: PoemsConnectionResolvers<ContextType>;
+  PoemsEdge?: PoemsEdgeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SavedPoem?: SavedPoemResolvers<ContextType>;
 };

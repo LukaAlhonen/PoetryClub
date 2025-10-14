@@ -5,8 +5,8 @@ export const Query: Resolvers["Query"] = {
     return services.poemService.getPoem({ id });
   },
 
-  poems: (_, { limit, cursor, filter }, { services }) => {
-    return services.poemService.getPoems({ cursor, limit, filter });
+  poems: (_, { first, after, filter }, { services }) => {
+    return services.poemService.getPoemsConnection({ first, after, filter });
   },
 
   authorById: (_, { id }, { services }) => {

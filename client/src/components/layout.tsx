@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <LayoutContainer>
       <LeftNav></LeftNav>
       <HeaderContainer><TitleContainer to="/">PoetryClub</TitleContainer></HeaderContainer>
-      <PageContainer>{children}</PageContainer>
+      <PageContainer data-scroll-container>{children}</PageContainer>
     </LayoutContainer>
   );
 };
