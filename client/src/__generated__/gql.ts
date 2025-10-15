@@ -60,7 +60,7 @@ type Documents = {
     "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n": typeof types.CreatePoemDocument,
     "\n    mutation Login($username: String!, $password: String!) {\n      login(username: $username, password: $password) {\n        token\n        author {\n          id\n          username\n        }\n      }\n    }\n": typeof types.LoginDocument,
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": typeof types.GetPoemDocument,
-    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": typeof types.GetPoemsDocument,
+    "\n  query GetPoems($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": typeof types.GetPoemsDocument,
 };
 const documents: Documents = {
     "\n    fragment CommentFragment on Comment {\n        id\n        text\n        author {\n            id\n            username\n        }\n        datePublished\n    }\n": types.CommentFragmentFragmentDoc,
@@ -109,7 +109,7 @@ const documents: Documents = {
     "\n    mutation CreatePoem($input: CreatePoemInput!) {\n      createPoem(input: $input) {\n        id\n        ...PoemCardFragment\n      }\n    }\n": types.CreatePoemDocument,
     "\n    mutation Login($username: String!, $password: String!) {\n      login(username: $username, password: $password) {\n        token\n        author {\n          id\n          username\n        }\n      }\n    }\n": types.LoginDocument,
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": types.GetPoemDocument,
-    "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n": types.GetPoemsDocument,
+    "\n  query GetPoems($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": types.GetPoemsDocument,
 };
 
 /**
@@ -313,7 +313,7 @@ export function gql(source: "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n"): (typeof documents)["\n  query GetPoems($limit: Int, $cursor: ID, $filter: GetPoemsFilter) {\n    poems(limit: $limit, cursor: $cursor, filter: $filter) {\n      id\n      ...PoemCardFragment\n    }\n  }\n"];
+export function gql(source: "\n  query GetPoems($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetPoems($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

@@ -5,28 +5,35 @@ import { GET_POEMS } from "./poems.graphql";
 import QueryResult from "../../components/query-result";
 import styled from "@emotion/styled";
 import colors from "../../colors";
-import { useEffect, useRef, useState } from "react";
-// import type { GetPoemsQuery, GetPoemsQueryVariables } from "../../__generated__/types";
+import { useEffect, useRef } from "react";
+import { NetworkStatus } from "@apollo/client";
 
 const Poems = () => {
-  const { loading, error, data, fetchMore } = useQuery(GET_POEMS, {
-    variables: { limit: 20}
+  const { loading, error, data, fetchMore, networkStatus } = useQuery(GET_POEMS, {
+    variables: { first: 5},
+    notifyOnNetworkStatusChange: true
   });
 
-  const [cursor, setCursor] = useState<string | null>(null);
+  const isLoading = networkStatus === NetworkStatus.fetchMore;
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          console.log("fetching more poems")
+          if (data?.poems?.pageInfo) {
+            if (data.poems.pageInfo.hasNextPage) {
+              fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor } })
+            }
+          }
         }
       },
       {
-        root: document.querySelector("[data-scroll-container]"),
+        root: scrollRef.current,
         threshold: 0.1,
+        rootMargin: "0% 0% 20%"
       }
     )
     if (bottomRef.current) {
@@ -36,17 +43,23 @@ const Poems = () => {
     return () => observer.disconnect();
   },[data, fetchMore])
 
-
   return (
     <Layout>
-      <QueryResult loading={loading} error={error} data={data}>
-        <PoemsContainer id="poems-container">
-          {data?.poems?.map((poem) => (
-            <PoemCard key={poem.id} poem={poem} />
-          ))}
-          <div ref={bottomRef} style={{ height: "1px" }} />
-        </PoemsContainer>
-      </QueryResult>
+      <ScrollContainer ref={scrollRef} data-scroll-container>
+        <QueryResult loading={loading} error={error} data={data}>
+          <PoemsContainer>
+            {data?.poems?.edges?.map((edge) => (
+              edge?.node ? (<PoemCard key={edge.node.id} poem={edge.node} /> ) : null
+            ))}
+            { isLoading && data?.poems?.pageInfo?.pageSize ?
+              Array.from({ length: data.poems.pageInfo.pageSize }).map((_, i) => (
+                <PoemCard key={`skeleton_${i}`} />
+              ))
+             : null}
+          </PoemsContainer>
+        </QueryResult>
+        <div ref={bottomRef} style={{ height: "1px" }} />
+      </ScrollContainer>
     </Layout>
   );
 };
@@ -55,7 +68,6 @@ export default Poems;
 
 const PoemsContainer = styled.div({
   background: colors.backgroundBlack,
-  overflowY: "visible",
   overflowX: "hidden",
   display: "grid",
   gap: "1em",
@@ -66,3 +78,9 @@ const PoemsContainer = styled.div({
   padding: "1em",
   boxSizing: "border-box",
 });
+
+const ScrollContainer = styled.div({
+  flexGrow: 1,
+  overflowY: "auto",
+  minHeight: 0,
+})

@@ -4,12 +4,14 @@ import colors from "../../colors";
 import { useFragment, type FragmentType } from "../../__generated__";
 import { POEM_CARD_FRAGMENT } from "./poem-card.graphql";
 import { dateFormatter } from "../../utils/formatters";
+import Spinner from "../spinner";
 
 import CommentsIcon from "../../assets/icons/comment.svg?react";
 import LikesIcons from "../../assets/icons/heart2.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import ArrowIcon from "../../assets/icons/arrow-right.svg?react";
 import UserIcon from "../../assets/icons/user.svg?react";
+import { keyframes } from "@emotion/react";
 
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
@@ -19,27 +21,32 @@ const PoemCard = (props: PoemCardProps) => {
   const poem = useFragment(POEM_CARD_FRAGMENT, props.poem);
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
-    : "loading...";
+    : "";
 
   return (
     <PoemContainer>
       <PoemHeader>
         <PoemTitle to={poem ? `/poem/${poem?.id}` : "#"}>
-          <h3>{poem?.title ?? "loading..."}</h3>
+          {poem?.title ? <h3>{poem.title}</h3> : <LoadingText><h3>loading</h3></LoadingText>}
         </PoemTitle>
         <PoemSubHeader>
           <UsernameContainer to="/">
             <UserButton></UserButton>
-            {poem?.author?.username ?? "loading..."}
+            {poem?.author?.username ?? null}
           </UsernameContainer>
           <h5>{date}</h5>
         </PoemSubHeader>
       </PoemHeader>
       <TextContainer>
-        {poem?.text ?? "loading..."}
-        <PoemLink to={poem ? `/poem/${poem?.id}` : "#"}>
-          Show full poem <Arrow />
-        </PoemLink>
+        {poem ?
+          <>
+            {poem.text}
+            <PoemLink to={poem ? `/poem/${poem?.id}` : "#"}>
+              Show full poem <Arrow />
+            </PoemLink>
+          </>
+          : <SpinnerContainer><Spinner /></SpinnerContainer>
+        }
       </TextContainer>
       <PoemFooter>
         <TagsContainer>
@@ -311,3 +318,31 @@ const HoverContainer = styled.div({
     cursor: "pointer"
   }
 })
+
+const SpinnerContainer = styled.div({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  height: "100%",
+});
+
+const dots = keyframes`
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+`;
+
+const LoadingText = styled.span({
+  position: "relative",
+  color: colors.backgroundBlack,
+  fontSize: "1.2em",
+  fontWeight: 500,
+
+  "&::after": {
+    content: "''",
+    animation: `${dots} 1.5s steps(4, end) infinite`,
+  },
+});

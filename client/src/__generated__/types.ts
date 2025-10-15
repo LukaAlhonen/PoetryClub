@@ -268,6 +268,15 @@ export type MutationUpdatePoemArgs = {
   input: UpdatePoemInput;
 };
 
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  pageSize?: Maybe<Scalars['Int']['output']>;
+  startCursor?: Maybe<Scalars['String']['output']>;
+};
+
 export type Poem = {
   __typename?: 'Poem';
   author: Author;
@@ -303,6 +312,18 @@ export type PoemSavedByArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type PoemsConnection = {
+  __typename?: 'PoemsConnection';
+  edges: Array<PoemsEdge>;
+  pageInfo: PageInfo;
+};
+
+export type PoemsEdge = {
+  __typename?: 'PoemsEdge';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<Poem>;
+};
+
 export type Query = {
   __typename?: 'Query';
   authorById: Author;
@@ -318,7 +339,7 @@ export type Query = {
   likes: Array<Like>;
   me: Author;
   poem: Poem;
-  poems: Array<Poem>;
+  poems: PoemsConnection;
   savedPoem: SavedPoem;
   savedPoems: Array<SavedPoem>;
 };
@@ -398,9 +419,9 @@ export type QueryPoemArgs = {
 
 
 export type QueryPoemsArgs = {
-  cursor?: InputMaybe<Scalars['ID']['input']>;
+  after?: InputMaybe<Scalars['ID']['input']>;
   filter?: InputMaybe<GetPoemsFilter>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -738,10 +759,10 @@ export type GetPoemQueryVariables = Exact<{
 export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string }, comments: Array<{ __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } }> } };
 
 export type GetPoemsQueryVariables = Exact<{
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  cursor?: InputMaybe<Scalars['ID']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['ID']['input']>;
   filter?: InputMaybe<GetPoemsFilter>;
 }>;
 
 
-export type GetPoemsQuery = { __typename?: 'Query', poems: Array<{ __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null }> };
+export type GetPoemsQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
