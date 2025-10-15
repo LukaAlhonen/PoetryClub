@@ -13,38 +13,7 @@ export class PoemService {
     this.cache = cache;
   }
 
-  /**
-   * Returns an array of Poem objects,
-   * optionally filter by authorId, authorNameContains, collectionId, textContains, titleContains
-   *
-   * @param cursor
-   * @param limit
-   * @param filter
-   * @returns All poems that match filter
-   *
-   * @example
-   * ```ts
-   * const poems = await poemAPI.getPoems({limit: 10, filter: {authorNameContains: "edgar"}})
-   * console.log(poems.length) // 10
-   * ```
-   **/
-  async getPoems({
-    cursor,
-    limit,
-    filter,
-  }: {
-    cursor?: string;
-    limit?: number;
-    filter?: GetPoemsFilter | null;
-  } = {}): Promise<PoemWithRelations[] | null> {
-    const cacheKey = `poems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:filter:${JSON.stringify(filter)}`;
-    const cached = await this.cache.getAll<PoemWithRelations>({
-      key: cacheKey,
-    });
-    if (cached) {
-      return cached;
-    }
-    // Add fields from filter to queryfilter if they are present
+  private createPoemsFilter({filter}: { filter: GetPoemsFilter}): Prisma.PoemWhereInput {
     const queryFilter: Prisma.PoemWhereInput = filter
       ? {
           ...(filter.authorId ? { authorId: filter.authorId } : {}),
@@ -68,6 +37,43 @@ export class PoemService {
         }
       : {};
 
+    return queryFilter;
+  }
+
+  /**
+   * Returns an array of Poem objects,
+   * optionally filter by authorId, authorNameContains, collectionId, textContains, titleContains
+   *
+   * @param after
+   * @param first
+   * @param filter
+   * @returns All poems that match filter
+   *
+   * @example
+   * ```ts
+   * const poems = await poemAPI.getPoems({first: 10, filter: {authorNameContains: "edgar"}})
+   * console.log(poems.length) // 10
+   * ```
+   **/
+  async getPoems({
+    after,
+    first,
+    filter,
+  }: {
+    after?: string;
+    first?: number;
+    filter?: GetPoemsFilter | null;
+  } = {}): Promise<PoemWithRelations[] | null> {
+    const cacheKey = `poems:first:${first ? first : "null"}:after:${after ? after : "null"}:filter:${JSON.stringify(filter)}`;
+    const cached = await this.cache.getAll<PoemWithRelations>({
+      key: cacheKey,
+    });
+    if (cached) {
+      return cached;
+    }
+    // Add fields from filter to queryfilter if they are present
+    const queryFilter: Prisma.PoemWhereInput = this.createPoemsFilter({filter})
+
     const queryOptions: Prisma.PoemFindManyArgs = {
       where: queryFilter,
       include: {
@@ -80,13 +86,13 @@ export class PoemService {
       orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
 
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -104,6 +110,57 @@ export class PoemService {
     }
 
     return poems;
+  }
+
+  async hasPreviousPage ({before, filter}: { before: string, filter?: GetPoemsFilter}): Promise<boolean> {
+    const firstPoem = await this.prisma.poem.findUnique({ where: { id: before } });
+    if (!firstPoem) return false;
+
+    const queryFilter = this.createPoemsFilter({ filter });
+    const hasPrev = await this.prisma.poem.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          { datePublished: { gt: firstPoem.datePublished } },
+          {
+            datePublished: firstPoem.datePublished,
+            id: { gt: firstPoem.id }
+          }
+        ]
+      },
+      orderBy: [{ datePublished: "asc" }, { id: "asc" }],
+      select: { id: true }
+    });
+    return Boolean(hasPrev)
+  }
+
+  async getPoemsConnection ({after, first, filter}: { after?: string, first?: number, filter?: GetPoemsFilter }) {
+    const poems = await this.getPoems({after, first: first ? first + 1 : undefined, filter});
+
+    const hasNextPage = poems.length > (first ?? poems.length);
+    const edges = hasNextPage ? poems.slice(0, first) : poems;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, filter });
+    }
+
+    return {
+      edges: edges.map((poem) => ({
+        node: poem,
+        cursor: endCursor
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length
+      }
+    };
   }
 
   /**
@@ -250,7 +307,7 @@ export class PoemService {
     });
 
     if (poem) {
-      await this.cache.delByPattern({ pattern: "poem:limit:*" });
+      await this.cache.delByPattern({ pattern: "poem:first:*" });
       await this.cache.removeRelations({ id: poem.author.id, name: "author" });
       if (poem.inCollection)
         await this.cache.removeRelations({
@@ -306,7 +363,7 @@ export class PoemService {
 
     if (poem) {
       // clear cache
-      await this.cache.delByPattern({ pattern: "poems:limit:*" });
+      await this.cache.delByPattern({ pattern: "poems:first:*" });
       await this.cache.removeRelations({ id: poem.id, name: "poem" });
       await this.cache.removeRelations({ id: poem.authorId, name: "author" });
       if (poem.collectionId)
@@ -358,7 +415,7 @@ export class PoemService {
     });
 
     if (poem) {
-      await this.cache.delByPattern({ pattern: "poems:limit:*" });
+      await this.cache.delByPattern({ pattern: "poems:first:*" });
       await this.cache.removeRelations({ id: poem.id, name: "poem" });
       await this.cache.removeRelations({ id: poem.authorId, name: "author" });
       if (poem.collectionId)

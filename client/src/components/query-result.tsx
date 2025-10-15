@@ -11,7 +11,7 @@ interface QueryResultProps {
 }
 
 const QueryResult = ({ loading, error, data, children }: QueryResultProps) => {
-  if (loading)
+  if (loading && !data)
     return (
       <SpinnerContainer>
         <Spinner></Spinner>
@@ -24,4 +24,10 @@ const QueryResult = ({ loading, error, data, children }: QueryResultProps) => {
 
 export default QueryResult;
 
-const SpinnerContainer = styled.div({});
+const SpinnerContainer = styled.div({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  height: "100%",
+});

@@ -3,8 +3,8 @@ import { Resolvers } from "../__generated__/types.js";
 export const Author: Resolvers["Author"] = {
   poems: ({ id }, { limit, cursor }, { services }) => {
     return services.poemService.getPoems({
-      limit,
-      cursor,
+      first: limit,
+      after: cursor,
       filter: {
         authorId: id,
       },

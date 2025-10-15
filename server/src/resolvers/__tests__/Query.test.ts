@@ -77,7 +77,8 @@ describe("Graphql Query integration tests", () => {
       if (errors) console.error(errors);
 
       expect(poems).toBeDefined();
-      expect(poems.length).toBe(8);
+      expect(poems.pageInfo.pageSize).toStrictEqual(8)
+      expect(poems.edges).toHaveLength(poems.pageInfo.pageSize);
     } else {
       throw new Error("invalid response kind");
     }
@@ -86,7 +87,7 @@ describe("Graphql Query integration tests", () => {
   test("poems, with pagination, succeeds", async () => {
     const initialResponse = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
-      variables: { limit: 4 },
+      variables: { first: 4 },
     });
 
     let cursor = "";
@@ -99,7 +100,11 @@ describe("Graphql Query integration tests", () => {
 
       expect(poems).toBeDefined();
 
-      expect(poems.length).toBe(4);
+      expect(poems.edges).toHaveLength(4);
+      expect(poems.pageInfo.hasNextPage).toBe(true)
+      expect(poems.pageInfo.hasPreviousPage).toBe(false)
+      expect(poems.pageInfo.endCursor).toStrictEqual(poems.edges[poems.pageInfo.pageSize-1].node.id)
+      cursor = poems.pageInfo.endCursor;
     } else {
       throw new Error("invalid response kind");
     }
@@ -107,7 +112,7 @@ describe("Graphql Query integration tests", () => {
     // get last 4 poems
     const secondResponse = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
-      variables: { limit: 4, cursor },
+      variables: { first: 4, after: cursor },
     });
 
     if (secondResponse.body.kind === "single") {
@@ -117,7 +122,9 @@ describe("Graphql Query integration tests", () => {
 
       expect(poems).toBeDefined();
 
-      expect(poems.length).toBe(4);
+      expect(poems.pageInfo.pageSize).toBe(4);
+      expect(poems.pageInfo.hasPreviousPage).toBe(true);
+      expect(poems.pageInfo.hasNextPage).toBe(false)
     } else {
       throw new Error("invalid response kind");
     }
@@ -141,10 +148,10 @@ describe("Graphql Query integration tests", () => {
 
       expect(poems).toBeDefined();
 
-      expect(poems.length).toBe(4);
+      expect(poems.pageInfo.pageSize).toBe(4);
 
-      poems.forEach((poem) => {
-        expect(poem.title.endsWith("0"));
+      poems.edges.forEach((edge) => {
+        expect(edge.node.title.endsWith("0"));
       });
     } else {
       throw new Error("invalid response kind");
@@ -157,10 +164,10 @@ describe("Graphql Query integration tests", () => {
     });
     if (poemsResponse.body.kind === "single") {
       const poems = poemsResponse.body.singleResult.data?.poems;
-      for (const poem of poems) {
+      for (const edge of poems.edges) {
         const response = await testServer.executeOperation<GetPoemQuery>({
           query: GET_POEM,
-          variables: { id: poem.id },
+          variables: { id: edge.node.id },
         });
 
         if (response.body.kind === "single") {
@@ -441,12 +448,12 @@ describe("Graphql Query integration tests", () => {
     if (poemsResponse.body.kind === "single") {
       const poems = poemsResponse.body.singleResult.data.poems;
 
-      for (const poem of poems) {
+      for (const edge of poems.edges) {
         const commentResponse =
           await testServer.executeOperation<GetCommentsQuery>({
             query: GET_COMMENTS,
             variables: {
-              poemId: poem.id,
+              poemId: edge.node.id,
             },
           });
 
@@ -767,7 +774,7 @@ describe("Graphql Query integration tests", () => {
     });
 
     if (poemsResponse.body.kind === "single") {
-      const poems = poemsResponse.body.singleResult.data?.poems;
+      const poems = poemsResponse.body.singleResult.data?.poems.edges.map((edge) => edge.node);
 
       for (const poem of poems) {
         const response = await testServer.executeOperation<GetLikesQuery>({
@@ -888,7 +895,8 @@ describe("Graphql Query integration tests", () => {
     });
 
     if (poemsResponse.body.kind === "single") {
-      for (const poem of poemsResponse.body.singleResult.data.poems) {
+      const poems = poemsResponse.body.singleResult.data.poems.edges.map((edge) => edge.node)
+      for (const poem of poems) {
         const response = await testServer.executeOperation<GetSavedPoemsQuery>({
           query: GET_SAVED_POEMS,
           variables: {

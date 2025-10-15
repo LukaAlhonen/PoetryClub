@@ -35,11 +35,13 @@ const PageContainer = styled.div({
   gridArea: "page-container",
   width: "100%",
   height: "100%",
-  overflowY: "scroll",
+  overflowY: "hidden",
   boxSizing: "border-box",
   paddingLeft: "1em",
   paddingRight: "0.3em",
   maxWidth: "100%",
+  display: "flex",
+  flexDirection: "column"
   // border: ,
 });
 

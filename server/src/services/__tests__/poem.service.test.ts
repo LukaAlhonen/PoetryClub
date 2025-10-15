@@ -52,7 +52,7 @@ describe("AuthorService integration tests", () => {
   })
 
   test("getPoems, with pagination", async () => {
-    const result1 = await services.poemService.getPoems({limit: 5})
+    const result1 = await services.poemService.getPoems({first: 5})
     expect(result1).toBeDefined()
     expect(result1).toHaveLength(5);
     let i = 0;
@@ -60,7 +60,7 @@ describe("AuthorService integration tests", () => {
       comparePoemFields(result1[i], poems[i])
     }
 
-    const result2 = await services.poemService.getPoems({limit: 5, cursor: result1[i-1].id})
+    const result2 = await services.poemService.getPoems({first: 5, after: result1[i-1].id})
     expect(result2).toBeDefined();
     expect(result2).toHaveLength(3)
     for (let j = 0; j < 3 && i < 8; ++j && ++i) {

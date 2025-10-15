@@ -15,13 +15,6 @@ const Poem = () => {
     variables: { poemId },
   });
 
-  if (loading)
-    return (
-      <div>
-        <h1>Loading...</h1>
-      </div>
-    );
-
   if (error) {
     console.log(error)
     return (
@@ -47,6 +40,7 @@ export default Poem;
 const PoemContainer = styled.div({
   display: "flex",
   flexDirection: "column",
+  overflowY: "auto",
   width: "100%",
   height: "100%",
 });

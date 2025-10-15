@@ -352,8 +352,8 @@ describe("Graphql Mutation integration tests", () => {
         if (result2.body.kind === "single") {
           const poems = result2.body.singleResult.data?.poems;
 
-          expect(poems).toHaveLength(0);
-          expect(poems).toStrictEqual([])
+          expect(poems.pageInfo.pageSize).toBe(0);
+          expect(poems.edges).toStrictEqual([])
         }
       }
     }
