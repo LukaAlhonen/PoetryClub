@@ -12,11 +12,11 @@ export const Poem: Resolvers["Poem"] = {
     return services.collectionService.getCollection({ id: collectionId });
   },
 
-  comments: ({ id }, { limit, cursor }, { services }) => {
-    return services.commentService.getComments({
+  comments: ({ id }, { first, after }, { services }) => {
+    return services.commentService.getCommentsConnection({
       poemId: id,
-      limit,
-      cursor,
+      first,
+      after,
     });
   },
 
@@ -24,10 +24,10 @@ export const Poem: Resolvers["Poem"] = {
     return services.poemService.getCommentsCount({ poemId: id });
   },
 
-  likes: ({ id }, { limit, cursor }, { services }) => {
-    return services.likeService.getLikes({
-      limit,
-      cursor,
+  likes: ({ id }, { first, after }, { services }) => {
+    return services.likeService.getLikesConnection({
+      first,
+      after,
       poemId: id,
     });
   },
@@ -36,10 +36,10 @@ export const Poem: Resolvers["Poem"] = {
     return services.poemService.getLikesCount({ poemId: id });
   },
 
-  savedBy: ({ id }, { limit, cursor }, { services }) => {
-    return services.savedPoemService.getSavedPoems({
-      limit,
-      cursor,
+  savedBy: ({ id }, { first, after }, { services }) => {
+    return services.savedPoemService.getSavedPoemsConnection({
+      first,
+      after,
       poemId: id,
     });
   },

@@ -59,7 +59,7 @@ describe("CollectionService integration tests", () => {
 
   test("getCollections, with pagination", async () => {
     const result1 = await services.collectionService.getCollections({
-      limit: 3,
+      first: 3,
     });
     expect(result1).toHaveLength(3);
 
@@ -68,8 +68,8 @@ describe("CollectionService integration tests", () => {
     }
 
     const result2 = await services.collectionService.getCollections({
-      limit: 3,
-      cursor: result1[result1.length - 1].id,
+      first: 3,
+      after: result1[result1.length - 1].id,
     });
 
     expect(result2).toHaveLength(1);
@@ -110,6 +110,10 @@ describe("CollectionService integration tests", () => {
     expect(result3).toHaveLength(1);
     expect(result3[0].title).toStrictEqual("author1 collection");
   });
+
+  test.todo("getCollectionsConnection")
+  test.todo("getCollectionsConnection, with pagination")
+  test.todo("getCollectionsConnection, with filter")
 
   test("createColleciton", async () => {
     const title = "test title";

@@ -2,16 +2,15 @@ import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
 import {
-  GetSavedPoemsQuery,
   GetSavedPoemQuery,
 } from "../../__generated__/graphql.js";
 
 import {
   GET_SAVED_POEM,
-  GET_SAVED_POEMS,
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { SavedPoemWithRelations } from "../../types/extended-types.js";
 
 describe("Graphql SavedPoem integration tests", () => {
   // DB seeded with:
@@ -26,19 +25,13 @@ describe("Graphql SavedPoem integration tests", () => {
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
-  let savedPoems: NonNullable<GetSavedPoemsQuery["savedPoems"]> = [];
+  let savedPoems: SavedPoemWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
-    const response = await testServer.executeOperation<GetSavedPoemsQuery>({
-      query: GET_SAVED_POEMS,
-    });
-
-    if (response.body.kind === "single") {
-      savedPoems = response.body.singleResult.data?.savedPoems;
-    }
+    const result = await seed({ prisma });
+    savedPoems = result.savedPoems;
   });
   afterAll(async () => {
     await testServer.cleanup();

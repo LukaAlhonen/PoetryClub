@@ -47,8 +47,8 @@ export class CommentService {
    * Returns array of Comment objects, optionally filter by author and or poem
    * @param authorId - filter by author
    * @param poemId - filter by poem
-   * @param limit
-   * @param cursor
+   * @param first
+   * @param after
    *
    * @example
    * const comments = await poemAPI.getComments({poemId: poem.id})
@@ -57,15 +57,15 @@ export class CommentService {
   async getComments({
     authorId,
     poemId,
-    limit,
-    cursor,
+    first,
+    after,
   }: {
     authorId?: string;
     poemId?: string;
-    limit?: number;
-    cursor?: string;
+    first?: number;
+    after?: string;
   } = {}): Promise<CommentWithRelations[] | null> {
-    const cacheKey = `comments:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:authorId:${authorId ? authorId : "null"}:poemId:${poemId ? poemId : "null"}`;
+    const cacheKey = `comments:first:${first ? first : "null"}:after:${after ? after : "null"}:authorId:${authorId ? authorId : "null"}:poemId:${poemId ? poemId : "null"}`;
     const cached = await this.cache.getAll<CommentWithRelations>({
       key: cacheKey,
     });
@@ -87,12 +87,12 @@ export class CommentService {
       orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -121,6 +121,62 @@ export class CommentService {
     }
 
     return comments;
+  }
+
+  async hasPreviousPage ({before, authorId, poemId}: { before: string, authorId?: string, poemId?: string}): Promise<boolean> {
+    const firstComment = await this.prisma.comment.findUnique({ where: { id: before } });
+    if (!firstComment) return false;
+
+    const queryFilter: Prisma.CommentWhereInput = {
+      ...(authorId ? { authorId } : {}),
+      ...(poemId ? { poemId } : {}),
+    };
+
+    const hasPrev = await this.prisma.comment.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          { datePublished: { gt: firstComment.datePublished } },
+          {
+            datePublished: firstComment.datePublished,
+            id: { gt: firstComment.id }
+          }
+        ]
+      },
+      orderBy: [{ datePublished: "asc" }, { id: "asc" }],
+      select: { id: true }
+    });
+    return Boolean(hasPrev)
+  }
+
+  async getCommentsConnection({first, after, authorId, poemId }: {first?: number, after?: string, authorId?: string, poemId?: string}) {
+    // fetch one extra to check if there are more comments available
+    const comments = await this.getComments({first: first ? first + 1 : undefined, after, authorId, poemId})
+
+    const hasNextPage = comments.length > (first ?? comments.length);
+    const edges = hasNextPage ? comments.slice(0, first) : comments;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, authorId, poemId });
+    }
+
+    return {
+      edges: edges.map((comment) => ({
+        node: comment,
+        cursor: comment.id
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length
+      }
+    }
   }
 
   /**
@@ -153,7 +209,7 @@ export class CommentService {
     });
 
     if (comment) {
-      await this.cache.delByPattern({ pattern: "comments:limit:*" });
+      await this.cache.delByPattern({ pattern: "comments:first:*" });
       await this.cache.removeRelations({
         id: comment.authorId,
         name: "author",

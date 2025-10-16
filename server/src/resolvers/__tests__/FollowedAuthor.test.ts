@@ -2,16 +2,15 @@ import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
 import {
-  GetFollowedAuthorsQuery,
   GetFollowedAuthorQuery,
 } from "../../__generated__/graphql.js";
 
 import {
   GET_FOLLOWED_AUTHOR,
-  GET_FOLLOWED_AUTHORS,
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { FollowedAuthorWithRelations } from "../../types/extended-types.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -26,22 +25,15 @@ describe("Graphql Mutation integration tests", () => {
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
-  let followedAuthors: NonNullable<GetFollowedAuthorsQuery["followedAuthors"]> =
-    [];
+  // let followedAuthors: NonNullable<GetFollowedAuthorsQuery["followedAuthors"]> =
+  //   [];
+  let followedAuthors: FollowedAuthorWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
-    const response = await testServer.executeOperation<GetFollowedAuthorsQuery>(
-      {
-        query: GET_FOLLOWED_AUTHORS,
-      },
-    );
-
-    if (response.body.kind === "single") {
-      followedAuthors = response.body.singleResult.data?.followedAuthors;
-    }
+    const result = await seed({ prisma });
+    followedAuthors = result.followedAuthors;
   });
   afterAll(async () => {
     await testServer.cleanup();

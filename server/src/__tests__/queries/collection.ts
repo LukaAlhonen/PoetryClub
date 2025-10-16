@@ -7,8 +7,20 @@ export const GET_COLLECTION = gql(`
             author {
                 id
             }
-            poems(limit: $poemsLimit, cursor: $poemsCursor) {
-                id
+            poems(first: $poemsLimit, after: $poemsCursor) {
+                edges {
+                    node {
+                        id
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
+                }
             }
             dateCreated
             title

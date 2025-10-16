@@ -51,7 +51,7 @@ describe("LikeService integration tests", () => {
   })
 
   test("getLikes, with pagination", async () => {
-    const result1 = await services.likeService.getLikes({limit: 5})
+    const result1 = await services.likeService.getLikes({first: 5})
 
     expect(result1).toBeDefined();
     expect(result1).toHaveLength(5);
@@ -60,7 +60,7 @@ describe("LikeService integration tests", () => {
       compareLikeFields(result1[i], likes[i])
     }
 
-    const result2 = await services.likeService.getLikes({limit: 5, cursor: result1[i-1].id})
+    const result2 = await services.likeService.getLikes({first: 5, after: result1[i-1].id})
 
     expect(result2).toBeDefined()
     expect(result2).toHaveLength(3);
@@ -73,6 +73,10 @@ describe("LikeService integration tests", () => {
     await expect(services.likeService.getLikes({poemId: likes[0].poemId})).resolves.toHaveLength(1)
     await expect(services.likeService.getLikes({authorId: likes[0].authorId})).resolves.toHaveLength(2)
   })
+
+  test.todo("getLikesConnection")
+  test.todo("getLikesConnection, with pagination")
+  test.todo("getLikesConnection, with filter")
 
   test("createLike", async () => {
     // create new author

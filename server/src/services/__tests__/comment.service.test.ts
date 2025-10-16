@@ -53,7 +53,7 @@ describe("CommentService integration tests", () => {
 
   test("getComments, with pagination", async () => {
     const result1 = await services.commentService.getComments({
-      limit: 10
+      first: 10
     })
     expect(result1).toBeDefined()
     expect(result1).toHaveLength(10)
@@ -64,8 +64,8 @@ describe("CommentService integration tests", () => {
     }
 
     const result2 = await services.commentService.getComments({
-      limit: 10,
-      cursor: result1[i-1].id
+      first: 10,
+      after: result1[i-1].id
     })
 
     expect(result2).toBeDefined()
@@ -91,6 +91,10 @@ describe("CommentService integration tests", () => {
     expect(result2).toBeDefined();
     expect(result2).toHaveLength(2)
   })
+
+  test.todo("getCommentsConnection")
+  test.todo("getCommentsConnection, with pagination")
+  test.todo("getCommentsConnection, with filter")
 
   test("createComment", async () => {
     const text = "testCommentText"

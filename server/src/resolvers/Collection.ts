@@ -7,10 +7,10 @@ export const Collection: Resolvers["Collection"] = {
     });
   },
 
-  poems: ({ id }, { limit, cursor }, { services }) => {
-    return services.poemService.getPoems({
-      first: limit,
-      after: cursor,
+  poems: ({ id }, { first, after }, { services }) => {
+    return services.poemService.getPoemsConnection({
+      first,
+      after,
       filter: {
         collectionId: id,
       },

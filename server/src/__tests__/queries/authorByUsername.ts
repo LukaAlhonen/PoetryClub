@@ -24,53 +24,137 @@ export const GET_AUTHOR_BY_USERNAME = gql(`
             id
             username
             email
-            poems(limit: $poemsLimit, cursor: $poemsCursor) {
-                id
-                author {
-                    id
+            poems (first: $poemsLimit after: $poemsCursor) {
+                edges {
+                    node {
+                        id
+                        author {
+                            id
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
-            savedPoems(limit: $savedPoemsLimit, cursor: $savedPoemsCursor) {
-                id
-                author {
-                    id
+            savedPoems (first: $savedPoemsLimit after: $savedPoemsCursor) {
+                edges {
+                    node {
+                        id
+                        author {
+                            id
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
-            comments(limit: $commentsLimit, cursor: $commentsCursor) {
-                id
-                author {
-                    id
+            comments (first: $commentsLimit after: $commentsCursor){
+                edges {
+                    node {
+                        id
+                        author {
+                            id
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
-            collections(limit: $collectionsLimit, cursor: $collectionsCursor) {
-                id
-                author {
-                    id
+            collections (first: $collectionsLimit after: $collectionsCursor) {
+                edges {
+                    node {
+                        id
+                        author {
+                            id
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
-            likedPoems(limit: $likedPoemsLimit, cursor: $likedPoemsCursor) {
-                id
-                author {
-                    id
+            likedPoems (first: $likedPoemsLimit after: $likedPoemsCursor) {
+                edges {
+                    node {
+                        id
+                        author {
+                            id
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
-            following(limit: $followingLimit, cursor: $followingCursor) {
-                id
-                follower {
-                    id
+            following (first: $followingLimit after: $followingCursor) {
+                edges {
+                    node {
+                        id
+                        follower {
+                            id
+                        }
+                        following {
+                            id
+                        }
+                    }
+                    cursor
                 }
-                following {
-                    id
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
             followingCount
-            followedBy(limit: $followedByLimit, cursor: $followedByCursor) {
-                id
-                following {
-                    id
+            followedBy (first: $followedByLimit after: $followedByCursor) {
+                edges {
+                    node {
+                        id
+                        following {
+                            id
+                        }
+                        follower {
+                            id
+                        }
+                    }
+                    cursor
                 }
-                follower {
-                    id
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
                 }
             }
             followedByCount

@@ -54,15 +54,15 @@ export class FollowedAuthorService {
   async getFollowedAuthors({
     followerId,
     followingId,
-    limit,
-    cursor,
+    first,
+    after,
   }: {
     followerId?: string;
     followingId?: string;
-    limit?: number;
-    cursor?: string;
+    first?: number;
+    after?: string;
   } = {}): Promise<FollowedAuthorWithRelations[] | null> {
-    const cacheKey = `followedAuthors:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:followerId:${followerId ? followerId : "null"}:followingId:${followingId ? followingId : "null"}`;
+    const cacheKey = `followedAuthors:first:${first ? first : "null"}:after:${after ? after : "null"}:followerId:${followerId ? followerId : "null"}:followingId:${followingId ? followingId : "null"}`;
     const cached = await this.cache.getAll<FollowedAuthorWithRelations>({
       key: cacheKey,
     });
@@ -82,12 +82,12 @@ export class FollowedAuthorService {
       orderBy: [{ dateFollowed: "desc" }, { id: "desc" }],
     };
 
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -106,6 +106,61 @@ export class FollowedAuthorService {
     }
 
     return followedAuthors;
+  }
+
+  async hasPreviousPage({before, followerId, followingId }: {before: string, followerId?: string, followingId?: string }) {
+    const firstFollowedAuthor = await this.prisma.followedAuthor.findUnique({ where: { id: before } });
+    if (!firstFollowedAuthor) return false;
+
+    const queryFilter: Prisma.FollowedAuthorWhereInput = {
+      ...(followerId ? { followerId } : {}),
+      ...(followingId ? { followingId } : {}),
+    };
+    const hasPrev = await this.prisma.followedAuthor.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          { dateFollowed: { gt: firstFollowedAuthor.dateFollowed}},
+          {
+            dateFollowed: firstFollowedAuthor.dateFollowed,
+            id: { gt: firstFollowedAuthor.id}
+          }
+        ]
+      },
+      orderBy: [{dateFollowed: "asc"}, {id: "asc"}],
+      select: {id: true}
+    })
+
+    return Boolean(hasPrev);
+  }
+
+  async getFollowedAuthorsConnection({first, after, followerId, followingId}: {first?: number, after?: string, followerId?: string, followingId?: string}){
+    const followedAuthors = await this.getFollowedAuthors({ first: first ? first + 1 : undefined, after, followerId, followingId });
+
+    const hasNextPage = followedAuthors.length > (first ?? followedAuthors.length);
+    const edges = hasNextPage ? followedAuthors.slice(0, first) : followedAuthors;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, followerId, followingId });
+    }
+
+    return {
+      edges: edges.map((followedAuthor) => ({
+        node: followedAuthor,
+        cursor: followedAuthor.id
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length,
+      }
+    }
   }
 
   /**
@@ -138,7 +193,7 @@ export class FollowedAuthorService {
     });
 
     if (followedAuthor) {
-      await this.cache.delByPattern({ pattern: "followedAuthor:limit:*" });
+      await this.cache.delByPattern({ pattern: "followedAuthor:first:*" });
       await this.cache.removeRelations({
         id: followedAuthor.followerId,
         name: "author",

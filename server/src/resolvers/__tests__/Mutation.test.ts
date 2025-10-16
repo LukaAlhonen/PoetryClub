@@ -317,8 +317,8 @@ describe("Graphql Mutation integration tests", () => {
     if (collectionsResponse.body.kind === "single") {
       const collections = collectionsResponse.body.singleResult.data?.collections;
 
-      const collection = collections.filter((collection) =>
-        collection.author.id !== login.author.id
+      const collectionEdge = collections.edges.filter((collectionEdge) =>
+        collectionEdge.node.author.id !== login.author.id
       )[0]
 
       const response = await testServer.executeOperation<CreatePoemMutation>({
@@ -327,7 +327,7 @@ describe("Graphql Mutation integration tests", () => {
           input: {
             title: "failedPoem1",
             text: "123456633!",
-            collectionId: collection.id,
+            collectionId: collectionEdge.node.id,
           }
         },
         headers: {
@@ -449,7 +449,7 @@ describe("Graphql Mutation integration tests", () => {
       expect(collection).toBeDefined();
       expect(collection.id).toBeDefined();
       expect(collection.title).toBeDefined();
-      expect(collection.poems).toStrictEqual([]);
+      expect(collection.poems.edges).toStrictEqual([]);
       expect(collection.dateCreated).toBeDefined();
       expect(collection.author.id).toStrictEqual(login.author.id);
     } else {
@@ -1968,15 +1968,15 @@ describe("Graphql Mutation integration tests", () => {
     if (collectionsResponse.body.kind === "single") {
       const collections = collectionsResponse.body.singleResult.data?.collections;
 
-      const collection = collections.filter((collection) =>
-        collection.author.id !== login.author.id && poemToUpdate.collectionId !== collection.id
+      const collectionEdge = collections.edges.filter((collectionEdge) =>
+        collectionEdge.node.author.id !== login.author.id && poemToUpdate.collectionId !== collectionEdge.node.id
       )[0]
 
       const response = await testServer.executeOperation<UpdatePoemMutation>({
         query: UPDATE_POEM,
         variables: {
           id: poemToUpdate.id,
-          collectionId: collection.id
+          collectionId: collectionEdge.node.id
         },
         headers: {
           authorization: `Bearer ${login.token}`,

@@ -84,7 +84,7 @@ describe("AuthorService integration tests", () => {
 
   test("getAuthors, with pagination", async () => {
     const result1 = await services.authorService.getAuthors({
-      limit: 3,
+      first: 3,
       omitAuthVersion: false,
       omitPassword: false,
     });
@@ -94,8 +94,8 @@ describe("AuthorService integration tests", () => {
     }
 
     const result2 = await services.authorService.getAuthors({
-      limit: 3,
-      cursor: result1[result1.length - 1].id,
+      first: 3,
+      after: result1[result1.length - 1].id,
       omitAuthVersion: false,
       omitPassword: false,
     });
@@ -113,6 +113,10 @@ describe("AuthorService integration tests", () => {
     expect(result).toHaveLength(1);
     expect(result[0].username).toStrictEqual("author1");
   });
+
+  test.todo("getAuthorsConnection")
+  test.todo("getAuthorsConnection, with pagination")
+  test.todo("getAuthorsConnection, with filter")
 
   test("getFollowedAuthorsCount", async () => {
     const result1 = await services.authorService.getFollowedAuthorsCount({

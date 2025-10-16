@@ -4,6 +4,12 @@ export const GET_POEMS = gql(`
    query GetPoems(
        $first: Int
        $after: ID
+       $commentsLimit: Int
+       $commentsCursor: ID
+       $likesLimit: Int
+       $likesCursor: ID
+       $savedByLimit: Int
+       $savedByCursor: ID
        $filter: GetPoemsFilter
    ) {
        poems(
@@ -20,27 +26,63 @@ export const GET_POEMS = gql(`
                        id
                    }
                    datePublished
-                   comments {
-                       id
-                       poem {
-                           id
+                   comments(first: $commentsLimit, after: $commentsCursor) {
+                       edges {
+                           node {
+                               id
+                               poem {
+                                   id
+                               }
+                           }
+                           cursor
+                       }
+                       pageInfo {
+                           hasNextPage
+                           hasPreviousPage
+                           startCursor
+                           endCursor
+                           pageSize
                        }
                    }
                    commentsCount
                    inCollection {
                        id
                    }
-                   likes {
-                       id
-                       poem {
-                           id
+                   likes(first: $likesLimit, after: $likesCursor) {
+                       edges {
+                           node {
+                               id
+                               poem {
+                                   id
+                               }
+                           }
+                           cursor
+                       }
+                       pageInfo {
+                           hasNextPage
+                           hasPreviousPage
+                           startCursor
+                           endCursor
+                           pageSize
                        }
                    }
                    likesCount
-                   savedBy {
-                       id
-                       poem {
-                           id
+                   savedBy(first: $savedByLimit, after: $savedByCursor) {
+                       edges {
+                           node {
+                               id
+                               poem {
+                                   id
+                               }
+                           }
+                           cursor
+                       }
+                       pageInfo {
+                           hasNextPage
+                           hasPreviousPage
+                           startCursor
+                           endCursor
+                           pageSize
                        }
                    }
                    savedByCount

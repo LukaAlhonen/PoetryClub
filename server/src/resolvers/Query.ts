@@ -15,12 +15,12 @@ export const Query: Resolvers["Query"] = {
 
   authors: (
     _,
-    { limit, cursor, usernameContains },
+    { first, after, usernameContains },
     { services },
   ) => {
-    return services.authorService.getAuthors({
-      limit,
-      cursor,
+    return services.authorService.getAuthorsConnection({
+      first,
+      after,
       usernameContains,
     });
   },
@@ -31,12 +31,12 @@ export const Query: Resolvers["Query"] = {
 
   comments: (
     _,
-    { limit, cursor, authorId, poemId },
+    { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.commentService.getComments({
-      limit,
-      cursor,
+    return services.commentService.getCommentsConnection({
+      first,
+      after,
       authorId,
       poemId,
     });
@@ -52,8 +52,8 @@ export const Query: Resolvers["Query"] = {
     return services.collectionService.getCollection({ id });
   },
 
-  collections: (_, { limit, cursor, filter }, { services }) => {
-    return services.collectionService.getCollections({ limit, cursor, filter });
+  collections: (_, { first, after, filter }, { services }) => {
+    return services.collectionService.getCollectionsConnection({ first, after, filter });
   },
 
   like: (_, { id }, { services }) => {
@@ -62,10 +62,10 @@ export const Query: Resolvers["Query"] = {
 
   likes: (
     _,
-    { limit, cursor, authorId, poemId },
+    { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.likeService.getLikes({ limit, cursor, authorId, poemId });
+    return services.likeService.getLikesConnection({ first, after, authorId, poemId });
   },
 
   savedPoem: (_, { id }, { services }) => {
@@ -74,12 +74,12 @@ export const Query: Resolvers["Query"] = {
 
   savedPoems: (
     _,
-    { limit, cursor, authorId, poemId },
+    { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.savedPoemService.getSavedPoems({
-      limit,
-      cursor,
+    return services.savedPoemService.getSavedPoemsConnection({
+      first,
+      after,
       authorId,
       poemId,
     });
@@ -91,12 +91,12 @@ export const Query: Resolvers["Query"] = {
 
   followedAuthors: (
     _,
-    { limit, cursor, followerId, followingId },
+    { first, after, followerId, followingId },
     { services },
   ) => {
-    return services.followedAuthorService.getFollowedAuthors({
-      limit,
-      cursor,
+    return services.followedAuthorService.getFollowedAuthorsConnection({
+      first,
+      after,
       followerId,
       followingId,
     });

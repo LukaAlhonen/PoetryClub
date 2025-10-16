@@ -8,27 +8,27 @@ export const typeDefs = gql`
     poems(first: Int, after: ID, filter: GetPoemsFilter): PoemsConnection!
     poem(id: ID!): Poem!
     authorById(id: ID!): Author!
-    authors(limit: Int, cursor: ID, usernameContains: String): [Author!]!
+    authors(first: Int, after: ID, usernameContains: String): AuthorsConnection!
     authorByUsername(username: String!): Author!
     comment(id: ID!): Comment!
-    comments(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Comment!]!
+    comments(first: Int, after: ID, authorId: ID, poemId: ID): CommentsConnection!
     collection(id: ID!): Collection!
     collections(
-      limit: Int
-      cursor: ID
+        first: Int
+      after: ID
       filter: GetCollectionsFilter
-    ): [Collection!]!
+    ): CollectionsConnection!
     like(id: ID!): Like!
-    likes(limit: Int, cursor: ID, authorId: ID, poemId: ID): [Like!]!
+    likes(first: Int, after: ID, authorId: ID, poemId: ID): LikesConnection!
     savedPoem(id: ID!): SavedPoem!
-    savedPoems(limit: Int, cursor: ID, authorId: ID, poemId: ID): [SavedPoem!]!
+    savedPoems(first: Int, after: ID, authorId: ID, poemId: ID): SavedPoemsConnection!
     followedAuthor(id: ID!): FollowedAuthor!
     followedAuthors(
-      limit: Int
-      cursor: ID
+        first: Int
+        after: ID
       followingId: ID
       followerId: ID
-    ): [FollowedAuthor!]!
+    ): FollowedAuthorsConnection!
     me: Author!
   }
 
@@ -67,14 +67,14 @@ export const typeDefs = gql`
     id: ID!
     username: String!
     email: String!
-    poems(limit: Int, cursor: ID): [Poem!]!
-    savedPoems(limit: Int, cursor: ID): [SavedPoem!]!
-    comments(limit: Int, cursor: ID): [Comment!]!
-    collections(limit: Int, cursor: ID): [Collection!]!
-    likedPoems(limit: Int, cursor: ID): [Like!]!
-    following(limit: Int, cursor: ID): [FollowedAuthor!]!
+    poems(first: Int, after: ID): PoemsConnection!
+    savedPoems(first: Int, after: ID): SavedPoemsConnection!
+    comments(first: Int, after: ID): CommentsConnection!
+    collections(first: Int, after: ID): CollectionsConnection!
+    likedPoems(first: Int, after: ID): LikesConnection!
+    following(first: Int, after: ID): FollowedAuthorsConnection!
     followingCount: Int!
-    followedBy(limit: Int, cursor: ID): [FollowedAuthor!]!
+    followedBy(first: Int, after: ID): FollowedAuthorsConnection!
     followedByCount: Int!
     dateJoined: Date!
   }
@@ -85,12 +85,12 @@ export const typeDefs = gql`
     author: Author!
     text: String!
     datePublished: Date!
-    comments(limit: Int, cursor: ID): [Comment!]!
+    comments(first: Int, after: ID): CommentsConnection!
     commentsCount: Int!
     inCollection: Collection
-    likes(limit: Int, cursor: ID): [Like!]!
+    likes(first: Int, after: ID): LikesConnection!
     likesCount: Int!
-    savedBy(limit: Int, cursor: ID): [SavedPoem!]!
+    savedBy(first: Int, after: ID): SavedPoemsConnection!
     savedByCount: Int!
     views: Int!
   }
@@ -106,7 +106,7 @@ export const typeDefs = gql`
   type Collection {
     id: ID!
     author: Author!
-    poems(limit: Int, cursor: ID): [Poem!]!
+    poems(first: Int, after: ID): PoemsConnection!
     dateCreated: Date!
     title: String!
   }
@@ -182,6 +182,7 @@ export const typeDefs = gql`
     title: String!
   }
 
+  # Relay style pagination
   type PageInfo {
       hasNextPage: Boolean!
       hasPreviousPage: Boolean!
@@ -190,6 +191,7 @@ export const typeDefs = gql`
       pageSize: Int
   }
 
+  # Poem
   type PoemsEdge {
       node: Poem
       cursor: String!
@@ -197,6 +199,72 @@ export const typeDefs = gql`
 
   type PoemsConnection {
       edges: [PoemsEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # Author
+  type AuthorsEdge {
+      node: Author
+      cursor: String!
+  }
+
+  type AuthorsConnection {
+      edges: [AuthorsEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # Comments
+  type CommentsEdge {
+      node: Comment
+      cursor: String!
+  }
+
+  type CommentsConnection {
+      edges: [CommentsEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # Collections
+  type CollectionsEdge {
+      node: Collection
+      cursor: String!
+  }
+
+  type CollectionsConnection {
+      edges: [CollectionsEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # Likes
+  type LikesEdge {
+      node: Like
+      cursor: String!
+  }
+
+  type LikesConnection {
+      edges: [LikesEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # SavedPoem
+  type SavedPoemsEdge {
+      node: SavedPoem
+      cursor: String!
+  }
+
+  type SavedPoemsConnection {
+      edges: [SavedPoemsEdge!]!
+      pageInfo: PageInfo!
+  }
+
+  # FollowedAuthor
+  type FollowedAuthorsEdge {
+      node: FollowedAuthor
+      cursor: String!
+  }
+
+  type FollowedAuthorsConnection {
+      edges: [FollowedAuthorsEdge!]!
       pageInfo: PageInfo!
   }
 `;

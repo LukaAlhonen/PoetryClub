@@ -52,7 +52,7 @@ describe("FollowedAuthorService integration tests", () => {
 
   test("getFollowedAuthors, with pagination", async () => {
     const result1 = await services.followedAuthorService.getFollowedAuthors({
-      limit: 10
+      first: 10
     })
 
     expect(result1).toBeDefined();
@@ -62,7 +62,7 @@ describe("FollowedAuthorService integration tests", () => {
       compareFollowedAuthorFields(result1[i], followedAuthors[i])
     }
 
-    const result2 = await services.followedAuthorService.getFollowedAuthors({limit: 10, cursor: result1[i-1].id})
+    const result2 = await services.followedAuthorService.getFollowedAuthors({first: 10, after: result1[i-1].id})
 
     expect(result2).toBeDefined();
     expect(result2).toHaveLength(followedAuthors.length-10)
@@ -84,6 +84,10 @@ describe("FollowedAuthorService integration tests", () => {
 
     expect(result).toHaveLength(3)
   })
+
+  test.todo("getFollowedAuthorsConnection")
+  test.todo("getFollowedAuthorsConnection, with pagination")
+  test.todo("getFollowedAuthorsConnection, with filter")
 
   test("createFollowedAuthor", async () => {
     // need to create author first since all seeded authors already follow each other

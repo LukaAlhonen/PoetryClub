@@ -1,54 +1,54 @@
 import { Resolvers } from "../__generated__/types.js";
 
 export const Author: Resolvers["Author"] = {
-  poems: ({ id }, { limit, cursor }, { services }) => {
-    return services.poemService.getPoems({
-      first: limit,
-      after: cursor,
+  poems: ({ id }, { first, after }, { services }) => {
+    return services.poemService.getPoemsConnection({
+      first,
+      after,
       filter: {
         authorId: id,
       },
     });
   },
 
-  savedPoems: ({ id }, { limit, cursor }, { services }) => {
-    return services.savedPoemService.getSavedPoems({
-      limit,
-      cursor,
+  savedPoems: ({ id }, { first, after }, { services }) => {
+    return services.savedPoemService.getSavedPoemsConnection({
+      first,
+      after,
       authorId: id,
     });
   },
 
-  comments: ({ id }, { limit, cursor }, { services }) => {
-    return services.commentService.getComments({
-      limit,
-      cursor,
+  comments: ({ id }, { first, after }, { services }) => {
+    return services.commentService.getCommentsConnection({
+      first,
+      after,
       authorId: id,
     });
   },
 
-  collections: ({ id }, { limit, cursor }, { services }) => {
-    return services.collectionService.getCollections({
-      limit,
-      cursor,
+  collections: ({ id }, { first, after }, { services }) => {
+    return services.collectionService.getCollectionsConnection({
+      first,
+      after,
       filter: {
         authorId: id,
       },
     });
   },
 
-  likedPoems: ({ id }, { limit, cursor }, { services }) => {
-    return services.likeService.getLikes({
-      limit,
-      cursor,
+  likedPoems: ({ id }, { first, after }, { services }) => {
+    return services.likeService.getLikesConnection({
+      first,
+      after,
       authorId: id,
     });
   },
 
-  followedBy: ({ id }, { limit, cursor }, { services }) => {
-    return services.followedAuthorService.getFollowedAuthors({
-      limit,
-      cursor,
+  followedBy: ({ id }, { first, after }, { services }) => {
+    return services.followedAuthorService.getFollowedAuthorsConnection({
+      first,
+      after,
       followingId: id,
     });
   },
@@ -59,10 +59,10 @@ export const Author: Resolvers["Author"] = {
     });
   },
 
-  following: ({ id }, { limit, cursor }, { services }) => {
-    return services.followedAuthorService.getFollowedAuthors({
-      limit,
-      cursor,
+  following: ({ id }, { first, after }, { services }) => {
+    return services.followedAuthorService.getFollowedAuthorsConnection({
+      first,
+      after,
       followerId: id,
     });
   },

@@ -125,6 +125,10 @@ describe("AuthorService integration tests", () => {
     }
   })
 
+  test.todo("getLikesConnection")
+  test.todo("getLikesConnection, with pagination")
+  test.todo("getLikesConnection, with filter")
+
   test("getLikesCount", async () => {
     const result = await services.poemService.getLikesCount({poemId: poems[0].id})
     expect(result).toBe(1)

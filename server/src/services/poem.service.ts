@@ -151,7 +151,7 @@ export class PoemService {
     return {
       edges: edges.map((poem) => ({
         node: poem,
-        cursor: endCursor
+        cursor: poem.id
       })),
       pageInfo: {
         hasNextPage,

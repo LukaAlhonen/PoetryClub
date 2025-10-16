@@ -20,27 +20,63 @@ export const GET_POEM = gql(`
                id
            }
            datePublished
-           comments(limit: $commentsLimit, cursor: $commentsCursor) {
-               id
-               poem {
-                   id
+           comments(first: $commentsLimit, after: $commentsCursor) {
+               edges {
+                   node {
+                       id
+                       poem {
+                           id
+                       }
+                   }
+                   cursor
+               }
+               pageInfo {
+                   hasNextPage
+                   hasPreviousPage
+                   startCursor
+                   endCursor
+                   pageSize
                }
            }
            commentsCount
            inCollection {
                id
            }
-           likes(limit: $likesLimit, cursor: $likesCursor) {
-               id
-               poem {
-                   id
+           likes(first: $likesLimit, after: $likesCursor) {
+               edges {
+                   node {
+                       id
+                       poem {
+                           id
+                       }
+                   }
+                   cursor
+               }
+               pageInfo {
+                   hasNextPage
+                   hasPreviousPage
+                   startCursor
+                   endCursor
+                   pageSize
                }
            }
            likesCount
-           savedBy(limit: $savedByLimit, cursor: $savedByCursor) {
-               id
-               poem {
-                   id
+           savedBy(first: $savedByLimit, after: $savedByCursor) {
+               edges {
+                   node {
+                       id
+                       poem {
+                           id
+                       }
+                   }
+                   cursor
+               }
+               pageInfo {
+                   hasNextPage
+                   hasPreviousPage
+                   startCursor
+                   endCursor
+                   pageSize
                }
            }
            savedByCount

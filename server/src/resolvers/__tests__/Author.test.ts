@@ -2,16 +2,15 @@ import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
 import {
-  GetAuthorsQuery,
   GetAuthorByIdQuery,
 } from "../../__generated__/graphql.js";
 
 import {
-  GET_AUTHORS,
   GET_AUTHOR_BY_ID,
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { AuthorWithRelations, SafeAuthor } from "../../types/extended-types.js";
 
 describe("Graphql Author integration tests", () => {
   // DB seeded with:
@@ -26,18 +25,13 @@ describe("Graphql Author integration tests", () => {
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
-  let authors: NonNullable<GetAuthorsQuery["authors"]> = [];
+  let authors: AuthorWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
-    const response = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-    if (response.body.kind === "single") {
-      authors = response.body.singleResult.data?.authors;
-    }
+    const result = await seed({ prisma });
+    authors = result.authors;
   });
   afterAll(async () => {
     await testServer.cleanup();
@@ -56,10 +50,11 @@ describe("Graphql Author integration tests", () => {
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
         expect(author.poems).toBeDefined();
-        expect(author.poems).toHaveLength(2);
+        expect(author.poems.edges).toHaveLength(2);
+        expect(author.poems.pageInfo.pageSize).toStrictEqual(author.poems.edges.length)
 
-        for (const poem of author.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of author.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
       }
     }
@@ -81,13 +76,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.poems).toBeDefined();
-        expect(author.poems).toHaveLength(1);
+        expect(author.poems.edges).toHaveLength(1);
+        expect(author.poems.pageInfo.pageSize).toStrictEqual(author.poems.edges.length)
+        expect(author.poems.pageInfo.hasNextPage).toBe(true);
+        expect(author.poems.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const poem of author.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of author.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
 
-        cursor = author.poems[author.poems.length - 1].id;
+        cursor = author.poems.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -104,10 +102,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.poems).toBeDefined();
-        expect(author.poems).toHaveLength(1);
+        expect(author.poems.edges).toHaveLength(1);
+        expect(author.poems.pageInfo.pageSize).toStrictEqual(author.poems.edges.length)
+        expect(author.poems.pageInfo.hasNextPage).toBe(false);
+        expect(author.poems.pageInfo.hasPreviousPage).toBe(true);
 
-        for (const poem of author.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of author.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
       }
     }
@@ -126,10 +127,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.savedPoems).toBeDefined();
-        expect(author.savedPoems).toHaveLength(2);
+        expect(author.savedPoems.edges).toHaveLength(2);
+        expect(author.savedPoems.pageInfo.pageSize).toStrictEqual(author.savedPoems.edges.length)
 
-        for (const savedPoem of author.savedPoems) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of author.savedPoems.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
       }
     }
@@ -151,13 +153,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.savedPoems).toBeDefined();
-        expect(author.savedPoems).toHaveLength(1);
+        expect(author.savedPoems.edges).toHaveLength(1);
+        expect(author.savedPoems.pageInfo.pageSize).toStrictEqual(author.savedPoems.edges.length)
+        expect(author.savedPoems.pageInfo.hasNextPage).toBe(true)
+        expect(author.savedPoems.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const savedPoem of author.savedPoems) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of author.savedPoems.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
 
-        cursor = author.savedPoems[author.savedPoems.length - 1].id;
+        cursor = author.savedPoems.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -174,10 +179,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.savedPoems).toBeDefined();
-        expect(author.savedPoems).toHaveLength(1);
+        expect(author.savedPoems.edges).toHaveLength(1);
+        expect(author.savedPoems.pageInfo.pageSize).toStrictEqual(author.savedPoems.edges.length)
+        expect(author.savedPoems.pageInfo.hasNextPage).toBe(false)
+        expect(author.savedPoems.pageInfo.hasPreviousPage).toBe(true)
 
-        for (const savedPoem of author.savedPoems) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of author.savedPoems.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
       }
     }
@@ -196,10 +204,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.comments).toBeDefined();
-        expect(author.comments).toHaveLength(4);
+        expect(author.comments.edges).toHaveLength(4);
+        expect(author.comments.pageInfo.pageSize).toStrictEqual(author.comments.edges.length)
 
-        for (const comment of author.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of author.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
       }
     }
@@ -221,13 +230,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.comments).toBeDefined();
-        expect(author.comments).toHaveLength(3);
+        expect(author.comments.edges).toHaveLength(3);
+        expect(author.comments.pageInfo.pageSize).toStrictEqual(author.comments.edges.length)
+        expect(author.comments.pageInfo.hasNextPage).toBe(true);
+        expect(author.comments.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const comment of author.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of author.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
 
-        cursor = author.comments[author.comments.length - 1].id;
+        cursor = author.comments.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -244,10 +256,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.comments).toBeDefined();
-        expect(author.comments).toHaveLength(1);
+        expect(author.comments.edges).toHaveLength(1);
+        expect(author.comments.pageInfo.pageSize).toStrictEqual(author.comments.edges.length)
+        expect(author.comments.pageInfo.hasNextPage).toBe(false);
+        expect(author.comments.pageInfo.hasPreviousPage).toBe(true)
 
-        for (const comment of author.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of author.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
       }
     }
@@ -266,10 +281,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.collections).toBeDefined();
-        expect(author.collections).toHaveLength(1);
+        expect(author.collections.edges).toHaveLength(1);
+        expect(author.collections.pageInfo.pageSize).toStrictEqual(author.collections.edges.length)
 
-        for (const collection of author.collections) {
-          expect(collection.id).toBeDefined();
+        for (const collectionEdge of author.collections.edges) {
+          expect(collectionEdge.node.id).toBeDefined();
         }
       }
     }
@@ -291,13 +307,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.collections).toBeDefined();
-        expect(author.collections).toHaveLength(1);
+        expect(author.collections.edges).toHaveLength(1);
+        expect(author.collections.pageInfo.pageSize).toStrictEqual(author.collections.edges.length)
+        expect(author.collections.pageInfo.hasNextPage).toBe(false);
+        expect(author.collections.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const collection of author.collections) {
-          expect(collection.id).toBeDefined();
+        for (const collectionEdge of author.collections.edges) {
+          expect(collectionEdge.node.id).toBeDefined();
         }
 
-        cursor = author.collections[author.collections.length - 1].id;
+        cursor = author.collections.pageInfo.endCursor
       }
 
       const secondResponse =
@@ -314,10 +333,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.collections).toBeDefined();
-        expect(author.collections).toHaveLength(0);
+        expect(author.collections.edges).toHaveLength(0);
+        expect(author.collections.pageInfo.pageSize).toStrictEqual(author.collections.edges.length)
+        expect(author.collections.pageInfo.hasNextPage).toBe(false);
+        expect(author.collections.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const collection of author.collections) {
-          expect(collection.id).toBeDefined();
+        for (const collectionEdge of author.collections.edges) {
+          expect(collectionEdge.node.id).toBeDefined();
         }
       }
     }
@@ -336,10 +358,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.likedPoems).toBeDefined();
-        expect(author.likedPoems).toHaveLength(2);
+        expect(author.likedPoems.edges).toHaveLength(2);
+        expect(author.likedPoems.pageInfo.pageSize).toStrictEqual(author.likedPoems.edges.length)
 
-        for (const like of author.likedPoems) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of author.likedPoems.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
       }
     }
@@ -361,13 +384,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.likedPoems).toBeDefined();
-        expect(author.likedPoems).toHaveLength(1);
+        expect(author.likedPoems.edges).toHaveLength(1);
+        expect(author.likedPoems.pageInfo.pageSize).toStrictEqual(author.likedPoems.edges.length)
+        expect(author.likedPoems.pageInfo.hasNextPage).toBe(true);
+        expect(author.likedPoems.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const like of author.likedPoems) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of author.likedPoems.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
 
-        cursor = author.likedPoems[author.likedPoems.length - 1].id;
+        cursor = author.likedPoems.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -384,10 +410,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.likedPoems).toBeDefined();
-        expect(author.likedPoems).toHaveLength(1);
+        expect(author.likedPoems.edges).toHaveLength(1);
+        expect(author.likedPoems.pageInfo.pageSize).toStrictEqual(author.likedPoems.edges.length)
+        expect(author.likedPoems.pageInfo.hasNextPage).toBe(false);
+        expect(author.likedPoems.pageInfo.hasPreviousPage).toBe(true);
 
-        for (const like of author.likedPoems) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of author.likedPoems.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
       }
     }
@@ -406,10 +435,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.followedBy).toBeDefined();
-        expect(author.followedBy).toHaveLength(3);
+        expect(author.followedBy.edges).toHaveLength(3);
+        expect(author.followedBy.pageInfo.pageSize).toStrictEqual(author.followedBy.edges.length)
 
-        for (const follower of author.followedBy) {
-          expect(follower.id).toBeDefined();
+        for (const followerEdge of author.followedBy.edges) {
+          expect(followerEdge.node.id).toBeDefined();
         }
       }
     }
@@ -431,13 +461,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.followedBy).toBeDefined();
-        expect(author.followedBy).toHaveLength(2);
+        expect(author.followedBy.edges).toHaveLength(2);
+        expect(author.followedBy.pageInfo.pageSize).toStrictEqual(author.followedBy.edges.length)
+        expect(author.followedBy.pageInfo.hasNextPage).toBe(true);
+        expect(author.followedBy.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const follower of author.followedBy) {
-          expect(follower.id).toBeDefined();
+        for (const followerEdge of author.followedBy.edges) {
+          expect(followerEdge.node.id).toBeDefined();
         }
 
-        cursor = author.followedBy[author.followedBy.length - 1].id;
+        cursor = author.followedBy.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -454,10 +487,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.followedBy).toBeDefined();
-        expect(author.followedBy).toHaveLength(1);
+        expect(author.followedBy.edges).toHaveLength(1);
+        expect(author.followedBy.pageInfo.pageSize).toStrictEqual(author.followedBy.edges.length)
+        expect(author.followedBy.pageInfo.hasNextPage).toBe(false);
+        expect(author.followedBy.pageInfo.hasPreviousPage).toBe(true);
 
-        for (const follower of author.followedBy) {
-          expect(follower.id).toBeDefined();
+        for (const followerEdge of author.followedBy.edges) {
+          expect(followerEdge.node.id).toBeDefined();
         }
       }
     }
@@ -492,10 +528,11 @@ describe("Graphql Author integration tests", () => {
         const author = response.body.singleResult.data?.authorById;
 
         expect(author.following).toBeDefined();
-        expect(author.following).toHaveLength(3);
+        expect(author.following.edges).toHaveLength(3);
+        expect(author.following.pageInfo.pageSize).toStrictEqual(author.following.edges.length)
 
-        for (const following of author.following) {
-          expect(following.id).toBeDefined();
+        for (const followingEdge of author.following.edges) {
+          expect(followingEdge.node.id).toBeDefined();
         }
       }
     }
@@ -517,13 +554,16 @@ describe("Graphql Author integration tests", () => {
         const author = initialResponse.body.singleResult.data?.authorById;
 
         expect(author.following).toBeDefined();
-        expect(author.following).toHaveLength(2);
+        expect(author.following.edges).toHaveLength(2);
+        expect(author.following.pageInfo.pageSize).toStrictEqual(author.following.edges.length)
+        expect(author.following.pageInfo.hasNextPage).toBe(true);
+        expect(author.following.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const following of author.following) {
-          expect(following.id).toBeDefined();
-
-          cursor = author.following[author.following.length - 1].id;
+        for (const followingEdge of author.following.edges) {
+          expect(followingEdge.node.id).toBeDefined();
         }
+
+        cursor = author.following.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -540,10 +580,13 @@ describe("Graphql Author integration tests", () => {
         const author = secondResponse.body.singleResult.data?.authorById;
 
         expect(author.following).toBeDefined();
-        expect(author.following).toHaveLength(1);
+        expect(author.following.edges).toHaveLength(1);
+        expect(author.following.pageInfo.pageSize).toStrictEqual(author.following.edges.length)
+        expect(author.following.pageInfo.hasNextPage).toBe(false);
+        expect(author.following.pageInfo.hasPreviousPage).toBe(true);
 
-        for (const following of author.following) {
-          expect(following.id).toBeDefined();
+        for (const followingEdge of author.following.edges) {
+          expect(followingEdge.node.id).toBeDefined();
         }
       }
     }
