@@ -153,7 +153,7 @@ export class CollectionService {
     return Boolean(hasPrev)
   }
 
-  async getCollectionsConnection({first, after, filter }: {first?: number, after?:string, filter?: GetCollectionsFilter}) {
+  async getCollectionsConnection({ first, after, filter }: { first?: number, after?: string, filter?: GetCollectionsFilter } = {}) {
     const collections = await this.getCollections({ first: first ? first + 1 : undefined, after, filter });
 
     const hasNextPage = collections.length > (first ?? collections.length);

@@ -134,7 +134,7 @@ export class PoemService {
     return Boolean(hasPrev)
   }
 
-  async getPoemsConnection ({after, first, filter}: { after?: string, first?: number, filter?: GetPoemsFilter }) {
+  async getPoemsConnection({ after, first, filter }: { after?: string, first?: number, filter?: GetPoemsFilter } = {}) {
     const poems = await this.getPoems({after, first: first ? first + 1 : undefined, filter});
 
     const hasNextPage = poems.length > (first ?? poems.length);

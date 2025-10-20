@@ -134,7 +134,7 @@ export class FollowedAuthorService {
     return Boolean(hasPrev);
   }
 
-  async getFollowedAuthorsConnection({first, after, followerId, followingId}: {first?: number, after?: string, followerId?: string, followingId?: string}){
+  async getFollowedAuthorsConnection({ first, after, followerId, followingId }: { first?: number, after?: string, followerId?: string, followingId?: string } = {}){
     const followedAuthors = await this.getFollowedAuthors({ first: first ? first + 1 : undefined, after, followerId, followingId });
 
     const hasNextPage = followedAuthors.length > (first ?? followedAuthors.length);

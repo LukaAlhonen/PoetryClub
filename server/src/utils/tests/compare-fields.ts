@@ -8,16 +8,20 @@ import {
   SavedPoemWithRelations,
 } from "../../types/extended-types.js";
 
-export const compareAuthorFields = (
+export const compareAuthorFields = ({author1, author2, ignorePassword, ignoreAuthVersion}: {
   author1: SafeAuthor,
   author2: SafeAuthor,
+  ignorePassword?: boolean,
+  ignoreAuthVersion?: boolean,
+}
 ) => {
   expect(author1.id).toStrictEqual(author2.id);
   expect(author1.username).toStrictEqual(author2.username);
   expect(author1.email).toStrictEqual(author2.email);
-  expect(author1.password).toStrictEqual(author2.password);
-  expect(author1.authVersion).toStrictEqual(author2.authVersion);
   expect(author1.dateJoined).toStrictEqual(author2.dateJoined);
+
+  if (!ignorePassword) expect(author1.password).toStrictEqual(author2.password);
+  if (!ignoreAuthVersion) expect(author1.authVersion).toStrictEqual(author2.authVersion);
 };
 
 export const comparePoemFields = (

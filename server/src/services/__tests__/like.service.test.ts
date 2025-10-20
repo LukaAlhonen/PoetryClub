@@ -74,9 +74,43 @@ describe("LikeService integration tests", () => {
     await expect(services.likeService.getLikes({authorId: likes[0].authorId})).resolves.toHaveLength(2)
   })
 
-  test.todo("getLikesConnection")
-  test.todo("getLikesConnection, with pagination")
-  test.todo("getLikesConnection, with filter")
+  test("getLikesConnection", async () => {
+    const result = await services.likeService.getLikesConnection();
+    expect(result.edges).toHaveLength(8)
+
+    result.edges.forEach((edge, i) => {
+      compareLikeFields(edge.node, likes[i]);
+    })
+  })
+
+  test("getLikesConnection, with pagination", async () => {
+    const result1 = await services.likeService.getLikesConnection({ first: 5 });
+
+    expect(result1.edges).toHaveLength(5);
+    expect(result1.pageInfo.hasNextPage).toBe(true);
+
+    let i = 0;
+    for (i; i < 5; ++i) {
+      compareLikeFields(result1.edges[i].node, likes[i]);
+    };
+
+    const result2 = await services.likeService.getLikesConnection({ first: 5, after: result1.pageInfo.endCursor });
+
+    expect(result2.edges).toHaveLength(3);
+    expect(result2.pageInfo.hasNextPage).toBe(false);
+
+    for (let j = 0; j < 3; ++i && ++j) {
+      compareLikeFields(result2.edges[j].node, likes[i]);
+    }
+  })
+
+  test("getLikesConnection, with filter", async () => {
+    const poemLikes = await services.likeService.getLikesConnection({ poemId: likes[0].poemId });
+    expect(poemLikes.edges).toHaveLength(1);
+
+    const authorLikes = await services.likeService.getLikesConnection({ authorId: likes[0].authorId });
+    expect(authorLikes.edges).toHaveLength(2)
+  })
 
   test("createLike", async () => {
     // create new author

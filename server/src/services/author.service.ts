@@ -234,7 +234,7 @@ export class AuthorService {
     return Boolean(hasPrev)
   }
 
-  async getAuthorsConnection({first, after, usernameContains}: {first?: number, after?: string, usernameContains?: string}) {
+  async getAuthorsConnection({ first, after, usernameContains }: { first?: number, after?: string, usernameContains?: string } = {}) {
     const authors = await this.getAuthors({ first: first ? first + 1 : undefined, after, usernameContains });
 
     const hasNextPage = authors.length > (first ?? authors.length);

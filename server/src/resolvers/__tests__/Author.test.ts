@@ -10,7 +10,7 @@ import {
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
-import { AuthorWithRelations, SafeAuthor } from "../../types/extended-types.js";
+import { AuthorWithRelations } from "../../types/extended-types.js";
 
 describe("Graphql Author integration tests", () => {
   // DB seeded with:

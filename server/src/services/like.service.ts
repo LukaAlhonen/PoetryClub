@@ -130,7 +130,7 @@ export class LikeService {
     return Boolean(hasPrev)
   }
 
-  async getLikesConnection ({first, after, authorId, poemId}: {first?: number, after?:string, authorId?: string, poemId?: string}) {
+  async getLikesConnection({ first, after, authorId, poemId }: { first?: number, after?: string, authorId?: string, poemId?: string } = {}) {
     const likes = await this.getLikes({ first: first ? first + 1 : undefined, after, authorId, poemId });
 
     const hasNextPage = likes.length > (first ?? likes.length);

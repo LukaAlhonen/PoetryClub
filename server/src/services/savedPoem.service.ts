@@ -136,7 +136,7 @@ export class SavedPoemService {
     return Boolean(hasPrev)
   }
 
-  async getSavedPoemsConnection ({after, first, authorId, poemId}: { after?: string, first?: number, authorId?: string, poemId?: string }) {
+  async getSavedPoemsConnection({ after, first, authorId, poemId }: { after?: string, first?: number, authorId?: string, poemId?: string } = {}) {
     const savedPoems = await this.getSavedPoems({after, first: first ? first + 1 : undefined, poemId, authorId});
 
     const hasNextPage = savedPoems.length > (first ?? savedPoems.length);

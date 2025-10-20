@@ -4,7 +4,7 @@ import { seed } from "../../utils/tests/seed-test-db.js";
 import { randomUUID } from "node:crypto";
 import { createServices } from "../index.js";
 import { FollowedAuthorWithRelations } from "../../types/extended-types.js";
-import { compareFollowedAuthorFields } from "../../utils/tests/compare-fields.js";
+import { compareAuthorFields, compareFollowedAuthorFields } from "../../utils/tests/compare-fields.js";
 
 const sortFollowedAuthors = ({
   followedAuthors,
@@ -85,9 +85,45 @@ describe("FollowedAuthorService integration tests", () => {
     expect(result).toHaveLength(3)
   })
 
-  test.todo("getFollowedAuthorsConnection")
-  test.todo("getFollowedAuthorsConnection, with pagination")
-  test.todo("getFollowedAuthorsConnection, with filter")
+  test("getFollowedAuthorsConnection", async () => {
+    const result = await services.followedAuthorService.getFollowedAuthorsConnection()
+    const resultFollowedAuthors = result.edges.map((edge) => edge.node);
+
+    expect(resultFollowedAuthors).toHaveLength(12);
+
+    resultFollowedAuthors.forEach((followedAuthor, i) => {
+      compareFollowedAuthorFields(followedAuthor, followedAuthors[i])
+    })
+  })
+
+  test("getFollowedAuthorsConnection, with pagination", async () => {
+    const result1 = await services.followedAuthorService.getFollowedAuthorsConnection({ first: 10 });
+
+    expect(result1.edges).toHaveLength(10);
+    expect(result1.pageInfo.hasNextPage).toBe(true);
+
+    let i = 0;
+    for (i; i < 10; ++i) {
+      compareFollowedAuthorFields(result1.edges[i].node, followedAuthors[i]);
+    }
+
+    const result2 = await services.followedAuthorService.getFollowedAuthorsConnection({ first: 10, after: result1.pageInfo.endCursor });
+
+    expect(result2.edges).toHaveLength(2);
+    expect(result2.pageInfo.hasNextPage).toBe(false)
+
+    for (let j = 0; j < 2; ++j && ++i) {
+      compareFollowedAuthorFields(result2.edges[j].node, followedAuthors[i])
+    }
+  })
+
+  test("getFollowedAuthorsConnection, with filter", async () => {
+    const result1 = await services.followedAuthorService.getFollowedAuthorsConnection({ followerId: followedAuthors[0].followerId });
+    expect(result1.edges).toHaveLength(3)
+
+    const result2 = await services.followedAuthorService.getFollowedAuthorsConnection({ followingId: followedAuthors[0].followingId });
+    expect(result2.edges).toHaveLength(3)
+  })
 
   test("createFollowedAuthor", async () => {
     // need to create author first since all seeded authors already follow each other

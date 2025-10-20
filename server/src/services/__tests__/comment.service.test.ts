@@ -92,9 +92,45 @@ describe("CommentService integration tests", () => {
     expect(result2).toHaveLength(2)
   })
 
-  test.todo("getCommentsConnection")
-  test.todo("getCommentsConnection, with pagination")
-  test.todo("getCommentsConnection, with filter")
+  test("getCommentsConnection", async () => {
+    const result = await services.commentService.getCommentsConnection();
+    const resultComments = result.edges.map((edge) => edge.node);
+
+    expect(resultComments).toHaveLength(16)
+
+    resultComments.forEach((comment, i) => {
+      compareCommentFields(comment, comments[i])
+    })
+  })
+
+  test("getCommentsConnection, with pagination", async () => {
+    const result1 = await services.commentService.getCommentsConnection({first: 10});
+    const resultComments1 = result1.edges.map((edge) => edge.node);
+
+    expect(resultComments1).toHaveLength(10);
+
+    let i = 0;
+    for (i; i < 10; ++i) {
+      compareCommentFields(comments[i], resultComments1[i]);
+    }
+
+    const result2 = await services.commentService.getCommentsConnection({ first: 10, after: result1.pageInfo.endCursor });
+    const resultComments2 = result2.edges.map((edge) => edge.node);
+
+    expect(resultComments2).toHaveLength(6);
+
+    for (let j = 0; j < 6; ++j && ++i) {
+      compareCommentFields(resultComments2[j], comments[i])
+    }
+  })
+
+  test("getCommentsConnection, with filter", async () => {
+    const result1 = await services.commentService.getCommentsConnection({ authorId: comments[0].authorId });
+    expect(result1.edges).toHaveLength(4);
+
+    const result2 = await services.commentService.getCommentsConnection({ poemId: comments[0].poemId });
+    expect(result2.edges).toHaveLength(2)
+  })
 
   test("createComment", async () => {
     const text = "testCommentText"

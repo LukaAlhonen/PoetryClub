@@ -149,7 +149,7 @@ export class CommentService {
     return Boolean(hasPrev)
   }
 
-  async getCommentsConnection({first, after, authorId, poemId }: {first?: number, after?: string, authorId?: string, poemId?: string}) {
+  async getCommentsConnection({ first, after, authorId, poemId }: { first?: number, after?: string, authorId?: string, poemId?: string } = {}) {
     // fetch one extra to check if there are more comments available
     const comments = await this.getComments({first: first ? first + 1 : undefined, after, authorId, poemId})
 
