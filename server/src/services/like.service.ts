@@ -43,21 +43,21 @@ export class LikeService {
    * Returns an array of Like objects, optionally filter by poem and or author
    * @param authorId - filter by author
    * @param poemId - filter by poem
-   * @param limit
-   * @param cursor
+   * @param first
+   * @param after
    **/
   async getLikes({
     authorId,
     poemId,
-    limit,
-    cursor,
+    first,
+    after,
   }: {
     authorId?: string;
     poemId?: string;
-    limit?: number;
-    cursor?: string;
+    first?: number;
+    after?: string;
   } = {}): Promise<LikeWithRelations[] | null> {
-    const cacheKey = `likes:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
+    const cacheKey = `likes:first:${first ? first : "null"}:after:${after ? after : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
     const cached = await this.cache.getAll<LikeWithRelations>({
       key: cacheKey,
     });
@@ -77,12 +77,12 @@ export class LikeService {
       orderBy: [{ datePublished: "desc" }, { id: "desc" }],
     };
 
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -99,6 +99,64 @@ export class LikeService {
     }
 
     return likes;
+  }
+
+  async hasPreviousPage({before, authorId, poemId}: {before: string, authorId?: string, poemId?: string}) {
+    const firstLike = await this.prisma.like.findUnique({ where: { id: before } });
+    if (!firstLike) return false;
+
+    const queryFilter: Prisma.LikeWhereInput = {
+      ...(authorId ? { authorId } : {}),
+      ...(poemId ? { poemId } : {}),
+    };
+
+    const hasPrev = await this.prisma.like.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          {
+            datePublished: { gt: firstLike.datePublished }
+          },
+          {
+            datePublished: firstLike.datePublished,
+            id: { gt: firstLike.id}
+          }
+        ]
+      },
+      orderBy: [{datePublished: "asc"}, {id: "asc"}],
+      select: { id: true}
+    })
+
+    return Boolean(hasPrev)
+  }
+
+  async getLikesConnection({ first, after, authorId, poemId }: { first?: number, after?: string, authorId?: string, poemId?: string } = {}) {
+    const likes = await this.getLikes({ first: first ? first + 1 : undefined, after, authorId, poemId });
+
+    const hasNextPage = likes.length > (first ?? likes.length);
+    const edges = hasNextPage ? likes.slice(0, first) : likes;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, authorId, poemId });
+    }
+
+    return {
+      edges: edges.map((like) => ({
+        node: like,
+        cursor: like.id
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length
+      }
+    }
   }
 
   /**
@@ -121,7 +179,7 @@ export class LikeService {
     });
 
     if (like) {
-      await this.cache.delByPattern({ pattern: "like:limit:*" });
+      await this.cache.delByPattern({ pattern: "like:first:*" });
       await this.cache.removeRelations({ id: like.poemId, name: "poem" });
       await this.cache.removeRelations({ id: like.authorId, name: "author" });
 

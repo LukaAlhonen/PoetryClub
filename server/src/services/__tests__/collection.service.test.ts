@@ -59,7 +59,7 @@ describe("CollectionService integration tests", () => {
 
   test("getCollections, with pagination", async () => {
     const result1 = await services.collectionService.getCollections({
-      limit: 3,
+      first: 3,
     });
     expect(result1).toHaveLength(3);
 
@@ -68,8 +68,8 @@ describe("CollectionService integration tests", () => {
     }
 
     const result2 = await services.collectionService.getCollections({
-      limit: 3,
-      cursor: result1[result1.length - 1].id,
+      first: 3,
+      after: result1[result1.length - 1].id,
     });
 
     expect(result2).toHaveLength(1);
@@ -110,6 +110,67 @@ describe("CollectionService integration tests", () => {
     expect(result3).toHaveLength(1);
     expect(result3[0].title).toStrictEqual("author1 collection");
   });
+
+  test("getCollectionsConnection", async () => {
+    const result = await services.collectionService.getCollectionsConnection();
+
+    expect(result.edges).toHaveLength(4)
+
+    result.edges.forEach((edge, i) => {
+      compareCollectionFields(edge.node, collections[i])
+    })
+  })
+
+  test("getCollectionsConnection, with pagination", async () => {
+    const result1 = await services.collectionService.getCollectionsConnection({ first: 3 });
+
+    expect(result1.edges).toHaveLength(3);
+    expect(result1.pageInfo.hasNextPage).toBe(true);
+
+    let i = 0;
+    for (i; i < 3; ++i) {
+      compareCollectionFields(result1.edges[i].node, collections[i]);
+    }
+
+    const result2 = await services.collectionService.getCollectionsConnection({ first: 3, after: result1.pageInfo.endCursor });
+
+    expect(result2.edges).toHaveLength(1);
+    expect(result2.pageInfo.hasNextPage).toBe(false);
+
+    compareCollectionFields(result2.edges[0].node, collections[i]);
+  })
+
+  test("getCollectionsConnection, with filter", async () => {
+    // get by authorId
+    const result1 = await services.collectionService.getCollectionsConnection({
+      filter: {
+        authorId: collections[0].authorId,
+      },
+    });
+
+    expect(result1.edges).toHaveLength(1);
+    expect(result1.edges[0].node.authorId).toStrictEqual(collections[0].authorId);
+
+    // get by authornameContains
+    const result2 = await services.collectionService.getCollectionsConnection({
+      filter: {
+        authorNameContains: "1",
+      },
+    });
+
+    expect(result2.edges).toHaveLength(1);
+    expect(result2.edges[0].node.author.username).toStrictEqual("author1");
+
+    // get by titleContains
+    const result3 = await services.collectionService.getCollectionsConnection({
+      filter: {
+        titleContains: "author1",
+      },
+    });
+
+    expect(result3.edges).toHaveLength(1);
+    expect(result3.edges[0].node.title).toStrictEqual("author1 collection");
+  })
 
   test("createColleciton", async () => {
     const title = "test title";

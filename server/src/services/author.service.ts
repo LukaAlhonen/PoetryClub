@@ -123,8 +123,8 @@ export class AuthorService {
    * @param omitPassword - include password with returned author, omitted by default
    * @param omitAuthVersion - include authVersion with returned author, omitted by default
    * @param usernameContains
-   * @param limit
-   * @param cursor
+   * @param first
+   * @param after
    * @returns array of Author objects
    *
    * @example
@@ -135,16 +135,16 @@ export class AuthorService {
     omitPassword = true,
     omitAuthVersion = true,
     usernameContains,
-    limit,
-    cursor,
+    first,
+    after,
   }: {
     omitPassword?: boolean;
     omitAuthVersion?: boolean;
     usernameContains?: string;
-    limit?: number;
-    cursor?: string;
+    first?: number;
+    after?: string;
   } = {}): Promise<SafeAuthor[] | null> {
-    const cacheKey = `authors:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
+    const cacheKey = `authors:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}:first:${first ? first : "null"}:after:${after ? after : "null"}:usernameContains:${usernameContains ? usernameContains : "null"}`;
     const cached = await this.cache.getAll<SafeAuthor>({
       key: cacheKey,
     });
@@ -172,12 +172,12 @@ export class AuthorService {
       orderBy: [{ dateJoined: "desc" }, { id: "desc" }],
     };
 
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -206,6 +206,61 @@ export class AuthorService {
     }
 
     return safeAuthors;
+  }
+
+  async hasPreviousPage({before, usernameContains}: {before: string, usernameContains?: string}) {
+    const firstAuthor = await this.prisma.author.findUnique({ where: { id: before } });
+    if (!firstAuthor) return false;
+
+    const queryFilter: Prisma.AuthorWhereInput = {
+      ...(usernameContains
+        ? { username: { contains: usernameContains, mode: "insensitive" } }
+        : {}),
+    };
+    const hasPrev = await this.prisma.author.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          { dateJoined: { gt: firstAuthor.dateJoined } },
+          {
+            dateJoined: firstAuthor.dateJoined,
+            id: { gt: firstAuthor.id }
+          }
+        ]
+      },
+      orderBy: [{ dateJoined: "asc" }, { id: "asc" }],
+      select: { id: true }
+    });
+    return Boolean(hasPrev)
+  }
+
+  async getAuthorsConnection({ first, after, usernameContains }: { first?: number, after?: string, usernameContains?: string } = {}) {
+    const authors = await this.getAuthors({ first: first ? first + 1 : undefined, after, usernameContains });
+
+    const hasNextPage = authors.length > (first ?? authors.length);
+    const edges = hasNextPage ? authors.slice(0, first) : authors;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, usernameContains });
+    }
+
+    return {
+      edges: edges.map((author) => ({
+        node: author,
+        cursor: author.id
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length
+      }
+    }
   }
 
   /**
@@ -299,7 +354,7 @@ export class AuthorService {
 
     if (author) {
       // nuke all batch author queries
-      await this.cache.delByPattern({ pattern: "author:limit:*" });
+      await this.cache.delByPattern({ pattern: "author:first:*" });
 
       // cache new author
       const cacheKey = `author:id:${author.id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
@@ -382,7 +437,7 @@ export class AuthorService {
         setKey: `author:${author.id}:queries`,
         cacheKey,
       });
-      await this.cache.delByPattern({ pattern: "authors:limit:*" });
+      await this.cache.delByPattern({ pattern: "authors:first:*" });
 
       for (const poem of author.poems) {
         await this.cache.removeRelations({ id: poem.id, name: "poem" });

@@ -20,7 +20,7 @@ const sortPoems = ({
 
   return poems;
 };
-describe("AuthorService integration tests", () => {
+describe("PoemService integration tests", () => {
   const cache = new CacheAPI();
   const services = createServices({ prisma, cache });
   const testId = randomUUID();
@@ -122,6 +122,89 @@ describe("AuthorService integration tests", () => {
     expect(result5).toHaveLength(2);
     for (const poem of result5) {
       assert(poem.text.includes("author1"))
+    }
+  })
+
+  test("getPoemsConnection", async () => {
+    const result = await services.poemService.getPoemsConnection();
+
+    expect(result.edges).toHaveLength(8);
+
+    result.edges.forEach((edge, i) => {
+      comparePoemFields(edge.node, poems[i])
+    })
+  })
+
+  test("getPoemsConnection, with pagination", async () => {
+    const result1 = await services.poemService.getPoemsConnection({ first: 5 });
+
+    expect(result1.edges).toHaveLength(5);
+    expect(result1.pageInfo.hasNextPage).toBe(true);
+
+    let i = 0;
+    for (i; i < 5; ++i) {
+      comparePoemFields(result1.edges[i].node, poems[i]);
+    }
+
+    const result2 = await services.poemService.getPoemsConnection({ first: 5, after: result1.pageInfo.endCursor });
+
+    expect(result2.edges).toHaveLength(3);
+    expect(result2.pageInfo.hasNextPage).toBe(false);
+
+    for (let j = 0; j < 3; ++j && ++i) {
+      comparePoemFields(result2.edges[j].node, poems[i])
+    }
+  })
+
+  test("getPoemsConnection, with filter", async () => {
+    const result1 = await services.poemService.getPoemsConnection({
+      filter: {
+        authorId: poems[0].authorId
+      }
+    })
+    expect(result1.edges).toHaveLength(2);
+    for (const edge of result1.edges) {
+      expect(edge.node.authorId).toStrictEqual(poems[0].authorId)
+    }
+
+    const result2 = await services.poemService.getPoemsConnection({
+      filter: {
+        authorNameContains: "1"
+      }
+    })
+    expect(result2.edges).toHaveLength(2);
+    for (const edge of result2.edges) {
+      assert(edge.node.author.username.includes("1"))
+    }
+
+    const result3 = await services.poemService.getPoemsConnection({
+      filter: {
+        collectionId: poems[0].collectionId
+      }
+    })
+    expect(result3.edges).toHaveLength(2);
+    for(const edge of result3.edges) {
+      expect(edge.node.collectionId).toStrictEqual(poems[0].collectionId)
+    }
+
+    const result4 = await services.poemService.getPoemsConnection({
+      filter: {
+        titleContains: "author1"
+      }
+    })
+    expect(result4.edges).toHaveLength(2);
+    for (const edge of result4.edges) {
+      assert(edge.node.title.includes("author1"))
+    }
+
+    const result5 = await services.poemService.getPoemsConnection({
+      filter: {
+        textContains: "author1"
+      }
+    })
+    expect(result5.edges).toHaveLength(2);
+    for (const edge of result5.edges) {
+      assert(edge.node.text.includes("author1"))
     }
   })
 

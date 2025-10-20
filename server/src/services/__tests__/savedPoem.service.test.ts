@@ -20,7 +20,7 @@ const sortSavedPoems = ({
   return savedPoems;
 };
 
-describe("AuthorService integration tests", () => {
+describe("SavedPoemService integration tests", () => {
   const cache = new CacheAPI();
   const services = createServices({ prisma, cache });
   const testId = randomUUID();
@@ -50,7 +50,7 @@ describe("AuthorService integration tests", () => {
   })
 
   test("getSavedPoems, with pagination", async () => {
-    const result1 = await services.savedPoemService.getSavedPoems({limit: 5})
+    const result1 = await services.savedPoemService.getSavedPoems({first: 5})
     expect(result1).toBeDefined();
     expect(result1).toHaveLength(5);
     let i = 0;
@@ -58,7 +58,7 @@ describe("AuthorService integration tests", () => {
       compareSavedPoemFields(result1[i], savedPoems[i])
     }
 
-    const result2 = await services.savedPoemService.getSavedPoems({limit: 5, cursor: result1[i-1].id})
+    const result2 = await services.savedPoemService.getSavedPoems({first: 5, after: result1[i-1].id})
     expect(result2).toBeDefined();
     expect(result2).toHaveLength(3);
     for (let j = 0; j < 3 && i < 8; ++j && ++i) {
@@ -82,6 +82,54 @@ describe("AuthorService integration tests", () => {
     expect(result2).toBeDefined();
     expect(result2).toHaveLength(1);
     expect(result2[0].poemId).toStrictEqual(savedPoems[0].poemId)
+  })
+
+  test("getSavedPoemsConnection", async () => {
+    const result = await services.savedPoemService.getSavedPoemsConnection();
+
+    expect(result.edges).toHaveLength(8);
+
+    result.edges.forEach((edge, i) => {
+      compareSavedPoemFields(edge.node, savedPoems[i])
+    })
+  })
+
+  test("getSavedPoemsConnection, with pagination", async () => {
+    const result1 = await services.savedPoemService.getSavedPoemsConnection({ first: 5 });
+
+    expect(result1.edges).toHaveLength(5);
+    expect(result1.pageInfo.hasNextPage).toBe(true);
+
+    let i = 0;
+
+    for (i; i < 5; ++i) {
+      compareSavedPoemFields(result1.edges[i].node, savedPoems[i]);
+    }
+
+    const result2 = await services.savedPoemService.getSavedPoemsConnection({ first: 5, after: result1.pageInfo.endCursor });
+
+    expect(result2.edges).toHaveLength(3);
+    expect(result2.pageInfo.hasNextPage).toBe(false)
+
+    for (let j = 0; j < 3; ++j && ++i) {
+      compareSavedPoemFields(result2.edges[j].node, savedPoems[i])
+    }
+  })
+
+  test("getSavedPoemsConnection, with filter", async () => {
+    const result1 = await services.savedPoemService.getSavedPoemsConnection({
+      authorId: savedPoems[0].authorId
+    })
+    expect(result1.edges).toHaveLength(2);
+    for (const edge of result1.edges) {
+      expect(edge.node.authorId).toStrictEqual(savedPoems[0].authorId)
+    }
+
+    const result2 = await services.savedPoemService.getSavedPoemsConnection({
+      poemId: savedPoems[0].poemId
+    })
+    expect(result2.edges).toHaveLength(1);
+    expect(result2.edges[0].node.poemId).toStrictEqual(savedPoems[0].poemId)
   })
 
   test("createSavedPoem", async () => {

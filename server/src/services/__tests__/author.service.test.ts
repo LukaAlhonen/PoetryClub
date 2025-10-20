@@ -43,7 +43,7 @@ describe("AuthorService integration tests", () => {
       });
 
       expect(result).toBeDefined();
-      compareAuthorFields(result, author);
+      compareAuthorFields({ author1: result, author2: author });
     }
   });
 
@@ -62,7 +62,7 @@ describe("AuthorService integration tests", () => {
       });
 
       expect(result).toBeDefined();
-      compareAuthorFields(result, author);
+      compareAuthorFields({ author1: result, author2: author});
     }
   });
 
@@ -78,30 +78,30 @@ describe("AuthorService integration tests", () => {
       omitPassword: false,
     });
     for (let i = 0; i < result.length; ++i) {
-      compareAuthorFields(result[i], authors[i]);
+      compareAuthorFields({author1: result[i], author2: authors[i]});
     }
   });
 
   test("getAuthors, with pagination", async () => {
     const result1 = await services.authorService.getAuthors({
-      limit: 3,
+      first: 3,
       omitAuthVersion: false,
       omitPassword: false,
     });
     expect(result1).toHaveLength(3);
     for (let i = 0; i < result1.length; ++i) {
-      compareAuthorFields(result1[i], authors[i]);
+      compareAuthorFields({ author1: result1[i], author2: authors[i] });
     }
 
     const result2 = await services.authorService.getAuthors({
-      limit: 3,
-      cursor: result1[result1.length - 1].id,
+      first: 3,
+      after: result1[result1.length - 1].id,
       omitAuthVersion: false,
       omitPassword: false,
     });
 
     expect(result2).toHaveLength(1);
-    compareAuthorFields(result2[0], authors[authors.length - 1]);
+    compareAuthorFields({author1: result2[0], author2: authors[authors.length - 1]});
   });
 
   test("getAuthors, with filter", async () => {
@@ -113,6 +113,42 @@ describe("AuthorService integration tests", () => {
     expect(result).toHaveLength(1);
     expect(result[0].username).toStrictEqual("author1");
   });
+
+  test("getAuthorsConnection", async () => {
+    const result = await services.authorService.getAuthorsConnection();
+    const resultAuthors = result.edges.map((edge) => edge.node)
+
+    expect(resultAuthors).toHaveLength(4);
+
+    authors.forEach((author, i) => {
+      compareAuthorFields({ author1: resultAuthors[i], author2: author, ignorePassword: true, ignoreAuthVersion: true })
+    })
+  })
+
+  test("getAuthorsConnection, with pagination", async () => {
+    const result1 = await services.authorService.getAuthorsConnection({ first: 3 });
+    const resultAuthors1 = result1.edges.map((edge) => edge.node);
+
+    expect(resultAuthors1).toHaveLength(3);
+
+    resultAuthors1.forEach((author, i) => {
+      compareAuthorFields({ author1: author, author2: authors[i], ignoreAuthVersion: true, ignorePassword: true});
+    })
+
+    const result2 = await services.authorService.getAuthorsConnection({ first: 3, after: result1.pageInfo.endCursor });
+    const resultAuthors2 = result2.edges.map((edge) => edge.node);
+
+    expect(resultAuthors2).toHaveLength(1);
+
+    compareAuthorFields({author1: resultAuthors2[0], author2: authors[authors.length - 1], ignoreAuthVersion: true, ignorePassword: true})
+  })
+
+  test("getAuthorsConnection, with filter", async () => {
+    const result = await services.authorService.getAuthorsConnection({usernameContains: "r1"})
+
+    expect(result.edges).toHaveLength(1);
+    expect(result.edges[0].node.username).toStrictEqual("author1")
+  })
 
   test("getFollowedAuthorsCount", async () => {
     const result1 = await services.authorService.getFollowedAuthorsCount({
@@ -145,7 +181,7 @@ describe("AuthorService integration tests", () => {
       omitPassword: false,
     });
 
-    compareAuthorFields(result, author);
+    compareAuthorFields({author1: result, author2: author});
   });
 
   test("createAuthor, with invalid input", async () => {

@@ -1,16 +1,28 @@
 import { gql } from "graphql-tag";
 
 export const GET_LIKES = gql(`
-    query GetLikes($limit: Int $cursor: ID $authorId: ID $poemId: ID) {
-        likes(limit: $limit cursor: $cursor authorId: $authorId poemId: $poemId) {
-            id
-            author {
-                id
+    query GetLikes($first: Int $after: ID $authorId: ID $poemId: ID) {
+        likes(first: $first after: $after authorId: $authorId poemId: $poemId) {
+            edges {
+                node {
+                    id
+                    author {
+                        id
+                    }
+                    poem {
+                        id
+                    }
+                    datePublished
+                }
+                cursor
             }
-            poem {
-                id
+            pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+                pageSize
             }
-            datePublished
         }
     }
 `);
