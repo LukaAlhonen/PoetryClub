@@ -19,22 +19,14 @@ export class PoemService {
         OR: [
           (filter.authorId ? { authorId: filter.authorId } : {}),
           (filter.collectionId ? { collectionId: filter.collectionId } : {}),
-          (filter.textContains
-            ? { text: { contains: filter.textContains, mode: "insensitive" } }
-            : {}),
-          (filter.titleContains
-            ? { title: { contains: filter.titleContains, mode: "insensitive" } }
-            : {}),
-          (filter.authorNameContains
-            ? {
-                author: {
-                  username: {
-                    contains: filter.authorNameContains,
-                    mode: "insensitive",
-                  },
-                },
-              }
-            : {}),
+          (filter.filter ? {
+            OR: [
+              { text: { contains: filter.filter, mode: "insensitive" } },
+              { title: { contains: filter.filter, mode: "insensitive" } },
+              { author: { username: { contains: filter.filter, mode: "insensitive" } } }
+            ]
+          }
+            : {})
         ]
         }
       : {};
@@ -53,7 +45,7 @@ export class PoemService {
    *
    * @example
    * ```ts
-   * const poems = await poemAPI.getPoems({first: 10, filter: {authorNameContains: "edgar"}})
+   * const poems = await poemAPI.getPoems({first: 10, filter: {filter: "edgar"}})
    * console.log(poems.length) // 10
    * ```
    **/
