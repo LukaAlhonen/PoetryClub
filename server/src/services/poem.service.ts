@@ -16,15 +16,16 @@ export class PoemService {
   private createPoemsFilter({filter}: { filter: GetPoemsFilter}): Prisma.PoemWhereInput {
     const queryFilter: Prisma.PoemWhereInput = filter
       ? {
-          ...(filter.authorId ? { authorId: filter.authorId } : {}),
-          ...(filter.collectionId ? { collectionId: filter.collectionId } : {}),
-          ...(filter.textContains
+        OR: [
+          (filter.authorId ? { authorId: filter.authorId } : {}),
+          (filter.collectionId ? { collectionId: filter.collectionId } : {}),
+          (filter.textContains
             ? { text: { contains: filter.textContains, mode: "insensitive" } }
             : {}),
-          ...(filter.titleContains
+          (filter.titleContains
             ? { title: { contains: filter.titleContains, mode: "insensitive" } }
             : {}),
-          ...(filter.authorNameContains
+          (filter.authorNameContains
             ? {
                 author: {
                   username: {
@@ -34,6 +35,7 @@ export class PoemService {
                 },
               }
             : {}),
+        ]
         }
       : {};
 
@@ -119,13 +121,17 @@ export class PoemService {
     const queryFilter = this.createPoemsFilter({ filter });
     const hasPrev = await this.prisma.poem.findFirst({
       where: {
-        ...queryFilter,
-        OR: [
-          { datePublished: { gt: firstPoem.datePublished } },
+        AND: [
+          queryFilter,
           {
-            datePublished: firstPoem.datePublished,
-            id: { gt: firstPoem.id }
-          }
+            OR: [
+              { datePublished: { gt: firstPoem.datePublished } },
+              {
+                datePublished: firstPoem.datePublished,
+                id: { gt: firstPoem.id }
+              }
+            ]
+          },
         ]
       },
       orderBy: [{ datePublished: "asc" }, { id: "asc" }],
