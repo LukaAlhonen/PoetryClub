@@ -29,5 +29,7 @@ const SpinnerContainer = styled.div({
   justifyContent: "center",
   alignItems: "center",
   width: "100%",
-  height: "100%",
+  flexGrow: 1,
+  minHeight: "100vh",
+  boxSizing: "border-box"
 });
