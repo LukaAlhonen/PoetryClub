@@ -136,7 +136,7 @@ describe("Graphql Query integration tests", () => {
       query: GET_POEMS,
       variables: {
         filter: {
-          titleContains: "0",
+          filter: "0",
         },
       },
     });

@@ -16,7 +16,7 @@ const Search = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemsWithFilterQuery, GetPoemsWithFilterQueryVariables>(GET_POEMS_WITH_FILTER, {
-    variables: { first: 5, filter: { titleContains: searchTerm }},
+    variables: { first: 5, ...(searchTerm !== "" ? { filter: { filter: searchTerm } } : {}) },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first"

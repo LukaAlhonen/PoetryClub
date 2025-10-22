@@ -183,10 +183,8 @@ export type GetCollectionsFilter = {
 
 export type GetPoemsFilter = {
   authorId?: InputMaybe<Scalars['ID']['input']>;
-  authorNameContains?: InputMaybe<Scalars['String']['input']>;
   collectionId?: InputMaybe<Scalars['ID']['input']>;
-  textContains?: InputMaybe<Scalars['String']['input']>;
-  titleContains?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Like = {

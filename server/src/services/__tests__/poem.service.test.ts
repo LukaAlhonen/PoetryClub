@@ -82,14 +82,15 @@ describe("PoemService integration tests", () => {
 
     const result2 = await services.poemService.getPoems({
       filter: {
-        authorNameContains: "1"
+        filter: "1"
       }
     })
     expect(result2).toBeDefined();
-    expect(result2).toHaveLength(2);
-    for (const poem of result2) {
-      assert(poem.author.username.includes("1"))
-    }
+    expect(result2).toHaveLength(5);
+
+    // filter result by author name, should have len 2
+    const authorPoems = result2.filter((poem) => (poem.author.username.includes("1")));
+    expect(authorPoems).toHaveLength(2)
 
     const result3 = await services.poemService.getPoems({
       filter: {
@@ -104,7 +105,7 @@ describe("PoemService integration tests", () => {
 
     const result4 = await services.poemService.getPoems({
       filter: {
-        titleContains: "author1"
+        filter: "author1"
       }
     })
     expect(result4).toBeDefined();
@@ -115,7 +116,7 @@ describe("PoemService integration tests", () => {
 
     const result5 = await services.poemService.getPoems({
       filter: {
-        textContains: "author1"
+        filter: "author1"
       }
     })
     expect(result5).toBeDefined();
@@ -169,12 +170,15 @@ describe("PoemService integration tests", () => {
 
     const result2 = await services.poemService.getPoemsConnection({
       filter: {
-        authorNameContains: "1"
+        filter: "1"
       }
     })
-    expect(result2.edges).toHaveLength(2);
+    expect(result2.edges).toHaveLength(5);
+
+
     for (const edge of result2.edges) {
-      assert(edge.node.author.username.includes("1"))
+      assert(edge.node.title.includes("1"))
+      assert(edge.node.text.includes("1"))
     }
 
     const result3 = await services.poemService.getPoemsConnection({
@@ -189,17 +193,19 @@ describe("PoemService integration tests", () => {
 
     const result4 = await services.poemService.getPoemsConnection({
       filter: {
-        titleContains: "author1"
+        filter: "author1"
       }
     })
+
     expect(result4.edges).toHaveLength(2);
     for (const edge of result4.edges) {
       assert(edge.node.title.includes("author1"))
+      assert(edge.node.text.includes("author1"))
     }
 
     const result5 = await services.poemService.getPoemsConnection({
       filter: {
-        textContains: "author1"
+        filter: "author1"
       }
     })
     expect(result5.edges).toHaveLength(2);
@@ -238,7 +244,7 @@ describe("PoemService integration tests", () => {
 
   test("updatePoem", async () => {
     // batch query where updated poem should be included
-    await services.poemService.getPoems({filter: {titleContains: "123"}})
+    await services.poemService.getPoems({filter: {filter: "123"}})
 
     const result = await services.poemService.updatePoem({poemId: poems[0].id, title: "testPoem123", text: "testPoemText1234"})
     expect(result).toBeDefined();
@@ -248,7 +254,7 @@ describe("PoemService integration tests", () => {
     expect(result).toStrictEqual(poem)
 
     // batch query where poem should be included
-    const batchPoems = await services.poemService.getPoems({filter: {titleContains: "123"}})
+    const batchPoems = await services.poemService.getPoems({filter: {filter: "123"}})
     expect(batchPoems[0]).toStrictEqual(poem)
   })
 

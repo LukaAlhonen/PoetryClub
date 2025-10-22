@@ -140,9 +140,7 @@ export const typeDefs = gql`
   input GetPoemsFilter {
     authorId: ID
     collectionId: ID
-    textContains: String
-    titleContains: String
-    authorNameContains: String
+    filter: String
   }
 
   input GetCollectionsFilter {
