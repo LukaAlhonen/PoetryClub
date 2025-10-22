@@ -25,7 +25,7 @@ const Poems = () => {
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemGrid poems={data} isLoading={isLoading} />
+          <PoemGrid poems={data?.poems} isLoading={isLoading} />
         </QueryResult>
       </ScrollContainer>
     </Layout>

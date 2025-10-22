@@ -32,7 +32,7 @@ const PoemDetail = (props: PoemDetailProps) => {
   const location = useLocation();
 
   const toggleComments = () => {
-    if (poem?.comments.length !== 0) {
+    if (poem?.comments.edges.length !== 0) {
       setHasToggled(true)
       setDisplayComments((s) => !s)
     }
@@ -105,8 +105,8 @@ const PoemDetail = (props: PoemDetailProps) => {
         </PoemFooter>
       </PoemContainer>
       <CommentSection ref={commentSectionRef} open={displayComments}>
-        {poem?.comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+        {poem?.comments?.edges?.map((edge) => (
+          edge?.node ? (<Comment key={edge.node.id} comment={edge.node}/>) : null
         ))}
       </CommentSection>
     </PoemDetailContainer>

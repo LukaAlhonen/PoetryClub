@@ -1,21 +1,21 @@
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import PoemCard from "../PoemCard/poem-card";
-import type { GetPoemsQuery } from "../../__generated__/graphql";
+import type { GetAuthorQuery, GetPoemsQuery } from "../../__generated__/graphql";
 
 interface PoemGridProps {
-  poems?: GetPoemsQuery;
+  poems?: GetPoemsQuery["poems"] | GetAuthorQuery["authorByUsername"]["poems"];
   isLoading?: boolean
 }
 
 const PoemGrid = (props: PoemGridProps) => {
   return (
     <PoemsContainer>
-      {props.poems?.poems?.edges?.map((edge) => (
+      {props.poems?.edges?.map((edge) => (
         edge?.node ? (<PoemCard key={edge.node.id} poem={edge.node} /> ) : null
       ))}
-      { props.isLoading && props.poems?.poems?.pageInfo?.pageSize ?
-        Array.from({ length: props.poems.poems.pageInfo.pageSize }).map((_, i) => (
+      { props.isLoading && props.poems?.pageInfo?.pageSize ?
+        Array.from({ length: props.poems.pageInfo.pageSize }).map((_, i) => (
           <PoemCard key={`skeleton_${i}`} />
         ))
        : null}

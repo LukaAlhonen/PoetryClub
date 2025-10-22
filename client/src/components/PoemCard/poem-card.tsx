@@ -30,7 +30,7 @@ const PoemCard = (props: PoemCardProps) => {
           {poem?.title ? <h3>{poem.title}</h3> : <LoadingText><h3>loading</h3></LoadingText>}
         </PoemTitle>
         <PoemSubHeader>
-          <UsernameContainer to="/">
+          <UsernameContainer to={poem?.author?.username ? `/author/${poem.author.username}` : "#"}>
             <UserButton></UserButton>
             {poem?.author?.username ?? null}
           </UsernameContainer>
@@ -146,7 +146,7 @@ const UsernameContainer = styled(Link)({
   },
   textDecoration: "none",
   boxSizing: "border-box",
-  padding: "0.2em",
+  padding: "0.3em",
   borderRadius: "0.5em",
   color: colors.backgroundBlack,
   background: colors.textEggshell,
@@ -297,7 +297,7 @@ const UserButton = styled(UserIcon)({
   height: "1.5em",
   width: "1.5em",
   transition: "fill 0.2s ease",
-  margin: "0 0.5em 0 0",
+  margin: "0 0.2em 0 0",
   "& path": {
     fill: colors.backgroundBlack,
     transition: "fill 0.2s ease"
