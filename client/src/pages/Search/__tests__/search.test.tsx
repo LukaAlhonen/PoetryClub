@@ -1,12 +1,12 @@
 import { beforeAll, expect, test, vi } from "vitest";
 import { screen } from "@testing-library/react";
-// import type { GetPoemsQuery, PoemsConnection } from "../../../__generated__/types";
-import { GET_POEMS } from "../../../pages/Poems/poems.graphql";
+import userEvent from "@testing-library/user-event";
 import { MockLink } from "@apollo/client/testing";
 import { renderMockProvider } from "../../../utils/test-utils";
 import { MemoryRouter } from "react-router-dom";
-import Poems from "../poems";
-import type { GetPoemsQueryVariables, GetPoemsQuery, PoemsConnection } from "../../../__generated__/graphql";
+import Search from "../search";
+import type { GetPoemsWithFilterQuery, GetPoemsWithFilterQueryVariables, PoemsConnection } from "../../../__generated__/graphql";
+import { GET_POEMS_WITH_FILTER } from "../search.graphql";
 
 beforeAll(() => {
   // dummy intersectionobserver mock
@@ -289,42 +289,169 @@ const mockPoems: PoemsConnection = {
   }
 }
 
+const mockPoems2: PoemsConnection = {
+  edges: [
+    {
+      node: {
+        __typename: "Poem",
+        id: "p_01",
+        title: "poem_01",
+        text: "poem_01_text",
+        datePublished: date,
+        author: {
+          __typename: "Author",
+          id: "a_01",
+          username: "author_01",
+          email: "author_01",
+          dateJoined: new Date(),
+          poems: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          savedPoems: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          collections: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          likedPoems: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          comments: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          followedBy: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          following: {
+            edges: [],
+            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          },
+          followedByCount: 0,
+          followingCount: 0
+        },
+        views: 200,
+        commentsCount: 10,
+        likesCount: 50,
+        inCollection: null,
+        savedByCount: 7,
+        comments: {
+          edges: [],
+          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        },
+        likes: {
+          edges: [],
+          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        },
+        savedBy: {
+          edges: [],
+          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        },
+      },
+      cursor: "p_01",
+    },
+  ],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: "p_01",
+    endCursor: "p_01",
+    pageSize: 1
+  }
+}
+
 // const mockPoemCardFragment = makeFragmentData(mockPoem, POEM_CARD_FRAGMENT)
 
-const mocks: MockLink.MockedResponse<GetPoemsQuery, GetPoemsQueryVariables>[] = [
+const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilterQueryVariables>[] = [
   {
     request: {
-      query: GET_POEMS,
-      variables: { first: 5}
+      query: GET_POEMS_WITH_FILTER,
+      variables: { first: 5, },
     },
     result: {
       data: {
         poems: mockPoems
       }
     }
-  }
+  },
+  {
+    request: {
+      query: GET_POEMS_WITH_FILTER,
+      variables: { first: 5, filter: { filter: "0" } },
+    },
+    result: {
+      data: {
+        poems: mockPoems
+      }
+    }
+  },
+  {
+    request: {
+      query: GET_POEMS_WITH_FILTER,
+      variables: { first: 5, filter: { filter: "01" } },
+    },
+    result: {
+      data: {
+        poems: mockPoems2
+      }
+    }
+  },
 ]
 
 test("Renders poem-card without errors", async () => {
   renderMockProvider({
     component:
     <MemoryRouter>
-      <Poems></Poems>
+      <Search></Search>
     </MemoryRouter>,
     mocks
   })
 
-    expect(await screen.findByText("poem_01")).toBeInTheDocument();
-    expect(await screen.findByText("poem_02")).toBeInTheDocument();
-    expect(await screen.findByText("poem_03")).toBeInTheDocument();
-    expect(await screen.findByText("poem_04")).toBeInTheDocument();
+  expect(await screen.findByText("poem_01")).toBeInTheDocument();
+  expect(await screen.findByText("poem_02")).toBeInTheDocument();
+  expect(await screen.findByText("poem_03")).toBeInTheDocument();
+  expect(await screen.findByText("poem_04")).toBeInTheDocument();
 
-    expect(await screen.findByText("poem_01_text")).toBeInTheDocument();
-    expect(await screen.findByText("poem_02_text")).toBeInTheDocument();
-    expect(await screen.findByText("poem_03_text")).toBeInTheDocument();
-    expect(await screen.findByText("poem_04_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_01_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_02_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_03_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_04_text")).toBeInTheDocument();
 
-    // find 4 poems
-    const poemCards = await screen.findAllByText(/poem_0\d+_text/i);
-    expect(poemCards).toHaveLength(4)
+  // find 4 poems
+  const poemCards = await screen.findAllByText(/poem_0\d+_text/i);
+  expect(poemCards).toHaveLength(4);
+
+  // simulate live search typing
+  // 1st result
+  const input = screen.getByRole("textbox");
+  await userEvent.type(input, "0");
+
+  expect(await screen.findByText("poem_01")).toBeInTheDocument();
+  expect(await screen.findByText("poem_02")).toBeInTheDocument();
+  expect(await screen.findByText("poem_03")).toBeInTheDocument();
+  expect(await screen.findByText("poem_04")).toBeInTheDocument();
+
+  expect(await screen.findByText("poem_01_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_02_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_03_text")).toBeInTheDocument();
+  expect(await screen.findByText("poem_04_text")).toBeInTheDocument();
+
+  // find 4 poems
+  const poemCards2 = await screen.findAllByText(/poem_0\d+_text/i);
+  expect(poemCards2).toHaveLength(4);
+
+  // 2nd result
+  await userEvent.type(input, "1");
+
+  expect(await screen.findByText("poem_01")).toBeInTheDocument();
+  expect(await screen.findByText("poem_01_text")).toBeInTheDocument();
+
+  // find 1 poems
+  const poemCard = await screen.findAllByText(/poem_0\d+_text/i);
+  expect(poemCard).toHaveLength(1);
 })

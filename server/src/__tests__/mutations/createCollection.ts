@@ -11,7 +11,19 @@ export const CREATE_COLLECTION = gql(`
                 id
             }
             poems {
-                id
+                edges {
+                    node {
+                        id
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
+                }
             }
             dateCreated
         }

@@ -2,20 +2,32 @@ import { gql } from "graphql-tag";
 
 export const GET_SAVED_POEMS = gql(`
     query GetSavedPoems(
-        $limit: Int
-        $cursor: ID
+        $first: Int
+        $after: ID
         $authorId: ID
         $poemId: ID
     ) {
-        savedPoems(limit: $limit cursor: $cursor authorId: $authorId poemId: $poemId) {
-            id
-            author {
-                id
+        savedPoems(first: $first after: $after authorId: $authorId poemId: $poemId) {
+            edges {
+                node {
+                    id
+                    author {
+                        id
+                    }
+                    poem {
+                        id
+                    }
+                    dateSaved
+                }
+                cursor
             }
-            poem {
-                id
+            pageInfo {
+                hasNextPage
+                hasPreviousPage
+                startCursor
+                endCursor
+                pageSize
             }
-            dateSaved
         }
     }
 `);

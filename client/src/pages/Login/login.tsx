@@ -81,6 +81,7 @@ const LoginContainer = styled.div({
   alignItems: "center",
   maxWidth: "30em",
   justifySelf: "center",
+  alignSelf: "center",
   width: "100%",
 })
 

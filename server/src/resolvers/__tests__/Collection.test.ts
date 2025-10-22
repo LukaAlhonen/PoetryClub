@@ -3,15 +3,14 @@ import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
 import {
   GetCollectionQuery,
-  GetCollectionsQuery,
 } from "../../__generated__/graphql.js";
 
 import {
   GET_COLLECTION,
-  GET_COLLECTIONS,
 } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { CollectionWithRelations } from "../../types/extended-types.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -26,20 +25,13 @@ describe("Graphql Mutation integration tests", () => {
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
 
-  let collections: NonNullable<GetCollectionsQuery["collections"]> = [];
+  let collections: CollectionWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
-
-    const response = await testServer.executeOperation<GetCollectionsQuery>({
-      query: GET_COLLECTIONS,
-    });
-
-    if (response.body.kind === "single") {
-      collections = response.body.singleResult.data?.collections;
-    }
+    const result = await seed({ prisma });
+    collections = result.collections;
   });
   afterAll(async () => {
     await testServer.cleanup();
@@ -84,10 +76,11 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.log(errors);
 
         expect(collection.poems).toBeDefined();
-        expect(collection.poems).toHaveLength(2);
+        expect(collection.poems.edges).toHaveLength(2);
+        expect(collection.poems.pageInfo.pageSize).toStrictEqual(collection.poems.edges.length)
 
-        for (const poem of collection.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of collection.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
       }
     }
@@ -111,13 +104,16 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.log(errors);
 
         expect(collection.poems).toBeDefined();
-        expect(collection.poems).toHaveLength(1);
+        expect(collection.poems.edges).toHaveLength(1);
+        expect(collection.poems.pageInfo.pageSize).toStrictEqual(collection.poems.edges.length)
+        expect(collection.poems.pageInfo.hasNextPage).toBe(true)
+        expect(collection.poems.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const poem of collection.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of collection.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
 
-        cursor = collection.poems[collection.poems.length - 1].id;
+        cursor = collection.poems.pageInfo.endCursor;
       }
 
       const secondResponse =
@@ -137,10 +133,13 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.log(errors);
 
         expect(collection.poems).toBeDefined();
-        expect(collection.poems).toHaveLength(1);
+        expect(collection.poems.edges).toHaveLength(1);
+        expect(collection.poems.pageInfo.pageSize).toStrictEqual(collection.poems.edges.length)
+        expect(collection.poems.pageInfo.hasNextPage).toBe(false)
+        expect(collection.poems.pageInfo.hasPreviousPage).toBe(true)
 
-        for (const poem of collection.poems) {
-          expect(poem.id).toBeDefined();
+        for (const poemEdge of collection.poems.edges) {
+          expect(poemEdge.node.id).toBeDefined();
         }
       }
     }

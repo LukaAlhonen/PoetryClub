@@ -9,6 +9,7 @@ import {
 import { GET_COMMENT, GET_COMMENTS } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { CommentWithRelations } from "../../types/extended-types.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -22,19 +23,13 @@ describe("Graphql Mutation integration tests", () => {
   const cache = new CacheAPI({ prefix: "Comment" });
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
-  let comments: NonNullable<GetCommentsQuery["comments"]> = [];
+  let comments: CommentWithRelations[] = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
-    const response = await testServer.executeOperation<GetCommentsQuery>({
-      query: GET_COMMENTS,
-    });
-
-    if (response.body.kind === "single") {
-      comments = response.body.singleResult.data?.comments;
-    }
+    const result = await seed({ prisma });
+    comments = result.comments;
   });
   afterAll(async () => {
     await testServer.cleanup();

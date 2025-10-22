@@ -1,9 +1,9 @@
 import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
-import { GetPoemQuery, GetPoemsQuery } from "../../__generated__/graphql.js";
+import { GetPoemQuery } from "../../__generated__/graphql.js";
 
-import { GET_POEM, GET_POEMS } from "../../__tests__/queries/index.js";
+import { GET_POEM } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
 import { PoemWithRelations } from "../../types/extended-types.js";
@@ -105,10 +105,11 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.comments).toBeDefined();
-        expect(poem.comments).toHaveLength(2);
+        expect(poem.comments.edges).toHaveLength(2);
+        expect(poem.comments.pageInfo.pageSize).toStrictEqual(poem.comments.edges.length)
 
-        for (const comment of poem.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of poem.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");
@@ -134,13 +135,16 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.comments).toBeDefined();
-        expect(poem.comments).toHaveLength(1);
+        expect(poem.comments.edges).toHaveLength(1);
+        expect(poem.comments.pageInfo.pageSize).toStrictEqual(poem.comments.edges.length)
+        expect(poem.comments.pageInfo.hasNextPage).toBe(true);
+        expect(poem.comments.pageInfo.hasPreviousPage).toBe(false);
 
-        for (const comment of poem.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of poem.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
 
-        cursor = poem.comments[poem.comments.length - 1].id;
+        cursor = poem.comments.pageInfo.endCursor;
       } else {
         throw new Error("invalid response kind");
       }
@@ -161,10 +165,13 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.comments).toBeDefined();
-        expect(poem.comments).toHaveLength(1);
+        expect(poem.comments.edges).toHaveLength(1);
+        expect(poem.comments.pageInfo.pageSize).toStrictEqual(poem.comments.edges.length)
+        expect(poem.comments.pageInfo.hasNextPage).toBe(false);
+        expect(poem.comments.pageInfo.hasPreviousPage).toBe(true);
 
-        for (const comment of poem.comments) {
-          expect(comment.id).toBeDefined();
+        for (const commentEdge of poem.comments.edges) {
+          expect(commentEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");
@@ -211,10 +218,11 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.likes).toBeDefined();
-        expect(poem.likes).toHaveLength(1);
+        expect(poem.likes.edges).toHaveLength(1);
+        expect(poem.likes.pageInfo.pageSize).toStrictEqual(poem.likes.edges.length)
 
-        for (const like of poem.likes) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of poem.likes.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");
@@ -240,13 +248,16 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.likes).toBeDefined();
-        expect(poem.likes).toHaveLength(1);
+        expect(poem.likes.edges).toHaveLength(1);
+        expect(poem.likes.pageInfo.pageSize).toStrictEqual(poem.likes.edges.length)
+        expect(poem.likes.pageInfo.hasNextPage).toBe(false)
+        expect(poem.likes.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const like of poem.likes) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of poem.likes.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
 
-        cursor = poem.likes[poem.likes.length - 1].id;
+        cursor = poem.likes.pageInfo.endCursor;
       } else {
         throw new Error("invalid response kind");
       }
@@ -267,10 +278,13 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.likes).toBeDefined();
-        expect(poem.likes).toHaveLength(0);
+        expect(poem.likes.edges).toHaveLength(0);
+        expect(poem.likes.pageInfo.pageSize).toStrictEqual(poem.likes.edges.length)
+        expect(poem.likes.pageInfo.hasNextPage).toBe(false)
+        expect(poem.likes.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const like of poem.likes) {
-          expect(like.id).toBeDefined();
+        for (const likeEdge of poem.likes.edges) {
+          expect(likeEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");
@@ -317,10 +331,11 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.savedBy).toBeDefined();
-        expect(poem.savedBy).toHaveLength(1);
+        expect(poem.savedBy.edges).toHaveLength(1);
+        expect(poem.savedBy.pageInfo.pageSize).toStrictEqual(poem.savedBy.edges.length)
 
-        for (const savedPoem of poem.savedBy) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of poem.savedBy.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");
@@ -346,13 +361,16 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.savedBy).toBeDefined();
-        expect(poem.savedBy).toHaveLength(1);
+        expect(poem.savedBy.edges).toHaveLength(1);
+        expect(poem.savedBy.pageInfo.pageSize).toStrictEqual(poem.savedBy.edges.length)
+        expect(poem.savedBy.pageInfo.hasNextPage).toBe(false)
+        expect(poem.savedBy.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const savedPoem of poem.savedBy) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of poem.savedBy.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
 
-        cursor = poem.savedBy[poem.savedBy.length - 1].id;
+        cursor = poem.savedBy.pageInfo.endCursor;
       } else {
         throw new Error("invalid response kind");
       }
@@ -373,10 +391,13 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.savedBy).toBeDefined();
-        expect(poem.savedBy).toHaveLength(0);
+        expect(poem.savedBy.edges).toHaveLength(0);
+        expect(poem.savedBy.pageInfo.pageSize).toStrictEqual(poem.savedBy.edges.length)
+        expect(poem.savedBy.pageInfo.hasNextPage).toBe(false)
+        expect(poem.savedBy.pageInfo.hasPreviousPage).toBe(false)
 
-        for (const savedPoem of poem.savedBy) {
-          expect(savedPoem.id).toBeDefined();
+        for (const savedPoemEdge of poem.savedBy.edges) {
+          expect(savedPoemEdge.node.id).toBeDefined();
         }
       } else {
         throw new Error("invalid response kind");

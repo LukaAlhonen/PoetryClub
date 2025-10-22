@@ -50,21 +50,21 @@ export class SavedPoemService {
    * Returns an array of SavedPoem objects, optianlly filter by poem and or author
    * @param authorId - author to filter by
    * @param poemId - poem to filter by
-   * @limit
-   * @cursor
+   * @first
+   * @after
    **/
   async getSavedPoems({
     authorId,
     poemId,
-    limit,
-    cursor,
+    first,
+    after,
   }: {
     authorId?: string;
     poemId?: string;
-    limit?: number;
-    cursor?: string;
+    first?: number;
+    after?: string;
   } = {}): Promise<SavedPoemWithRelations[] | null> {
-    const cacheKey = `savedPoems:limit:${limit ? limit : "null"}:cursor:${cursor ? cursor : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
+    const cacheKey = `savedPoems:first:${first ? first : "null"}:after:${after ? after : "null"}:poemId:${poemId ? poemId : "null"}:authorId:${authorId ? authorId : "null"}`;
     const cached = await this.cache.getAll<SavedPoemWithRelations>({
       key: cacheKey,
     });
@@ -83,12 +83,12 @@ export class SavedPoemService {
       },
       orderBy: [{ dateSaved: "desc" }, { id: "desc" }],
     };
-    if (limit) {
-      queryOptions.take = limit;
+    if (first) {
+      queryOptions.take = first;
     }
-    if (cursor) {
+    if (after) {
       queryOptions.cursor = {
-        id: cursor,
+        id: after,
       };
       queryOptions.skip = 1;
     }
@@ -108,6 +108,61 @@ export class SavedPoemService {
     }
 
     return savedPoems;
+  }
+
+  async hasPreviousPage ({before, authorId, poemId}: { before: string, authorId?: string, poemId?: string}): Promise<boolean> {
+    const firstSavedPoem = await this.prisma.savedPoem.findUnique({ where: { id: before } });
+    if (!firstSavedPoem) return false;
+
+    const queryFilter: Prisma.SavedPoemWhereInput = {
+      ...(authorId ? { authorId } : {}),
+      ...(poemId ? { poemId } : {}),
+    };
+
+    const hasPrev = await this.prisma.savedPoem.findFirst({
+      where: {
+        ...queryFilter,
+        OR: [
+          { dateSaved: { gt: firstSavedPoem.dateSaved } },
+          {
+            dateSaved: firstSavedPoem.dateSaved,
+            id: { gt: firstSavedPoem.id }
+          }
+        ]
+      },
+      orderBy: [{ dateSaved: "asc" }, { id: "asc" }],
+      select: { id: true }
+    });
+    return Boolean(hasPrev)
+  }
+
+  async getSavedPoemsConnection({ after, first, authorId, poemId }: { after?: string, first?: number, authorId?: string, poemId?: string } = {}) {
+    const savedPoems = await this.getSavedPoems({after, first: first ? first + 1 : undefined, poemId, authorId});
+
+    const hasNextPage = savedPoems.length > (first ?? savedPoems.length);
+    const edges = hasNextPage ? savedPoems.slice(0, first) : savedPoems;
+
+    const startCursor = edges.length > 0 ? edges[0].id : null;
+    const endCursor = edges.length > 0 ? edges[edges.length - 1].id : null;
+
+    let hasPreviousPage = false;
+    if (edges.length > 0) {
+      hasPreviousPage = await this.hasPreviousPage({ before: edges[0].id, authorId, poemId });
+    }
+
+    return {
+      edges: edges.map((savedPoem) => ({
+        node: savedPoem,
+        cursor: endCursor
+      })),
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        startCursor,
+        endCursor,
+        pageSize: edges.length
+      }
+    };
   }
 
   /**
@@ -136,7 +191,7 @@ export class SavedPoemService {
     });
 
     if (savedPoem) {
-      await this.cache.delByPattern({ pattern: "savedPoems:limit:*" });
+      await this.cache.delByPattern({ pattern: "savedPoems:first:*" });
       await this.cache.removeRelations({ id: savedPoem.poemId, name: "poem" });
       await this.cache.removeRelations({
         id: savedPoem.authorId,
