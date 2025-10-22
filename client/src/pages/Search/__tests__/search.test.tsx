@@ -371,7 +371,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, filter: { titleContains: "" } },
+      variables: { first: 5, },
     },
     result: {
       data: {
@@ -382,7 +382,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, filter: { titleContains: "0" } },
+      variables: { first: 5, filter: { filter: "0" } },
     },
     result: {
       data: {
@@ -393,7 +393,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, filter: { titleContains: "01" } },
+      variables: { first: 5, filter: { filter: "01" } },
     },
     result: {
       data: {
