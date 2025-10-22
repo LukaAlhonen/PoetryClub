@@ -344,7 +344,7 @@ describe("Graphql Mutation integration tests", () => {
           query: GET_POEMS,
           variables: {
             filter: {
-              titleContains: "failedPoem1"
+              filter: "failedPoem1"
             }
           }
         })
