@@ -59,6 +59,17 @@ const client = new ApolloClient({
         fields: {
           poems: relayStylePagination([
             "filter",
+          ]),
+          authorByUsername: {
+            keyArgs: ["username"],
+            merge: true
+          }
+        }
+      },
+      Author: {
+        fields: {
+          poems: relayStylePagination([
+            "filter"
           ])
         }
       }

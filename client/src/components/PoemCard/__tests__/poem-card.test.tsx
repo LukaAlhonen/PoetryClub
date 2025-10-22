@@ -22,13 +22,13 @@ const mockPoem: Poem = {
     username: "author_01",
     email: "author_01",
     dateJoined: new Date(),
-    poems: [],
-    savedPoems: [],
-    collections: [],
-    likedPoems: [],
-    comments: [],
-    followedBy: [],
-    following: [],
+    poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    likedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+    following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
     followedByCount: 0,
     followingCount: 0
   },
@@ -37,9 +37,9 @@ const mockPoem: Poem = {
   likesCount: 50,
   inCollection: null,
   savedByCount: 7,
-  comments: [],
-  likes: [],
-  savedBy: [],
+  comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+  likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+  savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
 }
 
 const mockPoemCardFragment = makeFragmentData(mockPoem, POEM_CARD_FRAGMENT)

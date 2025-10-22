@@ -1,0 +1,109 @@
+import { expect, test, beforeAll, vi } from "vitest";
+import { screen } from "@testing-library/react";
+import type { GetAuthorQuery, Author as AuthorModel } from "../../../__generated__/types";
+import { MockLink } from "@apollo/client/testing";
+import { renderMockProvider } from "../../../utils/test-utils";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import Author from "../author";
+import type { GetAuthorQueryVariables } from "../../../__generated__/graphql";
+import { GET_AUTHOR } from "../author.graphql";
+import { dateFormatter } from "../../../utils/formatters";
+
+vi.spyOn(console, "error").mockImplementation((msg) => console.log("Apollo error:", msg));
+
+beforeAll(() => {
+  // dummy intersectionobserver mock
+  const mockIntersectionObserver = vi.fn()
+  mockIntersectionObserver.mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null
+    });
+    window.IntersectionObserver = mockIntersectionObserver;
+});
+
+const date = new Date()
+
+const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"followedBy"|"following"|"collections"> = {
+  __typename: "Author",
+  id: "a_01",
+  username: "author_01",
+  email: "author_01@domain.com",
+  dateJoined: date,
+  followedByCount: 0,
+  followingCount: 0,
+  poems: {
+    __typename: "PoemsConnection",
+    edges: [
+      {
+        node: {
+          __typename: "Poem",
+          id: "p_01",
+          title: "poem_01",
+          text: "poem_01 text",
+          datePublished: date,
+          comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+          likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+          savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+          views: 0,
+          commentsCount: 0,
+          savedByCount: 0,
+          likesCount: 0,
+          author: {
+            id: "a_01",
+            username: "author_01",
+            email: "author_01@domain.com",
+            dateJoined: date,
+            poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            likedPoems:{ edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            followingCount: 0,
+            followedByCount: 0
+          }
+        },
+        cursor: "p_01"
+      }
+    ],
+    pageInfo: {
+      __typename: "PageInfo",
+      hasNextPage: false,
+      hasPreviousPage: false,
+      startCursor: "p_01",
+      endCursor: "p_01",
+      pageSize: 1
+    }
+  }
+}
+
+const mocks: MockLink.MockedResponse<GetAuthorQuery, GetAuthorQueryVariables>[] = [
+  {
+    request: {
+      query: GET_AUTHOR,
+      variables: {username: "author_01", poemsLimit: 5}
+    },
+    result: {
+      data: {
+        authorByUsername: mockAuthor
+      }
+    }
+  }
+]
+
+test("Renders poem-card without errors", async () => {
+  renderMockProvider({
+    component:
+    <MemoryRouter initialEntries={["/author/author_01"]}>
+      <Routes>
+        <Route element={<Author />} path="/author/:username" />
+      </Routes>
+    </MemoryRouter>,
+    mocks
+  })
+
+  expect(await screen.findAllByText(/.*author_01/)).toHaveLength(2);
+  expect(await screen.findByText(new RegExp(`Joined.*${dateFormatter(date)}`))).toBeInTheDocument();
+})

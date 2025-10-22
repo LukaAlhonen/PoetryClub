@@ -46,7 +46,7 @@ const Search = () => {
           }} />
         </SearchBar>
         <QueryResult data={data} loading={loading} error={error}>
-          <PoemGrid poems={data} isLoading={isLoading} />
+          <PoemGrid poems={data?.poems} isLoading={isLoading} />
         </QueryResult>
       </ScrollContainer>
     </Layout>
