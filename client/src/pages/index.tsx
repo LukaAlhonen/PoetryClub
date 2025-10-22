@@ -3,7 +3,7 @@ import Poem from "./Poem/poem";
 import Poems from "./Poems/poems";
 import ComposePoem from "./ComposePoem/compose-poem";
 import UserProfile from "./user-profile";
-import Search from "./search";
+import Search from "./Search/search";
 import Login from "./Login/login";
 import Register from "./register";
 import Test from "./test";

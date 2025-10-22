@@ -57,7 +57,9 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          poems: relayStylePagination()
+          poems: relayStylePagination([
+            "filter",
+          ])
         }
       }
     }
