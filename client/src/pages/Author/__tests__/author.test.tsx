@@ -93,7 +93,7 @@ const mocks: MockLink.MockedResponse<GetAuthorQuery, GetAuthorQueryVariables>[] 
   }
 ]
 
-test("Renders poem-card without errors", async () => {
+test("Renders Author page without errors", async () => {
   renderMockProvider({
     component:
     <MemoryRouter initialEntries={["/author/author_01"]}>
