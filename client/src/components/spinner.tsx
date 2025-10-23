@@ -10,7 +10,7 @@ const rotation = keyframes`
 const Spinner = styled.div({
   width: "48px",
   height: "48px",
-  border: `5px solid ${colors.accent}`,
+  border: `5px solid ${colors.wineRed}`,
   borderBottomColor: "transparent",
   borderRadius: "50%",
   display: "inline-block",

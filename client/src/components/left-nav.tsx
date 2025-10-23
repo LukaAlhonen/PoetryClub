@@ -2,13 +2,13 @@ import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/use-auth";
 
-import HomeIcon from "../assets/icons/home.svg?react";
-import SearchIcon from "../assets/icons/search.svg?react";
-import ComposeIcon from "../assets/icons/plus.svg?react";
-import UserIcon from "../assets/icons/user.svg?react";
-import BookMarksIcon from "../assets/icons/book-alt.svg?react";
-import LoginIcon from "../assets/icons/user-add.svg?react";
-import LogoutIcon from "../assets/icons/exit.svg?react";
+import HomeSVG from "../assets/icons/home.svg?react";
+import SearchSVG from "../assets/icons/search.svg?react";
+import ComposeSVG from "../assets/icons/plus.svg?react";
+import UserSVG from "../assets/icons/user.svg?react";
+import BookMarksSVG from "../assets/icons/book-alt.svg?react";
+import SignupSVG from "../assets/icons/user-add.svg?react";
+import LogoutSVG from "../assets/icons/exit.svg?react";
 import colors from "../colors";
 
 const LeftNav = () => {
@@ -17,16 +17,16 @@ const LeftNav = () => {
     <NavContainer>
       <TopNav>
         <NavLink to="/">
-          <HomeButton />
+          <HomeIcon />
           Home
         </NavLink>
         <NavLink to="/search">
-          <SearchButton />
+          <SearchIcon />
           Search
         </NavLink>
         {user ? (
         <NavLink to="/compose">
-          <ComposeButton />
+          <ComposeIcon />
           New Poem
         </NavLink>
         ): (<></>)}
@@ -35,21 +35,22 @@ const LeftNav = () => {
         { user ? (
           <>
             <NavLink to="/">
-              <BookMarksButton />
+              <BookMarksIcon />
               Bookmarks
             </NavLink>
-            <NavLink to="/">
-              <UserButton />
+            <NavLink to={`/author/${user}`}>
+              <UserIcon />
               Profile
             </NavLink>
             <NavLink onClick={logout} to="/">
-              <LogoutButton/>
+              <LogoutIcon/>
               Logout
             </NavLink>
           </>
         ) : (
           <>
-            <NavLink to="/login"><LoginButton />Login</NavLink>
+            <NavLink to="/signup"><SignupIcon />Signup</NavLink>
+            <NavLink to="/login"><UserIcon />Login</NavLink>
           </>
         )
         }
@@ -112,30 +113,30 @@ const navImg = {
 };
 
 // Nav svg image styles
-const HomeButton = styled(HomeIcon)({
+const HomeIcon = styled(HomeSVG)({
   ...navImg,
 });
 
-const SearchButton = styled(SearchIcon)({
+const SearchIcon = styled(SearchSVG)({
   ...navImg,
 });
 
-const ComposeButton = styled(ComposeIcon)({
+const ComposeIcon = styled(ComposeSVG)({
   ...navImg,
 });
 
-const BookMarksButton = styled(BookMarksIcon)({
+const BookMarksIcon = styled(BookMarksSVG)({
   ...navImg,
 });
 
-const UserButton = styled(UserIcon)({
+const UserIcon = styled(UserSVG)({
   ...navImg,
 });
 
-const LoginButton = styled(LoginIcon)({
+const SignupIcon = styled(SignupSVG)({
   ...navImg
 })
 
-const LogoutButton = styled(LogoutIcon)({
+const LogoutIcon = styled(LogoutSVG)({
   ...navImg
 })
