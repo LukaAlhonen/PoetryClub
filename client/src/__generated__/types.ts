@@ -589,3 +589,10 @@ export type GetPoemsWithFilterQueryVariables = Exact<{
 
 
 export type GetPoemsWithFilterQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
+
+export type SignupMutationVariables = Exact<{
+  input: CreateAuthorInput;
+}>;
+
+
+export type SignupMutation = { __typename?: 'Mutation', signup: { __typename?: 'Author', id: string, username: string } };

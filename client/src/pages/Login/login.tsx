@@ -5,9 +5,9 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client/react";
 import { LOGIN } from "./login.graphql";
 import type { LoginMutation, LoginMutationVariables } from "../../__generated__/types";
-import Spinner from "../../components/spinner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
+import FullSizeSpinner from "../../components/full-size-spinner";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -23,18 +23,16 @@ const Login = () => {
     }
   }, [data, login, navigate])
 
-  // console.log(data, loading, error)
-  // if (data) {
-  //   localStorage.setItem("token", data.login.token)
-  //   localStorage.setItem("username", JSON.stringify(data.login.author.username))
-  // }
-
   if (error) {
     return <div>{error.message}</div>
   }
 
   if (loading) {
-    return <><Spinner/></>
+    return (
+      <Layout>
+        <FullSizeSpinner />
+      </Layout>
+    )
   }
 
   return (

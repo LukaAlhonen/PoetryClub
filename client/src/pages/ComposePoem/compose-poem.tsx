@@ -6,9 +6,8 @@ import type { CreatePoemMutation, CreatePoemMutationVariables } from "../../__ge
 import { useMutation } from "@apollo/client/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Spinner from "../../components/spinner";
-// import { useApolloClient } from "@apollo/client/react";
 import { GET_POEMS } from "../Poems/poems.graphql";
+import FullSizeSpinner from "../../components/full-size-spinner";
 
 const ComposePoem = () => {
   const [text, setText] = useState<string>("");
@@ -17,26 +16,23 @@ const ComposePoem = () => {
     update(cache, { data }) {
       const cachedPoems = cache.readQuery({ query: GET_POEMS });
       if (cachedPoems && data) {
+        const newNode = { node: data.createPoem, cursor: data.createPoem.id }
         cache.writeQuery({
           query: GET_POEMS,
           data: {
-            poems: [ data.createPoem, ...cachedPoems.poems]
+            poems: {
+              edges: [newNode, ...cachedPoems.poems.edges],
+              pageInfo: cachedPoems.poems.pageInfo
+            }
           }
         })
       }
     }
   })
   const navigate = useNavigate();
-  // const client = useApolloClient();
 
   useEffect(() => {
     if (data?.createPoem.id) {
-      // client.writeQuery({
-      //   query: GET_POEMS,
-      //   data: {
-      //     poems: [data.createPoem]
-      //   }
-      // })
       setText("");
       setTitle("");
       navigate(`/poem/${data.createPoem.id}`)
@@ -44,7 +40,11 @@ const ComposePoem = () => {
   }, [data, navigate])
 
   if (loading) {
-    return <Spinner />
+    return (
+      <Layout>
+        <FullSizeSpinner/>
+      </Layout>
+    )
   }
 
   if (error) {
@@ -81,6 +81,7 @@ export default ComposePoem;
 
 const ComposePoemContainer = styled.div({
   justifySelf: "center",
+  alignSelf: "center",
   display: "flex",
   flexDirection: "column",
   maxWidth: "50em",

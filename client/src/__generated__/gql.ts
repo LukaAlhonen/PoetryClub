@@ -24,6 +24,7 @@ type Documents = {
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": typeof types.GetPoemDocument,
     "\n  query GetPoems($first: Int, $after: ID) {\n    poems(first: $first, after: $after) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": typeof types.GetPoemsDocument,
     "\n  query GetPoemsWithFilter($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": typeof types.GetPoemsWithFilterDocument,
+    "\n    mutation Signup ($input: CreateAuthorInput!) {\n        signup (input: $input) {\n            id\n            username\n        }\n    }\n": typeof types.SignupDocument,
 };
 const documents: Documents = {
     "\n    fragment AuthorDetailFragment on Author {\n        id\n        username\n        dateJoined\n        followedByCount\n        followingCount\n    }\n": types.AuthorDetailFragmentFragmentDoc,
@@ -36,6 +37,7 @@ const documents: Documents = {
     "\n    query GetPoem(\n      $poemId: ID!\n    ) {\n      poem(id: $poemId) {\n          id\n          ...PoemDetailFragment\n      }\n    }\n": types.GetPoemDocument,
     "\n  query GetPoems($first: Int, $after: ID) {\n    poems(first: $first, after: $after) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": types.GetPoemsDocument,
     "\n  query GetPoemsWithFilter($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n": types.GetPoemsWithFilterDocument,
+    "\n    mutation Signup ($input: CreateAuthorInput!) {\n        signup (input: $input) {\n            id\n            username\n        }\n    }\n": types.SignupDocument,
 };
 
 /**
@@ -92,6 +94,10 @@ export function gql(source: "\n  query GetPoems($first: Int, $after: ID) {\n    
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query GetPoemsWithFilter($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetPoemsWithFilter($first: Int, $after: ID, $filter: GetPoemsFilter) {\n    poems(first: $first, after: $after, filter: $filter) {\n      edges {\n          node {\n            id\n            ...PoemCardFragment\n          }\n          cursor\n      }\n      pageInfo {\n          hasNextPage\n          hasPreviousPage\n          startCursor\n          endCursor\n          pageSize\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    mutation Signup ($input: CreateAuthorInput!) {\n        signup (input: $input) {\n            id\n            username\n        }\n    }\n"): (typeof documents)["\n    mutation Signup ($input: CreateAuthorInput!) {\n        signup (input: $input) {\n            id\n            username\n        }\n    }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

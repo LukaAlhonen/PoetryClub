@@ -5,8 +5,7 @@ import ComposePoem from "./ComposePoem/compose-poem";
 import Author from "./Author/author";
 import Search from "./Search/search";
 import Login from "./Login/login";
-import Register from "./register";
-import Test from "./test";
+import Signup from "./Signup/signup";
 
 const Pages = () => {
   return (
@@ -18,8 +17,7 @@ const Pages = () => {
         <Route element={<ComposePoem />} path="/compose" />
         <Route element={<Search />} path="/search" />
         <Route element={<Login />} path="/login" />
-        <Route element={<Register />} path="/register" />
-        <Route element={<Test />} path="/test" />
+        <Route element={<Signup />} path="/signup" />
       </Routes>
     </BrowserRouter>
   );

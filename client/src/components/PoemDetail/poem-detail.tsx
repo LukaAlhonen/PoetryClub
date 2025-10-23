@@ -73,7 +73,7 @@ const PoemDetail = (props: PoemDetailProps) => {
           </h3>
           </PoemTitle>
           <PoemSubHeader>
-            <AuthorContainer to="/">
+            <AuthorContainer to={`/author/${poem.author.username}`}>
               <UserButton />
               {poem.author.username}
             </AuthorContainer>
@@ -122,7 +122,8 @@ const PoemDetailContainer = styled.div({
   width: "100%",
   minWidth: "15em",
   alignSelf: "center",
-  paddingBottom: "1em"
+  paddingBottom: "1em",
+  justifySelf: "center"
 });
 
 const PoemContainer = styled.div({
