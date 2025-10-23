@@ -82,26 +82,26 @@ const PoemDetail = (props: PoemDetailProps) => {
         </PoemHeader>
         <TextContainer>{poem.text}</TextContainer>
         <PoemFooter>
-          <TagsContainer>
-            <ViewsButton />
-            <span data-testid="views">
-              {poem?.views}
-            </span>
-          </TagsContainer>
           <StatsContainer>
+            <HoverContainer>
+              <LikesButton />
+            </HoverContainer>
             <span data-testid="likesCount">
               {poem?.likesCount}
             </span>
             <HoverContainer>
-              <LikesButton />
+              <CommentsButton open={displayComments} onClick={toggleComments}/>
             </HoverContainer>
             <span data-testid="commentsCount">
               {poem?.commentsCount}
             </span>
-            <HoverContainer>
-              <CommentsButton open={displayComments} onClick={toggleComments}/>
-            </HoverContainer>
           </StatsContainer>
+          <ViewsContainer>
+            <ViewsButton />
+            <span data-testid="views">
+              {poem?.views}
+            </span>
+          </ViewsContainer>
         </PoemFooter>
       </PoemContainer>
       <CommentSection ref={commentSectionRef} open={displayComments}>
@@ -123,7 +123,8 @@ const PoemDetailContainer = styled.div({
   minWidth: "15em",
   alignSelf: "center",
   paddingBottom: "1em",
-  justifySelf: "center"
+  justifySelf: "center",
+  margin: "1em"
 });
 
 const PoemContainer = styled.div({
@@ -222,17 +223,17 @@ const PoemFooter = styled.div({
   color: colors.backgroundBlack
 });
 
-const TagsContainer = styled.div({
+const ViewsContainer = styled.div({
   display: "flex",
   flexDirection: "row",
-  justifyContent: "left",
-  marginRight: "auto",
+  justifyContent: "right",
+  marginLeft: "auto",
 });
 
 const StatsContainer = styled.div({
   display: "flex",
   flexDirection: "row",
-  justifyContent: "right",
+  justifyContent: "left",
   alignContent: "space-evenly",
 });
 
@@ -282,8 +283,9 @@ const HoverContainer = styled.div({
 const CommentSection = styled.div<{ open?: boolean }>(({ open }) => ({
   marginTop: "1em",
   display: "flex",
+  width: "100%",
   flexDirection: "column",
-  alignItems: "end",
+  // alignItems: "start",
   transformOrigin: "top",
   transform: open ? "scaleY(1)" : "scaleY(0)",
   transition: "transform 0.1s ease",

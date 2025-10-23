@@ -6,6 +6,7 @@ import PoemDetail from "../../components/PoemDetail/poem-detail";
 import { Layout } from "../../components";
 import QueryResult from "../../components/query-result";
 import styled from "@emotion/styled";
+import ScrollContainer from "../../components/ScrollContainer/scroll-container";
 
 
 const Poem = () => {
@@ -24,24 +25,26 @@ const Poem = () => {
     );
   }
 
+  const handleIntersect = () => { };
+
   return (
     <Layout>
-      <PoemContainer>
+      <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
           <PoemDetail poem={data?.poem} />
         </QueryResult>
-      </PoemContainer>
+      </ScrollContainer>
     </Layout>
   );
 };
 
 export default Poem;
 
-const PoemContainer = styled.div({
-  display: "flex",
-  flexDirection: "column",
-  overflowY: "auto",
-  width: "100%",
-  height: "100%",
-  justifyContent: "center"
-});
+// const PoemContainer = styled.div({
+//   display: "flex",
+//   flexDirection: "column",
+//   overflowY: "auto",
+//   width: "100%",
+//   height: "100%",
+//   justifyContent: "center"
+// });

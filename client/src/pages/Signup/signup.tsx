@@ -50,7 +50,6 @@ const Signup = () => {
         </SignupTitle>
         <SignupForm onSubmit={(e) => {
           e.preventDefault();
-          // signupMutation({ variables: { input: { username, password, email} } });
           handleSubmit({username, password, email, verifyPassword})
           setUsername("");
           setPassword("");

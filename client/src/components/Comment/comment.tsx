@@ -37,7 +37,8 @@ const CommentContainer = styled.div({
   // padding: "0.5em",
   marginBottom: "1em",
   width: "100%",
-  minWidth: "10em",
+  maxWidth: "60%",
+  // minWidth: "30em",
   background: colors.textEggshell,
   color: colors.backgroundBlack,
   borderRadius: "0.5em"
@@ -90,5 +91,5 @@ const UserButton = styled(UserIcon)({
 
 const TextContainer = styled.div({
   display: "flex",
-  padding: "0.5em"
+  padding: "1em"
 })
