@@ -1,37 +1,54 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { GET_POEM } from "./poem.graphql";
-// import { useQuery } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import PoemDetail from "../../components/PoemDetail/poem-detail";
 import { Layout } from "../../components";
 import QueryResult from "../../components/query-result";
-import styled from "@emotion/styled";
 import ScrollContainer from "../../components/ScrollContainer/scroll-container";
+import CommentsSection from "../../components/CommentsSection/comments-section";
+import ComposeCommentForm from "../../containers/ComposeCommentForm/compose-comment-form";
+import type { GetPoemQuery, GetPoemQueryVariables } from "../../__generated__/graphql";
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../context/use-auth";
+import { NetworkStatus } from "@apollo/client";
 
 
 const Poem = () => {
   const { poemId = "" } = useParams();
-
-  const { loading, error, data } = useQuery(GET_POEM, {
-    variables: { poemId },
+  const [displayCommentForm, setDisplayCommentForm] = useState<boolean>(true);
+  const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemQuery, GetPoemQueryVariables>(GET_POEM, {
+    variables: { poemId, commentsLimit: 5 },
   });
+  const { user } = useAuth();
 
-  if (error) {
-    console.log(error)
-    return (
-      <div>
-        <h1>{error.message}</h1>
-      </div>
-    );
+  const composeCommentRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#composeComment" && composeCommentRef.current) {
+      composeCommentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [location])
+
+  const handleIntersect = () => {
+    if (data?.poem?.comments?.pageInfo?.hasNextPage) {
+      fetchMore({ variables: { commentsLimit: data.poem.comments.pageInfo.pageSize, commentsCursor: data.poem.comments.pageInfo.endCursor}})
+    }
+  };
+
+  const handleDisplayCommentForm = () => {
+    setDisplayCommentForm(!displayCommentForm);
   }
 
-  const handleIntersect = () => { };
+  const isLoading = networkStatus === NetworkStatus.fetchMore;
 
   return (
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemDetail poem={data?.poem} />
+          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} />
+          {user && displayCommentForm && poemId ? <ComposeCommentForm ref={composeCommentRef} poemId={poemId} /> : null}
+          <CommentsSection comments={data?.poem?.comments} isLoading={isLoading} pageSize={data?.poem?.comments?.pageInfo?.pageSize} />
         </QueryResult>
       </ScrollContainer>
     </Layout>
@@ -39,12 +56,3 @@ const Poem = () => {
 };
 
 export default Poem;
-
-// const PoemContainer = styled.div({
-//   display: "flex",
-//   flexDirection: "column",
-//   overflowY: "auto",
-//   width: "100%",
-//   height: "100%",
-//   justifyContent: "center"
-// });

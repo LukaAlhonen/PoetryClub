@@ -66,7 +66,7 @@ const PoemCard = (props: PoemCardProps) => {
             {poem?.commentsCount}
           </span>
           <HoverContainer>
-            <Link to={poem ? `/poem/${poem?.id}#comments` : "#"}>
+            <Link to={poem ? `/poem/${poem?.id}#composeComment` : "#"}>
               <CommentsButton />
             </Link>
           </HoverContainer>
@@ -90,6 +90,7 @@ const PoemContainer = styled.div({
   maxHeight: "30em",
   height: "30em",
   boxSizing: "border-box",
+  border: "0.15em solid gray",
   wordWrap: "break-word",
   overflowWrap: "break-word",
   background: colors.textEggshell,
@@ -150,16 +151,16 @@ const UsernameContainer = styled(Link)({
   borderRadius: "0.5em",
   color: colors.backgroundBlack,
   background: colors.textEggshell,
-  transition: "color 0.2s ease, background 0.2s ease, border 0.2s ease",
+  transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "auto",
   fontWeight: "bold",
   alignItems: "center",
   display: "flex",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15em solid gray`,
   "&:hover": {
     color: colors.textEggshell,
     background: colors.wineRed,
-    border: `0.15em solid ${colors.wineRed}`
+    // border: `0.15em solid ${colors.wineRed}`
   },
   "&:hover path": {
     fill: colors.textEggshell

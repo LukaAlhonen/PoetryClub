@@ -60,6 +60,8 @@ const SearchBar = styled.div({
   flexDirection: "row",
   alignItems: "center",
   borderRadius: "0.5em",
+  boxSizing: "border-box",
+  border: "0.15em solid gray",
   padding: "0.5em",
   margin: "1em",
   background: colors.textEggshell

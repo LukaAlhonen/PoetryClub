@@ -14,14 +14,6 @@ export const POEM_DETAIL_FRAGMENT = gql(`
             id
             username
         }
-        comments {
-            edges {
-                node {
-                    id
-                    ...CommentFragment
-                }
-            }
-        }
         views
         likesCount
         commentsCount
