@@ -67,7 +67,7 @@ const ComposePoem = () => {
               setTitle(e.target.value)
             }}/>
           </InputContainer>
-          <FormTextArea rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
+          <FormTextArea placeholder={"write your poem here"} rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
             setText(e.target.value)
           }} />
           <ComposeButton type="submit">Submit</ComposeButton>
@@ -91,6 +91,8 @@ const ComposePoemContainer = styled.div({
   background: colors.textEggshell,
   padding: "1em",
   borderRadius: "0.5em",
+  border: "0.15rem solid gray",
+  boxSizing: "border-box",
   color: colors.backgroundBlack
 })
 
@@ -109,37 +111,39 @@ const ComposeForm = styled.form({
 const FormInput = styled.input({
   display: "flex",
   maxWidth: "20em",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15rem solid gray`,
   background: colors.textEggshell,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
   borderRadius: "0.5em",
+  transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15em solid ${colors.wineRed}`
+    border: `0.15rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15em solid ${colors.wineRed}`,
+    border: `0.15rem solid ${colors.wineRed}`,
   }
 })
 
 const FormTextArea = styled.textarea({
   resize: "none",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15rem solid gray`,
   background: colors.textEggshell,
   margin: "0.5em",
-  padding: "0.3em",
+  padding: "0.5em",
   boxSizing: "border-box",
   fontSize: "1.1em",
   borderRadius: "0.5em",
+  transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15em solid ${colors.wineRed}`
+    border: `0.15rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15em solid ${colors.wineRed}`,
+    border: `0.15rem solid ${colors.wineRed}`,
   }
 })
 
@@ -161,8 +165,8 @@ const ComposeButton = styled.button({
   alignSelf: "center",
   textDecoration: "none",
   background: colors.backgroundBlack,
+  border: "0.15rem solid gray",
   color: colors.textEggshell,
-  border: "none",
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
@@ -170,6 +174,7 @@ const ComposeButton = styled.button({
   minWidth: "15em",
   borderRadius: "0.5em",
   fontSize: "1.1em",
+  transition: "background 0.1s ease-in-out",
   "&:hover": {
     background: colors.wineRed,
     cursor: "pointer"

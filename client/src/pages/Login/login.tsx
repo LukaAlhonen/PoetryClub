@@ -76,6 +76,8 @@ const LoginContainer = styled.div({
   background: colors.textEggshell,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
+  border: "0.15rem solid gray",
+  boxSizing: "border-box",
   alignItems: "center",
   maxWidth: "30em",
   justifySelf: "center",
@@ -108,20 +110,20 @@ const InputContainer = styled.div({
 
 const LoginInput = styled.input({
   display: "flex",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15rem solid gray`,
   background: colors.textEggshell,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
   borderRadius: "0.5em",
+  transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15em solid ${colors.wineRed}`
+    border: `0.15rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15em solid ${colors.wineRed}`,
-    // cursor: "horizontal-text"
+    border: `0.15rem solid ${colors.wineRed}`,
   }
 })
 
@@ -131,12 +133,13 @@ const LoginButton = styled.button({
   textDecoration: "none",
   background: colors.backgroundBlack,
   color: colors.textEggshell,
-  // border: `0.15em solid ${colors.backgroundBlack}`,
-  border: "none",
+  border: `0.15rem solid gray`,
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
   borderRadius: "0.5em",
+  transition: "background 0.1s ease-in-out",
+  fontWeight: "bold",
   "&:hover": {
     background: colors.wineRed,
     cursor: "pointer"

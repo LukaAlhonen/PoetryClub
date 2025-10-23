@@ -13,8 +13,6 @@ const link = new HttpLink({
   credentials: "include"
 })
 
-// let token = localStorage.getItem("token")
-
 const authLink = new SetContextLink(({ headers }) => {
   const token = localStorage.getItem("token");
   return {
@@ -63,6 +61,9 @@ const client = new ApolloClient({
           authorByUsername: {
             keyArgs: ["username"],
             merge: true
+          },
+          poem: {
+            keyArgs: ["id"]
           }
         }
       },
@@ -70,6 +71,13 @@ const client = new ApolloClient({
         fields: {
           poems: relayStylePagination([
             "filter"
+          ])
+        }
+      },
+      Poem: {
+        fields: {
+          comments: relayStylePagination([
+            "poemId"
           ])
         }
       }

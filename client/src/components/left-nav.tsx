@@ -97,6 +97,7 @@ const NavLink = styled(Link)({
   alignItems: "center",
   gap: "1em",
   boxSizing: "border-box",
+  border: "0.15em solid gray",
   borderRadius: "0.5em",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {

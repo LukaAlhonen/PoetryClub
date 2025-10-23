@@ -46,11 +46,10 @@ const Signup = () => {
     <Layout>
       <SignupContainer>
         <SignupTitle>
-          <h3>Email</h3>
+          <h3>Signup</h3>
         </SignupTitle>
         <SignupForm onSubmit={(e) => {
           e.preventDefault();
-          // signupMutation({ variables: { input: { username, password, email} } });
           handleSubmit({username, password, email, verifyPassword})
           setUsername("");
           setPassword("");
@@ -59,30 +58,30 @@ const Signup = () => {
         }}>
           <InputContainer>
             <h4>Username</h4>
-            <SignupInput value={username} onChange={(e) => {
+            <SignupInput required={true} value={username} onChange={(e) => {
               setUsername(e.target.value)
             }}/>
           </InputContainer>
           <InputContainer>
             <h4>Email</h4>
-            <SignupInput value={email} onChange={(e) => {
+            <SignupInput required={true} value={email} onChange={(e) => {
               setEmail(e.target.value)
             }}/>
           </InputContainer>
           <InputContainer>
             <h4>Password</h4>
-            <SignupInput type="password" value={password} onChange={(e) => {
+            <SignupInput required={true} type="password" value={password} onChange={(e) => {
               setPassword(e.target.value)
             }}/>
           </InputContainer>
           <InputContainer>
             <h4>Verify Password</h4>
-            <SignupInput type="password" value={verifyPassword} onChange={(e) => {
+            <SignupInput required={true} type="password" value={verifyPassword} onChange={(e) => {
               setVerifyPassword(e.target.value)
             }}/>
           </InputContainer>
           <InputContainer>
-            <SignupButton type="submit">Login</SignupButton>
+            <SignupButton type="submit">Signup</SignupButton>
           </InputContainer>
         </SignupForm>
       </SignupContainer>
@@ -98,6 +97,8 @@ const SignupContainer = styled.div({
   background: colors.textEggshell,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
+  border: "0.15rem solid gray",
+  boxSizing: "border-box",
   alignItems: "center",
   maxWidth: "30em",
   justifySelf: "center",
@@ -130,20 +131,20 @@ const InputContainer = styled.div({
 
 const SignupInput = styled.input({
   display: "flex",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15rem solid gray`,
   background: colors.textEggshell,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
   borderRadius: "0.5em",
+  transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15em solid ${colors.wineRed}`
+    border: `0.15rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15em solid ${colors.wineRed}`,
-    // cursor: "horizontal-text"
+    border: `0.15rem solid ${colors.wineRed}`,
   }
 })
 
@@ -153,12 +154,13 @@ const SignupButton = styled.button({
   textDecoration: "none",
   background: colors.backgroundBlack,
   color: colors.textEggshell,
-  // border: `0.15em solid ${colors.backgroundBlack}`,
-  border: "none",
+  border: `0.15rem solid gray`,
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
   borderRadius: "0.5em",
+  transition: "background 0.1s ease-in-out",
+  fontWeight: "bold",
   "&:hover": {
     background: colors.wineRed,
     cursor: "pointer"

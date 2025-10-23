@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test, beforeAll, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import type { GetPoemQuery, Poem as PoemModel } from "../../../__generated__/types";
 import { GET_POEM } from "../../../pages/Poem/poem.graphql";
@@ -6,6 +6,17 @@ import { MockLink } from "@apollo/client/testing";
 import { renderMockProvider } from "../../../utils/test-utils";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Poem from "../poem";
+
+beforeAll(() => {
+  // dummy intersectionobserver mock
+  const mockIntersectionObserver = vi.fn()
+  mockIntersectionObserver.mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null
+    });
+    window.IntersectionObserver = mockIntersectionObserver;
+});
 
 const date = new Date()
 
@@ -47,7 +58,7 @@ const mocks: MockLink.MockedResponse<GetPoemQuery>[] = [
   {
     request: {
       query: GET_POEM,
-      variables: {poemId: "p_01"}
+      variables: {poemId: "p_01", commentsLimit: 5}
     },
     result: {
       data: {
