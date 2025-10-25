@@ -54,6 +54,8 @@ const AuthorDetailContainer = styled.div({
   flexDirection: "column",
   alignItems: "center",
   borderRadius: "0.5em",
+  boxSizing: "border-box",
+  border: "0.15rem solid gray",
   padding: "2.5em",
   margin: "1em",
   background: colors.textEggshell,
@@ -77,7 +79,7 @@ const UserNameContainer = styled.div({
   marginBottom: "1rem",
   paddingBottom: "0.5rem",
   width: "100%",
-  borderBottom: `0.15rem solid ${colors.backgroundBlack}`
+  borderBottom: `0.15rem solid gray`
 })
 
 const UserIcon = styled(UserSVG)({

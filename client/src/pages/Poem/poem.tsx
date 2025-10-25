@@ -25,10 +25,10 @@ const Poem = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.hash === "#composeComment" && composeCommentRef.current) {
+    if (location.hash === "#composeComment" && composeCommentRef.current && !loading) {
       composeCommentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [location])
+  }, [location, loading])
 
   const handleIntersect = () => {
     if (data?.poem?.comments?.pageInfo?.hasNextPage) {

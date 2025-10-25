@@ -21,6 +21,44 @@ export const GET_AUTHOR = gql(`
                     pageSize
                 }
             }
+            followedBy {
+                edges {
+                    node {
+                        id
+                        follower {
+                            id
+                            ...FollowedAuthorFragment
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    endCursor
+                    startCursor
+                    pageSize
+                }
+            }
+            following {
+                edges {
+                    node {
+                        id
+                        following {
+                            id
+                            ...FollowedAuthorFragment
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    endCursor
+                    startCursor
+                    pageSize
+                }
+            }
         }
     }
 `)

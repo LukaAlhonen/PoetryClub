@@ -14,6 +14,8 @@ const Pages = () => {
         <Route element={<Poems />} path="/" />
         <Route element={<Poem />} path="/poem/:poemId" />
         <Route element={<Author />} path="/author/:username" />
+        <Route element={<Author />} path="/author/:username/followers" />
+        <Route element={<Author />} path="/author/:username/following" />
         <Route element={<ComposePoem />} path="/compose" />
         <Route element={<Search />} path="/search" />
         <Route element={<Login />} path="/login" />

@@ -63,14 +63,14 @@ const ComposePoem = () => {
         }}>
           <InputContainer>
             <h4>Title</h4>
-            <FormInput value={title} onChange={(e) => {
+            <FormInput required={true} value={title} onChange={(e) => {
               setTitle(e.target.value)
             }}/>
           </InputContainer>
           <FormTextArea placeholder={"write your poem here"} rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
             setText(e.target.value)
           }} />
-          <ComposeButton type="submit">Submit</ComposeButton>
+          <ComposeButton type="submit">Post</ComposeButton>
         </ComposeForm>
       </ComposePoemContainer>
     </Layout>
