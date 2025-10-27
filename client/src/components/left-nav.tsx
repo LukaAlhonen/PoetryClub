@@ -40,7 +40,7 @@ const LeftNav = () => {
             </NavLink>
             <NavLink to={`/author/${user}`}>
               <UserIcon />
-              Profile
+              <UsernameContainer>{user}</UsernameContainer>
             </NavLink>
             <NavLink onClick={logout} to="/">
               <LogoutIcon/>
@@ -106,11 +106,21 @@ const NavLink = styled(Link)({
   },
 });
 
+const UsernameContainer = styled.div({
+  fontSize: "clamp(0.1rem, 0.9em, 1rem)",
+  flexShrink: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+})
+
 const navImg = {
   width: "1.5em",
   height: "1.5em",
   fill: "currentcolor",
   transition: "fill 0.15s ease",
+  flexShrink: 0,
 };
 
 // Nav svg image styles

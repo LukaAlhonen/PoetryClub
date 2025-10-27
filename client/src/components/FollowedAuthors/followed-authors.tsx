@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import type { GetAuthorQuery } from "../../__generated__/graphql";
 import colors from "../../colors";
-import FollowedAuthor from "../../containers/FollowedAuthor/followed-author";
+import FollowedAuthor from "../FollowedAuthor/followed-author";
 import { Link } from "react-router-dom";
 
 import BackSVG from "../../assets/icons/arrow-left.svg?react";
@@ -65,6 +65,7 @@ const FollowedAuthorsContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   padding: "1rem",
+  // boxSizing: "border-box",
   borderBottomLeftRadius: "0.5rem",
   borderBottomRightRadius: "0.5rem",
   marginTop: "0",
@@ -103,24 +104,29 @@ const LinksContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-evenly",
-  paddingTop: "1em"
+  paddingTop: "1em",
+  // marginBottom: "-0.15rem",
+  background: colors.textEggshell,
 })
 
-const LinkContainer = styled(Link)<{isActive?: boolean}>(
+const LinkContainer = styled(Link, { shouldForwardProp: (prop) => prop !== "isActive"})<{isActive: boolean}>(
   ({isActive}) => ({
-    background: isActive ? colors.wineRed : colors.darkGray,
-    color: isActive ? colors.textEggshell : colors.backgroundBlack,
+    background: isActive ? colors.textEggshell : colors.darkGray,
+    color: colors.backgroundBlack,
     padding: "1rem",
     border: "0.15rem solid gray",
     borderBottom: "none",
+    fontWeight: "bold",
     borderTopLeftRadius: "0.5rem",
     borderTopRightRadius: "0.5rem",
-    margin: "0",
+    bottom: "-0.14rem",
+    position: "relative",
+    zIndex: 3,
     textDecoration: "none",
     transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
     "&:hover": {
-      color: colors.textEggshell,
-      background: colors.wineRed,
-    }
+      color: isActive ? colors.backgroundBlack : colors.textEggshell,
+      background: isActive ? colors.textEggshell : colors.wineRed,
+    },
   })
 )

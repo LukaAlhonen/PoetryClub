@@ -166,11 +166,11 @@ const TextContainer = styled.div({
 const UserButton = styled(UserIcon)({
   height: "1.5em",
   width: "1.5em",
-  transition: "fill 0.2s ease",
+  transition: "fill 0.1s ease",
   margin: "0 0.5em 0 0",
   "& path": {
     fill: colors.backgroundBlack,
-    transition: "fill 0.2s ease"
+    transition: "fill 0.1s ease"
   }
 });
 

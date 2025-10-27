@@ -12,13 +12,15 @@ import FullSizeSpinner from "../../components/full-size-spinner";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginMutation, { data, loading, error }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN);
+  const [loginMutation, { data, loading, error }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
+    fetchPolicy: "no-cache"
+  });
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
     if (data?.login.token) {
-      login(data.login.token, data.login.author.username)
+      login(data.login.token, data.login.author.username, data.login.author.id)
       navigate("/")
     }
   }, [data, login, navigate])

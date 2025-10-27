@@ -552,6 +552,13 @@ export type CreateCommentMutationVariables = Exact<{
 
 export type CreateCommentMutation = { __typename?: 'Mutation', createComment: { __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } } };
 
+export type FollowAuthorMutationVariables = Exact<{
+  followingId: Scalars['ID']['input'];
+}>;
+
+
+export type FollowAuthorMutation = { __typename?: 'Mutation', createFollowedAuthor?: { __typename?: 'FollowedAuthor', id: string, following: { __typename?: 'Author', id: string, username: string }, follower: { __typename?: 'Author', id: string, username: string } } | null };
+
 export type GetAuthorQueryVariables = Exact<{
   username: Scalars['String']['input'];
   poemsLimit?: InputMaybe<Scalars['Int']['input']>;

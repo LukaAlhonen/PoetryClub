@@ -10,12 +10,15 @@ import ScrollContainer from "../../components/ScrollContainer/scroll-container"
 import { NetworkStatus } from "@apollo/client"
 import { useEffect, useState } from "react"
 import FollowedAuthors from "../../components/FollowedAuthors/followed-authors"
+import { useAuth } from "../../context/use-auth"
 
 const Author = () => {
   const { username = "" } = useParams();
+  const { userId } = useAuth();
   const location = useLocation();
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(false);
 
   const { loading, error, data, networkStatus, fetchMore } = useQuery<GetAuthorQuery, GetAuthorQueryVariables>(GET_AUTHOR, {
     variables: {
@@ -28,6 +31,16 @@ const Author = () => {
     setShowFollowers(location.pathname.endsWith("/followers"));
     setShowFollowing(location.pathname.endsWith("/following"));
   }, [location.pathname])
+
+  useEffect(() => {
+    if (data?.authorByUsername?.followedBy.edges) {
+      data.authorByUsername.followedBy.edges.forEach((edge) => {
+        if (edge.node && edge.node.follower.id === userId) {
+          setIsFollowed(true)
+        }
+      })
+    }
+  })
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;
 
@@ -45,7 +58,7 @@ const Author = () => {
           {
             !showFollowers && !showFollowing ? (
               <>
-                <AuthorDetail author={data?.authorByUsername}></AuthorDetail>
+                <AuthorDetail author={data?.authorByUsername} isFollowed={isFollowed}></AuthorDetail>
                 <PoemGrid poems={data?.authorByUsername.poems} isLoading={isLoading} />
               </>
             ) : showFollowers ?

@@ -66,7 +66,7 @@ const TitleContainer = styled(Link)({
   transition: "none",
 
   "&:hover": {
-  transition: "color 0.2s ease, background-size 0.2s ease",
+  transition: "color 0.1s ease, background-size 0.1s ease",
     backgroundSize: "100% 0.1em",
     color: colors.wineRed,
   },
