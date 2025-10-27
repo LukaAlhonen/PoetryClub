@@ -4,7 +4,7 @@ import { FOLLOW_AUTHOR } from "./follow-button.graphql";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 
-import FollowSVG from "../../assets/icons/user-add.svg?react";
+import FollowSVG from "../../assets/icons/following.svg?react";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
@@ -89,9 +89,9 @@ const FollowButton = (props: FollowButtonProps) => {
 
   if (error) console.error(error.message);
 
-  return (
-    <FollowButtonContainer onClick={loading ? () => {} : handleClick}><FollowIcon />Follow</FollowButtonContainer>
-  )
+  if (!loading) {
+    return <FollowButtonContainer onClick={handleClick}><FollowIcon />Follow</FollowButtonContainer>
+  } else return null;
 }
 
 export default FollowButton;

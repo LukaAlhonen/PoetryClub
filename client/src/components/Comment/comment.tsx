@@ -31,7 +31,7 @@ const Comment = (props: CommentProps) => {
         :
         <>
           <CommentHeader>
-            <AuthorContainer to="/"><UserButton />{comment?.author.username}</AuthorContainer>
+            <AuthorContainer to={comment?.author?.username ? `/author/${comment.author.username}` : "#"}><UserButton />{comment?.author.username}</AuthorContainer>
             {date}
           </CommentHeader>
           <TextContainer>

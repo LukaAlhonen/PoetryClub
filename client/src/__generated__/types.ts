@@ -559,6 +559,13 @@ export type FollowAuthorMutationVariables = Exact<{
 
 export type FollowAuthorMutation = { __typename?: 'Mutation', createFollowedAuthor?: { __typename?: 'FollowedAuthor', id: string, following: { __typename?: 'Author', id: string, username: string }, follower: { __typename?: 'Author', id: string, username: string } } | null };
 
+export type UnfollowAuthorMutationVariables = Exact<{
+  followedAuthorId: Scalars['ID']['input'];
+}>;
+
+
+export type UnfollowAuthorMutation = { __typename?: 'Mutation', removeFollowedAuthor: { __typename?: 'FollowedAuthor', id: string, follower: { __typename?: 'Author', id: string }, following: { __typename?: 'Author', id: string } } };
+
 export type GetAuthorQueryVariables = Exact<{
   username: Scalars['String']['input'];
   poemsLimit?: InputMaybe<Scalars['Int']['input']>;

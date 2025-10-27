@@ -18,8 +18,6 @@ const Author = () => {
   const location = useLocation();
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
-  const [isFollowed, setIsFollowed] = useState(false);
-
   const { loading, error, data, networkStatus, fetchMore } = useQuery<GetAuthorQuery, GetAuthorQueryVariables>(GET_AUTHOR, {
     variables: {
       username,
@@ -27,20 +25,16 @@ const Author = () => {
     }
   })
 
+  const author = data?.authorByUsername;
+  const followers = author?.followedBy?.edges ?? [];
+  const followedEdge = followers.find(edge => edge?.node?.follower.id === userId);
+  const isFollowed = Boolean(followedEdge);
+  const followedAuthorId = followedEdge?.node?.id ?? null;
+
   useEffect(() => {
     setShowFollowers(location.pathname.endsWith("/followers"));
     setShowFollowing(location.pathname.endsWith("/following"));
   }, [location.pathname])
-
-  useEffect(() => {
-    if (data?.authorByUsername?.followedBy.edges) {
-      data.authorByUsername.followedBy.edges.forEach((edge) => {
-        if (edge.node && edge.node.follower.id === userId) {
-          setIsFollowed(true)
-        }
-      })
-    }
-  })
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;
 
@@ -58,7 +52,7 @@ const Author = () => {
           {
             !showFollowers && !showFollowing ? (
               <>
-                <AuthorDetail author={data?.authorByUsername} isFollowed={isFollowed}></AuthorDetail>
+                <AuthorDetail author={data?.authorByUsername} isFollowed={isFollowed} followedAuthorId={followedAuthorId}></AuthorDetail>
                 <PoemGrid poems={data?.authorByUsername.poems} isLoading={isLoading} />
               </>
             ) : showFollowers ?

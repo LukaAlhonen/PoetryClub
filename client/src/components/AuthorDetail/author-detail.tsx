@@ -10,17 +10,19 @@ import UserSVG from "../../assets/icons/user.svg?react";
 import CalendarSVG from "../../assets/icons/calendar.svg?react";
 import UsersSVG from "../../assets/icons/users.svg?react";
 import { useAuth } from "../../context/use-auth";
+import UnfollowButton from "../../containers/UnfollowButton/unfollow-button";
 
 interface AuthorDetailProps {
   author?: FragmentType<typeof AUTHOR_DETAIL_FRAGMENT>;
   isFollowed?: boolean;
+  followedAuthorId?: string | null;
 }
 
 const AuthorDetail = (props: AuthorDetailProps) => {
   const { user } = useAuth();
   const author = useFragment(AUTHOR_DETAIL_FRAGMENT, props.author);
   const date = author?.dateJoined ? dateFormatter(author.dateJoined) : "";
-  console.log(props.isFollowed)
+
   return (
     <AuthorDetailContainer>
       <HeaderContainer>
@@ -49,7 +51,13 @@ const AuthorDetail = (props: AuthorDetailProps) => {
             }
           </StatContainer>
         </StatsContainer>
-        {author?.username && user && user !== author.username && !props.isFollowed && <FollowButton followingId={author?.id} />}
+        {
+          author?.username && user && user !== author?.username &&
+            props.isFollowed ?
+              <UnfollowButton followedAuthorId={props.followedAuthorId} />
+              :
+              user !== author?.username && <FollowButton followingId={author?.id} />
+        }
       </FooterContainer>
     </AuthorDetailContainer>
   )
