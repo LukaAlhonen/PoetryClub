@@ -7,6 +7,7 @@ import colors from "../../colors";
 import UserSVG from "../../assets/icons/user.svg?react";
 import CalendarSVG from "../../assets/icons/calendar.svg?react";
 import UsersSVG from "../../assets/icons/users.svg?react";
+import { Link } from "react-router-dom";
 // import { Link } from "react-router-dom";
 
 interface AuthorDetailProps {
@@ -26,7 +27,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
         <DateContainer>Joined<CalendarIcon />{date}</DateContainer>
       </HeaderContainer>
       <StatsContainer>
-        <StatContainer>
+        <StatContainer to={author?.username ? `/author/${author.username}/followers` : "#"}>
           {author?.followedByCount !== undefined && author?.followedByCount >= 0
             ?
               <><UsersIcon />{author.followedByCount} <StatLinkContainer>Followers</StatLinkContainer></>
@@ -34,7 +35,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
               null
           }
         </StatContainer>
-        <StatContainer>
+        <StatContainer to={author?.username ? `/author/${author.username}/following` : "#"}>
           {author?.followingCount !== undefined && author?.followingCount >= 0
             ?
               <><UsersIcon />{author.followingCount} <StatLinkContainer>Following</StatLinkContainer></>
@@ -113,32 +114,25 @@ const StatsContainer = styled.div({
   width: "100%"
 })
 
-const StatContainer = styled.div({
+const StatContainer = styled(Link)({
+  textDecoration: "none",
   display: "flex",
   flexDirection: "row",
   marginRight: "3em",
   fontWeight: "bold",
   color: colors.backgroundBlack,
+  transition: "color 0.1s ease-in-out",
   "&:hover": {
     color: colors.wineRed,
     cursor: "pointer",
-    transition: "color 0.2s ease"
   }
 })
 
 const StatLinkContainer = styled.div({
   color: colors.backgroundBlack,
   marginLeft: "0.2em",
-  position: "relative",
-  backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
-  backgroundPosition: "0 100%",
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "0% 0.2em", // 👈 start hidden
-  transition: "none",
-
+  transition: "color 0.1s ease-in-out",
   "&:hover": {
-    transition: "color 0.2s ease, background-size 0.2s ease",
-    backgroundSize: "100% 0.2em", // 👈 expands left → right
     color: colors.wineRed,
   },
 })
@@ -147,8 +141,8 @@ const UsersIcon = styled(UsersSVG)({
   width: "1em",
   height: "1em",
   marginRight: "0.2em",
+  transition: "fill 0.1s ease-in-out",
   "& path": {
     fill: "currentcolor",
-    transition: "fill 0.2s ease"
   }
 })

@@ -49,8 +49,8 @@ const Author = () => {
                 <PoemGrid poems={data?.authorByUsername.poems} isLoading={isLoading} />
               </>
             ) : showFollowers ?
-            <FollowedAuthors followers={data?.authorByUsername?.followedBy} /> :
-            showFollowing ? <FollowedAuthors following={data?.authorByUsername?.following} /> : null
+            <FollowedAuthors followers={data?.authorByUsername?.followedBy} username={username} /> :
+            showFollowing ? <FollowedAuthors following={data?.authorByUsername?.following} username={username} /> : null
           }
         </QueryResult>
       </ScrollContainer>
