@@ -81,13 +81,14 @@ const SearchButton = styled(SearchIcon)({
 const SearchInput = styled.input({
   width: "100%",
   height: "2.4em",
-  border: `0.15em solid ${colors.backgroundBlack}`,
+  border: `0.15em solid gray`,
   background: colors.textEggshell,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
   borderRadius: "0.5em",
+  transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
     border: `0.15em solid ${colors.wineRed}`

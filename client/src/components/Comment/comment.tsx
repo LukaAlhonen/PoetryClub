@@ -17,9 +17,6 @@ const Comment = (props: CommentProps) => {
   const comment = useFragment(COMMENT_FRAGMENT, props.comment)
   const date = comment? dateFormatter(comment.datePublished) : "loading..."
 
-  if (props.isLoading) {
-    console.log("spinner is spinning")
-  }
 
   return (
     <CommentContainer noMargin={props.noMargin}>
@@ -31,7 +28,7 @@ const Comment = (props: CommentProps) => {
         :
         <>
           <CommentHeader>
-            <AuthorContainer to="/"><UserButton />{comment?.author.username}</AuthorContainer>
+            <AuthorContainer to={comment?.author?.username ? `/author/${comment.author.username}` : "#"}><UserButton />{comment?.author.username}</AuthorContainer>
             {date}
           </CommentHeader>
           <TextContainer>

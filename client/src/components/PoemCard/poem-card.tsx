@@ -118,12 +118,12 @@ const PoemTitle = styled(Link)({
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",
   backgroundRepeat: "no-repeat",
-  backgroundSize: "0% 0.2em", // 👈 start hidden
+  backgroundSize: "0% 0.2em",
   transition: "none",
 
   "&:hover": {
-    transition: "color 0.2s ease, background-size 0.2s ease",
-    backgroundSize: "100% 0.2em", // 👈 expands left → right
+    transition: "color 0.1s ease, background-size 0.1s ease",
+    backgroundSize: "100% 0.2em",
     color: colors.wineRed,
   },
   "& h3": {
@@ -210,7 +210,7 @@ const PoemLink = styled(Link)({
   fontWeight: "bold",
   cursor: "pointer",
 
-  transition: "transform 0.2s ease-out, color 0.15s ease",
+  transition: "transform 0.1s ease-out, color 0.15s ease",
   "&:hover": {
     transform: "translateX(-50%) translateY(-3px)",
     color: colors.wineRed,
@@ -297,11 +297,11 @@ const ViewsButton = styled(ViewsIcon)({
 const UserButton = styled(UserIcon)({
   height: "1.5em",
   width: "1.5em",
-  transition: "fill 0.2s ease",
+  transition: "fill 0.1s ease",
   margin: "0 0.2em 0 0",
   "& path": {
     fill: colors.backgroundBlack,
-    transition: "fill 0.2s ease"
+    transition: "fill 0.1s ease"
   }
 })
 

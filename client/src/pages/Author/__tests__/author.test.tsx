@@ -24,7 +24,7 @@ beforeAll(() => {
 
 const date = new Date()
 
-const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"followedBy"|"following"|"collections"> = {
+const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"collections"> = {
   __typename: "Author",
   id: "a_01",
   username: "author_01",
@@ -32,6 +32,8 @@ const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"follow
   dateJoined: date,
   followedByCount: 0,
   followingCount: 0,
+  followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+  following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
   poems: {
     __typename: "PoemsConnection",
     edges: [
@@ -83,7 +85,7 @@ const mocks: MockLink.MockedResponse<GetAuthorQuery, GetAuthorQueryVariables>[] 
   {
     request: {
       query: GET_AUTHOR,
-      variables: {username: "author_01", poemsLimit: 5}
+      variables: {username: "author_01", poemsLimit: 5, followedByLimit: 10, followingLimit: 10}
     },
     result: {
       data: {

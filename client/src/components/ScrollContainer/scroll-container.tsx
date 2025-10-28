@@ -2,8 +2,6 @@ import styled from "@emotion/styled";
 import type React from "react";
 import { useEffect, useRef } from "react";
 
-// threshold: 0.1,
-// rootMargin: "0% 0% 20%"
 interface ScrollContainerProps {
   onIntersect: () => void;
   children: React.ReactNode;
