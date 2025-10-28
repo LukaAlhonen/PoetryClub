@@ -23,6 +23,8 @@ const AuthorDetail = (props: AuthorDetailProps) => {
   const author = useFragment(AUTHOR_DETAIL_FRAGMENT, props.author);
   const date = author?.dateJoined ? dateFormatter(author.dateJoined) : "";
 
+
+
   return (
     <AuthorDetailContainer>
       <HeaderContainer>
@@ -52,11 +54,12 @@ const AuthorDetail = (props: AuthorDetailProps) => {
           </StatContainer>
         </StatsContainer>
         {
-          author?.username && user && user !== author?.username &&
+          author?.username && user ? user !== author?.username &&
             props.isFollowed ?
               <UnfollowButton followedAuthorId={props.followedAuthorId} />
               :
               user !== author?.username && <FollowButton followingId={author?.id} />
+          : null
         }
       </FooterContainer>
     </AuthorDetailContainer>

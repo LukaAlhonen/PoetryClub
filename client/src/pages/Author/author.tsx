@@ -21,7 +21,9 @@ const Author = () => {
   const { loading, error, data, networkStatus, fetchMore } = useQuery<GetAuthorQuery, GetAuthorQueryVariables>(GET_AUTHOR, {
     variables: {
       username,
-      poemsLimit: 5
+      poemsLimit: 5,
+      followedByLimit: 10,
+      followingLimit: 10,
     }
   })
 
@@ -39,9 +41,28 @@ const Author = () => {
   const isLoading = networkStatus === NetworkStatus.fetchMore;
 
   const handleIntersect = () => {
-    if (data?.authorByUsername?.poems?.pageInfo?.hasNextPage) {
-      fetchMore({ variables: { poemsLimit: 5, poemsCursor: data.authorByUsername.poems.pageInfo.endCursor } });
-      console.log("fetching more")
+    if (showFollowers) {
+      if (data?.authorByUsername?.followedBy?.pageInfo?.hasNextPage) {
+        fetchMore({ variables: {
+          poemsLimit: 5,
+          followedByLimit: 10,
+          followedByCursor: data.authorByUsername.followedBy.pageInfo.endCursor,
+          followingLimit: 10,
+        }})
+      }
+    } else if (showFollowing) {
+      if (data?.authorByUsername?.following?.pageInfo?.hasNextPage) {
+        fetchMore({ variables: {
+          poemsLimit: 5,
+          followedByLimit: 10,
+          followingLimit: 10,
+          followingCursor: data.authorByUsername.following.pageInfo.endCursor,
+        }})
+      }
+    } else {
+      if (data?.authorByUsername?.poems?.pageInfo?.hasNextPage) {
+        fetchMore({ variables: { poemsLimit: 5, followedByLimit: 10, followingLimit: 10, poemsCursor: data.authorByUsername.poems.pageInfo.endCursor } });
+      }
     }
   };
 
@@ -56,8 +77,8 @@ const Author = () => {
                 <PoemGrid poems={data?.authorByUsername.poems} isLoading={isLoading} />
               </>
             ) : showFollowers ?
-            <FollowedAuthors followers={data?.authorByUsername?.followedBy} username={username} /> :
-            showFollowing ? <FollowedAuthors following={data?.authorByUsername?.following} username={username} /> : null
+            <FollowedAuthors followers={data?.authorByUsername?.followedBy} username={username} isLoading={isLoading} /> :
+            showFollowing ? <FollowedAuthors following={data?.authorByUsername?.following} username={username} isLoading={isLoading} /> : null
           }
         </QueryResult>
       </ScrollContainer>

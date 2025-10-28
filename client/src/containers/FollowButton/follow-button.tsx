@@ -41,12 +41,12 @@ const FollowButton = (props: FollowButtonProps) => {
 
       // Author who followed
       if (user) {
-        const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5 } });
+        const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 } });
         if (cachedAuthor2 && data?.createFollowedAuthor) {
           const newNode = { node: data.createFollowedAuthor, cursor: data.createFollowedAuthor.id };
           cache.writeQuery({
             query: GET_AUTHOR,
-            variables: { username: user, poemsLimit: 5 },
+            variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 },
             data: {
               ...cachedAuthor2,
               authorByUsername: {

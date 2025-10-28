@@ -570,6 +570,10 @@ export type GetAuthorQueryVariables = Exact<{
   username: Scalars['String']['input'];
   poemsLimit?: InputMaybe<Scalars['Int']['input']>;
   poemsCursor?: InputMaybe<Scalars['ID']['input']>;
+  followedByLimit?: InputMaybe<Scalars['Int']['input']>;
+  followedByCursor?: InputMaybe<Scalars['ID']['input']>;
+  followingLimit?: InputMaybe<Scalars['Int']['input']>;
+  followingCursor?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 

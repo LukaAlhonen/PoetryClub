@@ -38,8 +38,7 @@ interface UnfollowButtonProps {
 const UnfollowButton = (props: UnfollowButtonProps) => {
   const { username = "" } = useParams();
   const { user, userId } = useAuth();
-  // TODO:
-  // - remove cached followedauthor
+
   const [unfollowAuthorMutation, { loading, error }] = useMutation<UnfollowAuthorMutation, UnfollowAuthorMutationVariables>(UNFOLLOW_AUTHOR, {
     update(cache, { data }) {
       const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
@@ -73,14 +72,14 @@ const UnfollowButton = (props: UnfollowButtonProps) => {
       }
 
       if (user) {
-        const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5 } });
+        const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 } });
         if (cachedAuthor2 && data?.removeFollowedAuthor) {
           const updatedEdges = cachedAuthor2.authorByUsername.following.edges.filter((edge) => (
             edge?.node?.id !== data.removeFollowedAuthor.id
           )) ?? [];
           cache.writeQuery({
             query: GET_AUTHOR,
-            variables: { username: user, poemsLimit: 5 },
+            variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 },
             data: {
               ...cachedAuthor2,
               authorByUsername: {

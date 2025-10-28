@@ -1,7 +1,12 @@
 import { gql } from "../../__generated__";
 
 export const GET_AUTHOR = gql(`
-    query GetAuthor ($username: String! $poemsLimit: Int $poemsCursor: ID) {
+    query GetAuthor (
+        $username: String!
+        $poemsLimit: Int $poemsCursor: ID
+        $followedByLimit: Int $followedByCursor: ID
+        $followingLimit: Int $followingCursor: ID
+    ) {
         authorByUsername (username: $username) {
             id
             ...AuthorDetailFragment
@@ -21,7 +26,7 @@ export const GET_AUTHOR = gql(`
                     pageSize
                 }
             }
-            followedBy {
+            followedBy (first: $followedByLimit after: $followedByCursor) {
                 edges {
                     node {
                         id
@@ -40,7 +45,7 @@ export const GET_AUTHOR = gql(`
                     pageSize
                 }
             }
-            following {
+            following (first: $followingLimit after: $followingCursor) {
                 edges {
                     node {
                         id

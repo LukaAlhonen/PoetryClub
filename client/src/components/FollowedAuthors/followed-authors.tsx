@@ -9,6 +9,7 @@ import BackSVG from "../../assets/icons/arrow-left.svg?react";
 interface FollowedAuthorsProps {
   followers?: GetAuthorQuery["authorByUsername"]["followedBy"];
   following?: GetAuthorQuery["authorByUsername"]["following"];
+  isLoading?: boolean;
   username?: string;
 }
 
@@ -41,6 +42,7 @@ const FollowedAuthors = (props: FollowedAuthorsProps) => {
       </LinksContainer>
       <FollowedAuthorsContainer>
         {authors.map(author => author ? <FollowedAuthor key={author.id} author={author} /> : null)}
+        {props.isLoading && <FollowedAuthor key={"skeleton_1"}  />}
       </FollowedAuthorsContainer>
     </Container>
   )
