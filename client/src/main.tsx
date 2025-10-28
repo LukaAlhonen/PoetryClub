@@ -84,6 +84,9 @@ const client = new ApolloClient({
         fields: {
           comments: relayStylePagination([
             "poemId"
+          ]),
+          likes: relayStylePagination([
+            "authorId"
           ])
         }
       }

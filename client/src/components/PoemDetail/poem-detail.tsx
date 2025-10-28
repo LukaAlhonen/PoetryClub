@@ -4,10 +4,11 @@ import { POEM_DETAIL_FRAGMENT } from "./poem-detail.graphql";
 import { dateFormatter } from "../../utils/formatters";
 import { Link } from "react-router-dom";
 import colors from "../../colors";
+import LikeButton from "../../containers/LikeButton/like-button";
 
 import UserIcon from "../../assets/icons/user.svg?react";
-import CommentsIcon from "../../assets/icons/comment.svg?react";
-import LikesIcons from "../../assets/icons/heart2.svg?react";
+import CommentSVG from "../../assets/icons/comment.svg?react";
+import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
 
 interface PoemDetailProps {
@@ -15,6 +16,9 @@ interface PoemDetailProps {
   // component should already make sure that no null or undefined data is passed to this component
   poem?: FragmentType<typeof POEM_DETAIL_FRAGMENT> | null;
   onCommentButtonClick?: () => void;
+  displayCommentForm?: boolean;
+  isLiked?: boolean;
+  likeId?: string | null;
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
@@ -54,18 +58,19 @@ const PoemDetail = (props: PoemDetailProps) => {
         <TextContainer>{poem.text}</TextContainer>
         <PoemFooter>
           <StatsContainer>
-            <HoverContainer>
-              <LikesButton />
-            </HoverContainer>
-            <span data-testid="likesCount">
-              {poem?.likesCount}
-            </span>
-            <HoverContainer>
-              <CommentsButton onClick={props.onCommentButtonClick}/>
-            </HoverContainer>
-            <span data-testid="commentsCount">
-              {poem?.commentsCount}
-            </span>
+            <LikeButton isLiked={props.isLiked} poemId={poem?.id} likeId={props.likeId}>
+              <LikeIcon/>
+              <span data-testid="likesCount">
+                {poem?.likesCount}
+              </span>
+            </LikeButton>
+            <CommentsButton open={props.displayCommentForm} onClick={props.onCommentButtonClick}>
+              <CommentIcon />
+              <span data-testid="commentsCount">
+                {poem?.commentsCount}
+              </span>
+            </CommentsButton>
+            {/*{poem?.commentsCount}*/}
           </StatsContainer>
           <ViewsContainer>
             <ViewsButton />
@@ -200,6 +205,7 @@ const StatsContainer = styled.div({
   flexDirection: "row",
   justifyContent: "left",
   alignContent: "space-evenly",
+  alignItems: "center"
 });
 
 // Icons
@@ -210,27 +216,45 @@ const svgButtonStyles = {
   height: "1.15em",
 };
 
-const CommentsButton = styled(CommentsIcon)<{open?: boolean}>(({ open }) =>({
-  ...svgButtonStyles,
-  "& path": {
-    fill: open ? colors.wineRed : colors.backgroundBlack,
-    transition: "fill 0.15s ease",
-  },
-  "&:hover path": {
-    fill: colors.wineRed,
-  },
-}));
+const CommentsButton = styled.button<{ open?: boolean }>(({open}) => ({
+  display: "flex",
+  height: "2.1rem",
+  minWidth: "3.2rem",
+  color: open ? colors.textEggshell : colors.backgroundBlack,
+  background: open ? colors.wineRed : colors.textEggshell,
+  border: "0.15rem solid gray",
+  borderRadius: "0.5rem",
+  padding: "0.2rem 0.3rem 0.2rem 0.3rem",
+  alignItems: "center",
+  marginLeft: "0.5rem",
+  font: "inherit",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  fontWeight: "inherit",
+  "&:hover": {
+    background: colors.wineRed,
+    color: colors.textEggshell,
+    cursor: "pointer"
+  }
+}))
 
-const LikesButton = styled(LikesIcons)({
-  ...svgButtonStyles,
+const CommentIcon = styled(CommentSVG)({
+  width: "1.5rem",
+  height: "1.5rem",
+  marginRight: "0.3rem",
   "& path": {
-    fill: colors.backgroundBlack,
-    transition: "fill 0.1s ease-in-out",
-  },
-  "&:hover path": {
-    fill: colors.wineRed,
-  },
-});
+    fill: "currentcolor"
+  }
+})
+
+const LikeIcon = styled(ThumbSVG)({
+  width: "1.5rem",
+  height: "1.5rem",
+  marginRight: "0.3rem",
+  "& path": {
+    fill: "currentcolor"
+  }
+})
 
 const ViewsButton = styled(ViewsIcon) ({
   ...svgButtonStyles,
@@ -238,9 +262,3 @@ const ViewsButton = styled(ViewsIcon) ({
     fill: colors.backgroundBlack
   }
 });
-
-const HoverContainer = styled.div({
-  ":hover": {
-    cursor: "pointer"
-  }
-})

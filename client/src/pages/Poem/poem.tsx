@@ -14,15 +14,18 @@ import { NetworkStatus } from "@apollo/client";
 
 
 const Poem = () => {
+  const { user, userId } = useAuth();
   const { poemId = "" } = useParams();
-  const [displayCommentForm, setDisplayCommentForm] = useState<boolean>(true);
+  const [displayCommentForm, setDisplayCommentForm] = useState<boolean>(false);
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemQuery, GetPoemQueryVariables>(GET_POEM, {
-    variables: { poemId, commentsLimit: 5 },
+    variables: { poemId, commentsLimit: 5, authorId: userId },
   });
-  const { user } = useAuth();
 
   const composeCommentRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+
+  const isLiked = !!(data?.poem?.likes?.edges?.[0]?.node?.author?.id === userId);
+  const likeId = data?.poem?.likes?.edges && data.poem.likes.edges[0] && data.poem.likes.edges[0].cursor
 
   useEffect(() => {
     if (location.hash === "#composeComment" && composeCommentRef.current && !loading) {
@@ -37,7 +40,7 @@ const Poem = () => {
   };
 
   const handleDisplayCommentForm = () => {
-    setDisplayCommentForm(!displayCommentForm);
+    if (user) setDisplayCommentForm(!displayCommentForm);
   }
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;
@@ -46,7 +49,7 @@ const Poem = () => {
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} />
+          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} displayCommentForm={displayCommentForm} isLiked={isLiked} likeId={likeId}/>
           {user && displayCommentForm && poemId ? <ComposeCommentForm ref={composeCommentRef} poemId={poemId} /> : null}
           <CommentsSection comments={data?.poem?.comments} isLoading={isLoading} pageSize={data?.poem?.comments?.pageInfo?.pageSize} />
         </QueryResult>
