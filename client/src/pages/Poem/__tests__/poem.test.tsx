@@ -6,6 +6,8 @@ import { MockLink } from "@apollo/client/testing";
 import { renderMockProvider } from "../../../utils/test-utils";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Poem from "../poem";
+import { INCREMENT_POEM_VIEWS } from "../../../containers/PoemDetail/poem-detail.graphql";
+import type { IncrementPoemViewsMutation } from "../../../__generated__/graphql";
 
 beforeAll(() => {
   // dummy intersectionobserver mock
@@ -32,13 +34,13 @@ const mockPoem: PoemModel = {
     username: "author_01",
     email: "author_01",
     dateJoined: new Date(),
-    poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    likedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-    following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
+    poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0 }},
+    savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+    collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+    likedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+    comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+    followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+    following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
     followedByCount: 0,
     followingCount: 0
   },
@@ -47,28 +49,38 @@ const mockPoem: PoemModel = {
   likesCount: 50,
   inCollection: null,
   savedByCount: 7,
-  comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-  likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
-  savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false}},
+  comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+  likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
+  savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
 }
 
 // const mockPoemCardFragment = makeFragmentData(mockPoem, POEM_CARD_FRAGMENT)
 
-const mocks: MockLink.MockedResponse<GetPoemQuery>[] = [
-  {
-    request: {
-      query: GET_POEM,
-      variables: {poemId: "p_01", commentsLimit: 5, authorId: null}
-    },
-    result: {
-      data: {
-        poem: mockPoem
-      }
+const getPoemMock: MockLink.MockedResponse<GetPoemQuery> = {
+  request: {
+    query: GET_POEM,
+    variables: { poemId: "p_01", commentsLimit: 5, authorId: null }
+  },
+  result: {
+    data: {
+      poem: mockPoem
     }
   }
-]
+};
 
-test("Renders poem-card without errors", async () => {
+const incrementPoemMock: MockLink.MockedResponse<IncrementPoemViewsMutation> = {
+  request: {
+    query: INCREMENT_POEM_VIEWS,
+    variables: { poemId: "p_01"}
+  },
+  result: {
+    data: {
+      incrementPoemViews: { id: "p_01"}
+    }
+  }
+}
+
+test("Renders poem page without errors", async () => {
   renderMockProvider({
     component:
     <MemoryRouter initialEntries={["/poem/p_01"]}>
@@ -76,7 +88,7 @@ test("Renders poem-card without errors", async () => {
         <Route element={<Poem />} path="/poem/:poemId" />
       </Routes>
     </MemoryRouter>,
-    mocks
+    mocks: [getPoemMock, incrementPoemMock]
   })
 
     expect(await screen.findByText("poem_01")).toBeInTheDocument();

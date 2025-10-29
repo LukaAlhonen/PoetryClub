@@ -1,16 +1,18 @@
 import styled from "@emotion/styled";
 import { useFragment, type FragmentType } from "../../__generated__";
-import { POEM_DETAIL_FRAGMENT } from "./poem-detail.graphql";
+import { INCREMENT_POEM_VIEWS, POEM_DETAIL_FRAGMENT } from "./poem-detail.graphql";
 import { dateFormatter } from "../../utils/formatters";
 import { Link } from "react-router-dom";
 import colors from "../../colors";
-import LikeButton from "../../containers/LikeButton/like-button";
+import LikeButton from "../LikeButton/like-button";
+import { useMutation } from "@apollo/client/react";
 
 import UserIcon from "../../assets/icons/user.svg?react";
 import CommentSVG from "../../assets/icons/comment.svg?react";
 import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
-import type { CreateLikeMutation } from "../../__generated__/graphql";
+import type { CreateLikeMutation, IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables } from "../../__generated__/graphql";
+import { useEffect, useRef } from "react";
 
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
@@ -24,12 +26,37 @@ interface PoemDetailProps {
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
+  const hasIncremented = useRef(false);
   const poem = useFragment(POEM_DETAIL_FRAGMENT, props.poem);
+  const [incrementPoemViewsMutation, { error }] = useMutation<IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables>(INCREMENT_POEM_VIEWS, {
+    update(cache){
+      const cachedPoem = cache.identify({ __typename: "Poem", id: poem?.id })
+      if (cachedPoem) {
+        cache.modify({
+          id: cachedPoem,
+          fields: {
+            views(existingCount = 0){
+              return existingCount + 1
+            }
+          }
+        })
+      }
+    }
+  })
+
+  useEffect(() => {
+    if (poem?.id && !hasIncremented.current) {
+      incrementPoemViewsMutation({ variables: { poemId: poem.id } })
+      hasIncremented.current = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poem?.id])
 
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
     : "loading...";
 
+  if (error) console.error(error)
 
   // TODO: create 404 page to redirect to
   if (!poem) {
