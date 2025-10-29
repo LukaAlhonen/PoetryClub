@@ -9,12 +9,10 @@ import ScrollContainer from "../../components/ScrollContainer/scroll-container";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../context/use-auth";
 
 const Poems = () => {
-  const { userId } = useAuth();
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemsQuery, GetPoemsQueryVariables>(GET_POEMS, {
-    variables: { first: 5, authorId: userId },
+    variables: { first: 5 },
     notifyOnNetworkStatusChange: true
   });
 
@@ -22,9 +20,11 @@ const Poems = () => {
 
   const handleIntersect = () => {
     if (data?.poems?.pageInfo?.hasNextPage) {
-      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor, authorId: userId } })
+      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor } })
     }
   }
+
+  const poems = data?.poems?.edges?.map(edge => edge?.node);
 
   return (
     <Layout>
@@ -33,7 +33,7 @@ const Poems = () => {
           <TitleContainer to="/">PoetryClub</TitleContainer>
         </HeaderContainer>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemGrid poems={data?.poems} isLoading={isLoading} />
+          <PoemGrid poems={poems} isLoading={isLoading} pageSize={data?.poems?.pageInfo?.pageSize} />
         </QueryResult>
       </ScrollContainer>
     </Layout>

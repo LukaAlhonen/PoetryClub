@@ -1,27 +1,30 @@
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import PoemCard from "../PoemCard/poem-card";
-import type { GetAuthorQuery, GetPoemsQuery } from "../../__generated__/graphql";
-import { useAuth } from "../../context/use-auth";
+import type { PoemCardFragmentFragment } from "../../__generated__/graphql";
 
 interface PoemGridProps {
-  poems?: GetPoemsQuery["poems"] | GetAuthorQuery["authorByUsername"]["poems"];
-  isLoading?: boolean
+  // poems?: GetPoemsQuery["poems"] | GetAuthorQuery["authorByUsername"]["poems"];
+  isLoading?: boolean;
+  poems?: ({ __typename?: "Poem", id: string } & { ' $fragmentRefs'?: { "PoemCardFragmentFragment": PoemCardFragmentFragment } | undefined } | undefined | null)[];
+  pageSize?: number | null;
 }
 
 const PoemGrid = (props: PoemGridProps) => {
-  const { userId } = useAuth();
   return (
     <PoemsContainer>
-      {props.poems?.edges?.map((edge) => {
+      {/*{props.poems?.edges?.map((edge) => {
         const isLiked = !!(edge?.node?.likes?.edges?.[0]?.node?.author?.id === userId);
         const likeId = edge?.node?.likes?.edges?.[0]?.node && edge.node.likes.edges[0].node.id;
         return (
           edge?.node ? (<PoemCard key={edge.node.id} poem={edge.node} likeId={likeId} isLiked={isLiked} />) : null
         )
-      })}
-      { props.isLoading && props.poems?.pageInfo?.pageSize ?
-        Array.from({ length: props.poems.pageInfo.pageSize }).map((_, i) => (
+      })}*/}
+      { props.poems?.map((poem) => (
+        poem?.id && <PoemCard key={poem.id} poem={poem} />
+      ))}
+      { props.isLoading && props.pageSize ?
+        Array.from({ length: props.pageSize }).map((_, i) => (
           <PoemCard key={`skeleton_${i}`} />
         ))
        : null}

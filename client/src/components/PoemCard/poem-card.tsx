@@ -55,7 +55,7 @@ const PoemCard = (props: PoemCardProps) => {
       </TextContainer>
       <PoemFooter>
         <StatsContainer>
-          <LikeButton like={props.like} poemId={poem?.id} isLiked={props.isLiked} likeId={props.likeId}>
+          <LikeButton poemId={poem?.id} isLiked={props.isLiked} likeId={props.likeId} likedByCurrentUser={poem?.likedByCurrentUser}>
             <LikeIcon />
             <span data-testid="likesCount">
               {poem?.likesCount}

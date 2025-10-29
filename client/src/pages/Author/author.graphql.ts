@@ -6,7 +6,8 @@ export const GET_AUTHOR = gql(`
         $poemsLimit: Int $poemsCursor: ID
         $followedByLimit: Int $followedByCursor: ID
         $followingLimit: Int $followingCursor: ID
-        $currentUserId: ID
+        $likedPoemsLimit: Int $likedPoemsCursor: ID
+        $savedPoemsLimit: Int $savedPoemsCursor: ID
     ) {
         authorByUsername (username: $username) {
             id
@@ -16,19 +17,43 @@ export const GET_AUTHOR = gql(`
                     node {
                         id
                         ...PoemCardFragment
-                        likes(authorId: $currentUserId) {
-                            edges {
-                                node {
-                                    id
-                                    poem {
-                                        id
-                                    }
-                                    author {
-                                        id
-                                        username
-                                    }
-                                }
-                            }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
+                }
+            }
+            likedPoems (first: $likedPoemsLimit after: $likedPoemsCursor) {
+                edges {
+                    node {
+                        id
+                        poem {
+                            id
+                            ...PoemCardFragment
+                        }
+                    }
+                    cursor
+                }
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                    pageSize
+                }
+            }
+            savedPoems (first: $savedPoemsLimit after: $savedPoemsCursor) {
+                edges {
+                    node {
+                        id
+                        poem {
+                            id
+                            ...PoemCardFragment
                         }
                     }
                     cursor

@@ -4,37 +4,20 @@ import type { RemoveLikeMutation, CreateLikeMutation, CreateLikeMutationVariable
 import { CREATE_LIKE, REMOVE_LIKE } from "./like-button.graphql";
 import colors from "../../colors";
 import { useAuth } from "../../context/use-auth";
-import { GET_POEM } from "../../pages/Poem/poem.graphql";
 import { useEffect, useState } from "react";
-
 
 interface LikeButtonProps {
   children: React.ReactNode;
   poemId?: string;
-  isLiked?: boolean;
-  likeId?: string | null;
-  like?: CreateLikeMutation["createLike"]
+  likedByCurrentUser?: CreateLikeMutation["createLike"] | null;
 }
 
 const LikeButton = (props: LikeButtonProps) => {
-  const { user, userId } = useAuth();
-  const [isLiked, setIsLiked] = useState<boolean>(props.isLiked === undefined ? false : props.isLiked);
+  const { user } = useAuth();
+  const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
+
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
-    optimisticResponse: {
-      __typename: "Mutation",
-      createLike: {
-        __typename: "Like",
-        id: "temp_like_id",
-        poem: {
-          id: props.poemId ?? "temp_poem_id",
-        },
-        author: {
-          id: userId ?? "temp_author_id",
-          username: user ?? "temp_username"
-        }
-      }
-    },
-    update(cache){
+    update(cache, { data }) {
       cache.modify({
         id: cache.identify({ __typename: "Poem", id: props.poemId}),
         fields: {
@@ -43,30 +26,19 @@ const LikeButton = (props: LikeButtonProps) => {
           }
         }
       })
-    },
-    refetchQueries: [
-      {
-        query: GET_POEM,
-        variables: { poemId: props.poemId, commentsLimit: 5, authorId: userId }
+      if (data?.createLike) {
+        cache.modify({
+          id: cache.identify({ __typename: "Poem", id: props.poemId}),
+          fields: {
+            likedByCurrentUser() { return data.createLike }
+          }
+        })
       }
-    ],
+    }
   })
+
   const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
-    optimisticResponse: {
-      __typename: "Mutation",
-      removeLike: {
-        __typename: "Like",
-        id: "temp_remove_id",
-        poem: {
-          id: props.poemId ?? "temp_poem_id",
-        },
-        author: {
-          id: userId ?? "temp_author_id",
-          username: user ?? "temp_username"
-        }
-      }
-    },
-    update(cache){
+    update(cache, { data }) {
       cache.modify({
         id: cache.identify({ __typename: "Poem", id: props.poemId}),
         fields: {
@@ -75,27 +47,29 @@ const LikeButton = (props: LikeButtonProps) => {
           }
         }
       })
-    },
-    refetchQueries: [
-      {
-        query: GET_POEM,
-        variables: { poemId: props.poemId, commentsLimit: 5, authorId: userId }
+      if (data?.removeLike) {
+        cache.modify({
+          id: cache.identify({ __typename: "Poem", id: props.poemId}),
+          fields: {
+            likedByCurrentUser() { return null }
+          }
+        })
       }
-    ],
+    }
   })
 
   useEffect(() => {
-    if (!user) setIsLiked(false)
+    if (!user) setIsLiked(false);
   }, [user])
 
   const handleClick = () => {
     if (props.poemId && !createLoading && !removeLoading && user) {
       if (!isLiked) {
-        setIsLiked(true)
+        setIsLiked(true);
         createLikeMutation({ variables: { poemId: props.poemId }})
-      } else if (isLiked && props.likeId) {
+      } else if (isLiked && props.likedByCurrentUser?.id) {
         setIsLiked(false)
-        removeLikeMutation({ variables: { likeId: props.likeId }})
+        removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
       }
     }
   }

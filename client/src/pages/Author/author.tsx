@@ -24,7 +24,8 @@ const Author = () => {
       poemsLimit: 5,
       followedByLimit: 10,
       followingLimit: 10,
-      currentUserId: userId
+      likedPoemsLimit: 10,
+      savedPoemsLimit: 10,
     }
   })
 
@@ -67,6 +68,11 @@ const Author = () => {
     }
   };
 
+  // const likedPoems = data?.authorByUsername?.likedPoems?.edges.map(edge => edge?.node?.poem)
+  // const poems = data?.authorByUsername?.poems?.edges.map(edge => omit(edge?.node, "likes"))
+  // const poems = _.compact(_.map(_.get(data, "authorByUsername.poems.edges"), "node"))
+  const poems = data?.authorByUsername?.poems?.edges?.map(edge => edge?.node);
+
   return (
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
@@ -75,7 +81,7 @@ const Author = () => {
             !showFollowers && !showFollowing ? (
               <>
                 <AuthorDetail author={data?.authorByUsername} isFollowed={isFollowed} followedAuthorId={followedAuthorId}></AuthorDetail>
-                <PoemGrid poems={data?.authorByUsername.poems} isLoading={isLoading} />
+                <PoemGrid poems={poems} isLoading={isLoading} pageSize={data?.authorByUsername?.poems?.pageInfo?.pageSize} />
               </>
             ) : showFollowers ?
             <FollowedAuthors followers={data?.authorByUsername?.followedBy} username={username} isLoading={isLoading} /> :
