@@ -58,7 +58,7 @@ const mocks: MockLink.MockedResponse<GetPoemQuery>[] = [
   {
     request: {
       query: GET_POEM,
-      variables: {poemId: "p_01", commentsLimit: 5}
+      variables: {poemId: "p_01", commentsLimit: 5, authorId: null}
     },
     result: {
       data: {
