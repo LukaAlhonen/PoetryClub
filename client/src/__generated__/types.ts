@@ -543,8 +543,6 @@ export type FollowedAuthorFragmentFragment = { __typename?: 'Author', id: string
 
 export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null };
 
-export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } };
-
 export type CreateCommentMutationVariables = Exact<{
   poemId: Scalars['ID']['input'];
   text: Scalars['String']['input'];
@@ -573,6 +571,15 @@ export type RemoveLikeMutationVariables = Exact<{
 
 
 export type RemoveLikeMutation = { __typename?: 'Mutation', removeLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } };
+
+export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } };
+
+export type IncrementPoemViewsMutationVariables = Exact<{
+  poemId: Scalars['ID']['input'];
+}>;
+
+
+export type IncrementPoemViewsMutation = { __typename?: 'Mutation', incrementPoemViews: { __typename?: 'Poem', id: string } };
 
 export type UnfollowAuthorMutationVariables = Exact<{
   followedAuthorId: Scalars['ID']['input'];

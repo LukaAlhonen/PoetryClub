@@ -277,4 +277,19 @@ describe("PoemService integration tests", () => {
     // make sure no poem was removed
     await expect(services.poemService.getPoems()).resolves.toHaveLength(8)
   })
+
+  test("incrementPoemViews", async () => {
+    const poemToUpdate = poems[0];
+    expect(poemToUpdate.views).toBe(0);
+
+    // fetch poem so redis caches it
+    await services.poemService.getPoem({id: poemToUpdate.id})
+
+    const result = await services.poemService.incrementPoemViews({ poemId: poemToUpdate.id });
+    expect(result.views).toBe(1);
+
+    // fetch poem again to verify views was incremented
+    const updatedPoem = await services.poemService.getPoem({ id: poemToUpdate.id });
+    expect(updatedPoem.views).toBe(1)
+  })
 });

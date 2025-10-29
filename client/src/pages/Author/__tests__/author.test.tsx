@@ -9,9 +9,10 @@ import type { GetAuthorQueryVariables } from "../../../__generated__/graphql";
 import { GET_AUTHOR } from "../author.graphql";
 import { dateFormatter } from "../../../utils/formatters";
 
-vi.spyOn(console, "error").mockImplementation((msg) => console.log("Apollo error:", msg));
+// vi.spyOn(console, "error").mockImplementation((msg) => console.log("Apollo error:", msg));
 
 beforeAll(() => {
+  vi.spyOn(console, "error").mockImplementation(() => { })
   // dummy intersectionobserver mock
   const mockIntersectionObserver = vi.fn()
   mockIntersectionObserver.mockReturnValue({
@@ -32,8 +33,8 @@ const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"collec
   dateJoined: date,
   followedByCount: 0,
   followingCount: 0,
-  followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-  following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+  followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+  following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
   poems: {
     __typename: "PoemsConnection",
     edges: [
@@ -44,9 +45,9 @@ const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"collec
           title: "poem_01",
           text: "poem_01 text",
           datePublished: date,
-          comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-          likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-          savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+          comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+          likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+          savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
           views: 0,
           commentsCount: 0,
           savedByCount: 0,
@@ -56,13 +57,13 @@ const mockAuthor: Omit<AuthorModel, "comments"|"savedPoems"|"likedPoems"|"collec
             username: "author_01",
             email: "author_01@domain.com",
             dateJoined: date,
-            poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            likedPoems:{ edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
-            savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false } },
+            poems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            likedPoems:{ edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            collections: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            followedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            following: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
+            savedPoems: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0 } },
             followingCount: 0,
             followedByCount: 0
           }

@@ -38,31 +38,31 @@ const mockPoems: PoemsConnection = {
           dateJoined: new Date(),
           poems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           savedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           collections: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           likedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           comments: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedBy: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           following: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedByCount: 0,
           followingCount: 0
@@ -74,15 +74,15 @@ const mockPoems: PoemsConnection = {
         savedByCount: 7,
         comments: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         likes: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         savedBy: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
       },
       cursor: "p_01",
@@ -102,31 +102,31 @@ const mockPoems: PoemsConnection = {
         dateJoined: new Date(),
         poems: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         savedPoems: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         collections: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         likedPoems: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         comments: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         followedBy: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         following: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         followedByCount: 0,
         followingCount: 0
@@ -138,15 +138,15 @@ const mockPoems: PoemsConnection = {
       savedByCount: 7,
       comments: {
         edges: [],
-        pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
       },
       likes: {
         edges: [],
-        pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
       },
       savedBy: {
         edges: [],
-        pageInfo: {hasNextPage: false, hasPreviousPage: false}
+        pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
       },
       },
       cursor: "p_02"
@@ -166,31 +166,31 @@ const mockPoems: PoemsConnection = {
           dateJoined: new Date(),
           poems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           savedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           collections: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           likedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           comments: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedBy: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           following: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedByCount: 0,
           followingCount: 0
@@ -202,15 +202,15 @@ const mockPoems: PoemsConnection = {
         savedByCount: 7,
         comments: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         likes: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         savedBy: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
       },
       cursor: "p_03"
@@ -230,31 +230,31 @@ const mockPoems: PoemsConnection = {
           dateJoined: new Date(),
           poems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           savedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           collections: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           likedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           comments: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedBy: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           following: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedByCount: 0,
           followingCount: 0
@@ -266,15 +266,15 @@ const mockPoems: PoemsConnection = {
         savedByCount: 7,
         comments: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         likes: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         savedBy: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
       },
       cursor: "p_04"
@@ -306,31 +306,31 @@ const mockPoems2: PoemsConnection = {
           dateJoined: new Date(),
           poems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           savedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           collections: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           likedPoems: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           comments: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedBy: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           following: {
             edges: [],
-            pageInfo: {hasNextPage: false, hasPreviousPage: false}
+            pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
           },
           followedByCount: 0,
           followingCount: 0
@@ -342,15 +342,15 @@ const mockPoems2: PoemsConnection = {
         savedByCount: 7,
         comments: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         likes: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
         savedBy: {
           edges: [],
-          pageInfo: {hasNextPage: false, hasPreviousPage: false}
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null, pageSize: 0}
         },
       },
       cursor: "p_01",
@@ -403,7 +403,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   },
 ]
 
-test("Renders poem-card without errors", async () => {
+test("Renders search page without errors", async () => {
   renderMockProvider({
     component:
     <MemoryRouter>
