@@ -489,7 +489,7 @@ describe("Graphql Mutation integration tests", () => {
         const poems = poemResponse.body.singleResult.data?.poems;
 
         poems.edges.forEach((edge) => {
-          expect(edge.node.likedByCurrentUser).toBe(true)
+          expect(edge.node.likedByCurrentUser.author.id).toStrictEqual(login.author.id)
         })
       }
     }

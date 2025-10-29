@@ -91,7 +91,16 @@ export const GET_POEMS = gql(`
                    }
                    savedByCount
                    views
-                   likedByCurrentUser
+                   likedByCurrentUser {
+                       id
+                       poem {
+                           id
+                       }
+                       author {
+                           id
+                           username
+                       }
+                   }
                }
            }
            pageInfo {

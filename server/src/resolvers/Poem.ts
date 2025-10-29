@@ -50,7 +50,9 @@ export const Poem: Resolvers["Poem"] = {
   },
 
   likedByCurrentUser: async ({ id}, _, { user, services }) => {
-    if (!user) return false;
-    return Boolean(services.likeService.getLikes({ poemId: id, authorId: user.authorId }));
+    if (!user) return null;
+    const likes = await services.likeService.getLikes({ poemId: id, authorId: user.authorId });
+    if (likes.length !== 1) return null;
+    return likes[0];
   }
 };
