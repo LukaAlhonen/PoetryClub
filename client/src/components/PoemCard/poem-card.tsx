@@ -5,16 +5,21 @@ import { useFragment, type FragmentType } from "../../__generated__";
 import { POEM_CARD_FRAGMENT } from "./poem-card.graphql";
 import { dateFormatter } from "../../utils/formatters";
 import Spinner from "../spinner";
+import LikeButton from "../../containers/LikeButton/like-button";
 
-import CommentsIcon from "../../assets/icons/comment.svg?react";
-import LikesIcons from "../../assets/icons/heart2.svg?react";
+import CommentSVG from "../../assets/icons/comment.svg?react";
+import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import ArrowIcon from "../../assets/icons/arrow-right.svg?react";
 import UserIcon from "../../assets/icons/user.svg?react";
 import { keyframes } from "@emotion/react";
+import type { CreateLikeMutation } from "../../__generated__/graphql";
 
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
+  isLiked?: boolean;
+  likeId?: string | null;
+  like?: CreateLikeMutation["createLike"]; // Pretty much all queries use the same shape for the like type
 }
 
 const PoemCard = (props: PoemCardProps) => {
@@ -49,28 +54,26 @@ const PoemCard = (props: PoemCardProps) => {
         }
       </TextContainer>
       <PoemFooter>
+        <StatsContainer>
+          <LikeButton like={props.like} poemId={poem?.id} isLiked={props.isLiked} likeId={props.likeId}>
+            <LikeIcon />
+            <span data-testid="likesCount">
+              {poem?.likesCount}
+            </span>
+          </LikeButton>
+          <CommentsButton to={poem ? `/poem/${poem?.id}#composeComment` : "#"}>
+            <CommentIcon />
+            <span data-testid="commentsCount">
+              {poem?.commentsCount}
+            </span>
+          </CommentsButton>
+        </StatsContainer>
         <TagsContainer>
           <ViewsButton />
           <span data-testid="views">
             {poem?.views}
           </span>
         </TagsContainer>
-        <StatsContainer>
-          <span data-testid="likesCount">
-            {poem?.likesCount}
-          </span>
-          <HoverContainer>
-            <LikesButton />
-          </HoverContainer>
-          <span data-testid="commentsCount">
-            {poem?.commentsCount}
-          </span>
-          <HoverContainer>
-            <Link to={poem ? `/poem/${poem?.id}#composeComment` : "#"}>
-              <CommentsButton />
-            </Link>
-          </HoverContainer>
-        </StatsContainer>
       </PoemFooter>
     </PoemContainer>
   );
@@ -197,13 +200,10 @@ const TextContainer = styled.div({
 });
 
 const PoemLink = styled(Link)({
-  // paddingLeft: "1em",
   position: "absolute",
   bottom: "0.7em",
-  // marginTop: "auto",
   left: "50%",
   transform: "translateX(-50%)",
-  // textAlign: "center",
   textWrap: "nowrap",
   fontSize: "1.2em",
   zIndex: 2,
@@ -247,7 +247,7 @@ const TagsContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   justifyContent: "left",
-  marginRight: "auto",
+  marginLeft: "auto",
 });
 
 const StatsContainer = styled.div({
@@ -265,27 +265,57 @@ const svgButtonStyles = {
   height: "1em",
 };
 
-const CommentsButton = styled(CommentsIcon)({
-  ...svgButtonStyles,
-  "& path": {
-    fill: colors.backgroundBlack,
-    transition: "fill 0.15s ease",
-  },
-  "&:hover path": {
-    fill: colors.wineRed,
-  },
-});
+// const CommentsButton = styled(CommentsIcon)({
+//   ...svgButtonStyles,
+//   "& path": {
+//     fill: colors.backgroundBlack,
+//     transition: "fill 0.15s ease",
+//   },
+//   "&:hover path": {
+//     fill: colors.wineRed,
+//   },
+// });
 
-const LikesButton = styled(LikesIcons)({
-  ...svgButtonStyles,
+const CommentsButton = styled(Link)({
+  textDecoration: "none",
+  display: "flex",
+  height: "2.1rem",
+  minWidth: "3.2rem",
+  color: colors.backgroundBlack,
+  background: colors.textEggshell,
+  border: "0.15rem solid gray",
+  borderRadius: "0.5rem",
+  padding: "0.2rem 0.3rem 0.2rem 0.3rem",
+  alignItems: "center",
+  marginLeft: "0.5rem",
+  font: "inherit",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  fontWeight: "inherit",
+  "&:hover": {
+    background: colors.wineRed,
+    color: colors.textEggshell,
+    cursor: "pointer"
+  }
+})
+
+const CommentIcon = styled(CommentSVG)({
+  width: "1.5rem",
+  height: "1.5rem",
+  marginRight: "0.3rem",
   "& path": {
-    fill: colors.backgroundBlack,
-    transition: "fill 0.15s ease",
-  },
-  "&:hover path": {
-    fill: colors.wineRed,
-  },
-});
+    fill: "currentcolor"
+  }
+})
+
+const LikeIcon = styled(ThumbSVG)({
+  width: "1.5em",
+  height: "1.5em",
+  marginRight: "0.3em",
+  "& path": {
+    fill: "currentColor"
+  }
+})
 
 const ViewsButton = styled(ViewsIcon)({
   ...svgButtonStyles,
@@ -313,12 +343,6 @@ const Arrow = styled(ArrowIcon)({
   fill: "currentcolor",
   transition: "transform 0.15s ease"
 });
-
-const HoverContainer = styled.div({
-  ":hover": {
-    cursor: "pointer"
-  }
-})
 
 const SpinnerContainer = styled.div({
   display: "flex",

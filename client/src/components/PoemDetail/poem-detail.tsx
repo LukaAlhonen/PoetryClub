@@ -10,6 +10,7 @@ import UserIcon from "../../assets/icons/user.svg?react";
 import CommentSVG from "../../assets/icons/comment.svg?react";
 import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
+import type { CreateLikeMutation } from "../../__generated__/graphql";
 
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
@@ -19,6 +20,7 @@ interface PoemDetailProps {
   displayCommentForm?: boolean;
   isLiked?: boolean;
   likeId?: string | null;
+  like?: CreateLikeMutation["createLike"];
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
@@ -58,7 +60,7 @@ const PoemDetail = (props: PoemDetailProps) => {
         <TextContainer>{poem.text}</TextContainer>
         <PoemFooter>
           <StatsContainer>
-            <LikeButton isLiked={props.isLiked} poemId={poem?.id} likeId={props.likeId}>
+            <LikeButton isLiked={props.isLiked} poemId={poem?.id} likeId={props.likeId} like={props.like}>
               <LikeIcon/>
               <span data-testid="likesCount">
                 {poem?.likesCount}

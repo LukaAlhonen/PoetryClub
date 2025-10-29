@@ -10,13 +10,15 @@ import styled from "@emotion/styled";
 import colors from "../../colors";
 import SearchIcon from "../../assets/icons/search.svg?react";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../context/use-auth";
 
 const Search = () => {
+  const { userId } = useAuth();
   const [filter, setFilter] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemsWithFilterQuery, GetPoemsWithFilterQueryVariables>(GET_POEMS_WITH_FILTER, {
-    variables: { first: 5, ...(searchTerm !== "" ? { filter: { filter: searchTerm } } : {}) },
+    variables: { first: 5, currentUserId: userId, ...(searchTerm !== "" ? { filter: { filter: searchTerm } } : {}) },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first"
@@ -32,7 +34,7 @@ const Search = () => {
 
   const handleIntersect = () => {
     if (data?.poems?.pageInfo?.hasNextPage) {
-      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor } })
+      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor, currentUserId: userId } })
     }
   }
 

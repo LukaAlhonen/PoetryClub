@@ -25,7 +25,10 @@ const Poem = () => {
   const location = useLocation();
 
   const isLiked = !!(data?.poem?.likes?.edges?.[0]?.node?.author?.id === userId);
-  const likeId = data?.poem?.likes?.edges && data.poem.likes.edges[0] && data.poem.likes.edges[0].cursor
+  const likeId = data?.poem?.likes?.edges && data.poem.likes.edges[0] && data.poem.likes.edges[0].cursor;
+  const like = data?.poem?.likes?.edges ? data.poem.likes.edges.find((edge) => edge?.node?.author?.id === userId) : undefined;
+
+  // const like = edge.node?.likes?.edges?.find((edge) => edge?.node?.author?.id === userId);
 
   useEffect(() => {
     if (location.hash === "#composeComment" && composeCommentRef.current && !loading) {
@@ -49,7 +52,7 @@ const Poem = () => {
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} displayCommentForm={displayCommentForm} isLiked={isLiked} likeId={likeId}/>
+          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} displayCommentForm={displayCommentForm} isLiked={isLiked} likeId={likeId} like={like?.node ?? undefined} />
           {user && displayCommentForm && poemId ? <ComposeCommentForm ref={composeCommentRef} poemId={poemId} /> : null}
           <CommentsSection comments={data?.poem?.comments} isLoading={isLoading} pageSize={data?.poem?.comments?.pageInfo?.pageSize} />
         </QueryResult>

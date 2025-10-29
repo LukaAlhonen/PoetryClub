@@ -13,6 +13,7 @@ interface LikeButtonProps {
   poemId?: string;
   isLiked?: boolean;
   likeId?: string | null;
+  like?: CreateLikeMutation["createLike"]
 }
 
 const LikeButton = (props: LikeButtonProps) => {

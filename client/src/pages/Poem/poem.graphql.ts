@@ -29,6 +29,7 @@ export const GET_POEM = gql(`
           likes (authorId: $authorId) {
               edges {
                   node {
+                      id
                       poem {
                           id
                       }
