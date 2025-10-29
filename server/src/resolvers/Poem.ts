@@ -48,4 +48,9 @@ export const Poem: Resolvers["Poem"] = {
   savedByCount: ({ id }, _, { services }) => {
     return services.poemService.getSavedPoemsCount({ poemId: id });
   },
+
+  likedByCurrentUser: async ({ id}, _, { user, services }) => {
+    if (!user) return false;
+    return Boolean(services.likeService.getLikes({ poemId: id, authorId: user.authorId }));
+  }
 };

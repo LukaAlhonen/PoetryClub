@@ -348,6 +348,7 @@ export type Poem = {
   datePublished: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
   inCollection?: Maybe<Collection>;
+  likedByCurrentUser?: Maybe<Scalars['Boolean']['output']>;
   likes: LikesConnection;
   likesCount: Scalars['Int']['output'];
   savedBy: SavedPoemsConnection;
@@ -837,6 +838,7 @@ export type PoemResolvers<ContextType = MyContext, ParentType extends ResolversP
   datePublished?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inCollection?: Resolver<Maybe<ResolversTypes['Collection']>, ParentType, ContextType>;
+  likedByCurrentUser?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   likes?: Resolver<ResolversTypes['LikesConnection'], ParentType, ContextType, Partial<PoemLikesArgs>>;
   likesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   savedBy?: Resolver<ResolversTypes['SavedPoemsConnection'], ParentType, ContextType, Partial<PoemSavedByArgs>>;

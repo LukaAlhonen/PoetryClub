@@ -93,6 +93,7 @@ export const typeDefs = gql`
     savedBy(first: Int, after: ID): SavedPoemsConnection!
     savedByCount: Int!
     views: Int!
+    likedByCurrentUser: Boolean
   }
 
   type Comment {
