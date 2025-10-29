@@ -24,11 +24,12 @@ export const Poem: Resolvers["Poem"] = {
     return services.poemService.getCommentsCount({ poemId: id });
   },
 
-  likes: ({ id }, { first, after }, { services }) => {
+  likes: ({ id }, { first, after, authorId }, { services }) => {
     return services.likeService.getLikesConnection({
       first,
       after,
       poemId: id,
+      authorId
     });
   },
 

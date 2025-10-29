@@ -24,6 +24,7 @@ const Author = () => {
       poemsLimit: 5,
       followedByLimit: 10,
       followingLimit: 10,
+      currentUserId: userId
     }
   })
 

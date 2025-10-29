@@ -6,6 +6,7 @@ export const GET_AUTHOR = gql(`
         $poemsLimit: Int $poemsCursor: ID
         $followedByLimit: Int $followedByCursor: ID
         $followingLimit: Int $followingCursor: ID
+        $currentUserId: ID
     ) {
         authorByUsername (username: $username) {
             id
@@ -15,6 +16,20 @@ export const GET_AUTHOR = gql(`
                     node {
                         id
                         ...PoemCardFragment
+                        likes(authorId: $currentUserId) {
+                            edges {
+                                node {
+                                    id
+                                    poem {
+                                        id
+                                    }
+                                    author {
+                                        id
+                                        username
+                                    }
+                                }
+                            }
+                        }
                     }
                     cursor
                 }

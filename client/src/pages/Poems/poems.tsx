@@ -9,10 +9,12 @@ import ScrollContainer from "../../components/ScrollContainer/scroll-container";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/use-auth";
 
 const Poems = () => {
+  const { userId } = useAuth();
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemsQuery, GetPoemsQueryVariables>(GET_POEMS, {
-    variables: { first: 5},
+    variables: { first: 5, authorId: userId },
     notifyOnNetworkStatusChange: true
   });
 
@@ -20,7 +22,7 @@ const Poems = () => {
 
   const handleIntersect = () => {
     if (data?.poems?.pageInfo?.hasNextPage) {
-      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor } })
+      fetchMore({ variables: { first: data.poems.pageInfo.pageSize, after: data.poems.pageInfo.endCursor, authorId: userId } })
     }
   }
 

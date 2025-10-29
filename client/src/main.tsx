@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, Observable } from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import { SetContextLink } from "@apollo/client/link/context";
 import { ErrorLink } from "@apollo/client/link/error";
@@ -32,25 +32,8 @@ const errorLink = new ErrorLink(({ error }) => {
   }
 })
 
-// artificial delay for queries to give it that cool realistic vibe bro
-const delayLink = new ApolloLink((operation, forward) => {
-  return new Observable(observer => {
-    const handle = setTimeout(() => {
-      const subscription = forward(operation).subscribe({
-        next: observer.next.bind(observer),
-        error: observer.error.bind(observer),
-        complete: observer.complete.bind(observer),
-      });
-
-      return () => subscription.unsubscribe();
-    }, 2000);
-
-    return () => clearTimeout(handle);
-  });
-});
-
 const client = new ApolloClient({
-  link: ApolloLink.from([errorLink, authLink, delayLink, link]),
+  link: ApolloLink.from([errorLink, authLink, link]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -84,6 +67,9 @@ const client = new ApolloClient({
         fields: {
           comments: relayStylePagination([
             "poemId"
+          ]),
+          likes: relayStylePagination([
+            "authorId"
           ])
         }
       }
