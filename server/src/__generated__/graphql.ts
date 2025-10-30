@@ -694,7 +694,6 @@ export type PoemCommentsArgs = {
 
 export type PoemLikesArgs = {
   after?: InputMaybe<Scalars['ID']['input']>;
-  authorId?: InputMaybe<Scalars['ID']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
 };
 

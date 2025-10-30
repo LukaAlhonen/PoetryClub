@@ -88,7 +88,7 @@ export const typeDefs = gql`
     comments(first: Int, after: ID): CommentsConnection!
     commentsCount: Int!
     inCollection: Collection
-    likes(first: Int, after: ID, authorId: ID): LikesConnection!
+    likes(first: Int, after: ID): LikesConnection!
     likesCount: Int!
     savedBy(first: Int, after: ID): SavedPoemsConnection!
     savedByCount: Int!
