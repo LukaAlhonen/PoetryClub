@@ -353,6 +353,7 @@ export type Poem = {
   likesCount: Scalars['Int']['output'];
   savedBy: SavedPoemsConnection;
   savedByCount: Scalars['Int']['output'];
+  savedByCurrentUser?: Maybe<SavedPoem>;
   text: Scalars['String']['output'];
   title: Scalars['String']['output'];
   views: Scalars['Int']['output'];
@@ -842,6 +843,7 @@ export type PoemResolvers<ContextType = MyContext, ParentType extends ResolversP
   likesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   savedBy?: Resolver<ResolversTypes['SavedPoemsConnection'], ParentType, ContextType, Partial<PoemSavedByArgs>>;
   savedByCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  savedByCurrentUser?: Resolver<Maybe<ResolversTypes['SavedPoem']>, ParentType, ContextType>;
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   views?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;

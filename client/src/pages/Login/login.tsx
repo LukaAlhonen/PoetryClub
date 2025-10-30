@@ -2,18 +2,20 @@ import colors from "../../colors";
 import styled from "@emotion/styled";
 import { Layout } from "../../components";
 import { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client/react";
+import { useApolloClient, useMutation } from "@apollo/client/react";
 import { LOGIN } from "./login.graphql";
 import type { LoginMutation, LoginMutationVariables } from "../../__generated__/types";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 import FullSizeSpinner from "../../components/full-size-spinner";
+import { GET_POEMS } from "../Poems/poems.graphql";
 
 const Login = () => {
+  const client = useApolloClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginMutation, { data, loading, error }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
-    fetchPolicy: "no-cache"
+    fetchPolicy: "no-cache",
   });
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -21,9 +23,14 @@ const Login = () => {
   useEffect(() => {
     if (data?.login.token) {
       login(data.login.token, data.login.author.username, data.login.author.id)
-      navigate("/")
+      client.clearStore().then(() => {
+        client.refetchQueries({
+          include: [GET_POEMS],
+        })
+        navigate("/")
+      })
     }
-  }, [data, login, navigate])
+  }, [data, login, navigate, client])
 
   if (error) {
     return <div>{error.message}</div>

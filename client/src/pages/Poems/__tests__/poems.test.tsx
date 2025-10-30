@@ -9,6 +9,7 @@ import Poems from "../poems";
 import type { GetPoemsQueryVariables, GetPoemsQuery, PoemsConnection } from "../../../__generated__/graphql";
 
 beforeAll(() => {
+  vi.spyOn(console, "error").mockImplementation(() => { })
   // dummy intersectionobserver mock
   const mockIntersectionObserver = vi.fn()
   mockIntersectionObserver.mockReturnValue({

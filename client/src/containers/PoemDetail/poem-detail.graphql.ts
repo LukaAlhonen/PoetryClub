@@ -28,6 +28,16 @@ export const POEM_DETAIL_FRAGMENT = gql(`
                 id
             }
         }
+        savedByCurrentUser {
+            id
+            author {
+                id
+                username
+            }
+            poem {
+                id
+            }
+        }
     }
 `)
 

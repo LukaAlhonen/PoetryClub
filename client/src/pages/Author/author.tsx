@@ -3,7 +3,7 @@ import { Layout } from "../../components"
 import QueryResult from "../../components/query-result"
 import { GET_AUTHOR } from "./author.graphql"
 import type { GetAuthorQuery, GetAuthorQueryVariables } from "../../__generated__/graphql"
-import { Link, useLocation, useParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import PoemGrid from "../../components/PoemGrid/poem-grid"
 import AuthorDetail from "../../components/AuthorDetail/author-detail"
 import ScrollContainer from "../../components/ScrollContainer/scroll-container"
@@ -15,11 +15,13 @@ import colors from "../../colors"
 
 import SavedSVG from "../../assets/icons/book-alt.svg?react";
 import LikeSVG from "../../assets/icons/heart.svg?react";
+import { useEffect } from "react"
 
 const Author = () => {
   const { username = "" } = useParams();
-  const { userId } = useAuth();
+  const { user, userId } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { loading, error, data, networkStatus, fetchMore } = useQuery<GetAuthorQuery, GetAuthorQueryVariables>(GET_AUTHOR, {
     variables: {
       username,
@@ -45,6 +47,10 @@ const Author = () => {
   const savedPoems = data?.authorByUsername?.savedPoems?.edges?.map(edge => edge?.node?.poem)
 
   const poemsToDisplay = location.pathname.endsWith("/likes") ? likedPoems : location.pathname.endsWith("/saved") ? savedPoems : poems;
+
+  useEffect(() => {
+    if (location.pathname.endsWith("/saved") && (!user || user !== username)) navigate("/")
+  })
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;
 
@@ -97,7 +103,7 @@ const Author = () => {
                 <LinksContainer>
                   <LinkContainer to={`/author/${username}`} isActive={poemsToDisplay === poems}>Poems</LinkContainer>
                   <LinkContainer to={`/author/${username}/likes`} isActive={poemsToDisplay === likedPoems}><LikeIcon />Likes</LinkContainer>
-                  <LinkContainer to={`/author/${username}/saved`} isActive={poemsToDisplay === savedPoems}><SavedIcon />Saved</LinkContainer>
+                  {user && user === username ? <LinkContainer to={`/author/${username}/saved`} isActive={poemsToDisplay === savedPoems}><SavedIcon />Saved</LinkContainer> : null}
                 </LinksContainer>
                 <PoemGrid poems={poemsToDisplay} isLoading={isLoading} pageSize={data?.authorByUsername?.poems?.pageInfo?.pageSize} />
               </>

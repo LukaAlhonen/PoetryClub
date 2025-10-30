@@ -9,9 +9,20 @@ import UserSVG from "../assets/icons/user.svg?react";
 import SignupSVG from "../assets/icons/user-add.svg?react";
 import LogoutSVG from "../assets/icons/exit.svg?react";
 import colors from "../colors";
+import { useApolloClient } from "@apollo/client/react";
+import { GET_POEMS } from "../pages/Poems/poems.graphql";
 
 const LeftNav = () => {
   const { user, logout } = useAuth();
+  const client = useApolloClient();
+  const handleLogout = () => {
+    client.clearStore().then(() => {
+      client.refetchQueries({
+        include: [GET_POEMS],
+      })
+      logout();
+    })
+  }
   return (
     <NavContainer>
       <TopNav>
@@ -37,7 +48,7 @@ const LeftNav = () => {
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
             </NavLink>
-            <NavLink onClick={logout} to="/">
+            <NavLink onClick={handleLogout} to="/">
               <LogoutIcon/>
               Logout
             </NavLink>

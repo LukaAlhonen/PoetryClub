@@ -18,70 +18,122 @@ const LikeButton = (props: LikeButtonProps) => {
   const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
 
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
+    // update(cache, { data }) {
+    //   if (user) {
+
+    //     if (data?.createLike) {
+    //       cache.modify({
+    //         id: cache.identify({ __typename: "Poem", id: props.poemId }),
+    //         fields: {
+    //           likedByCurrentUser() { return data.createLike },
+    //         }
+    //       })
+    //     }
+    //   }
+    // },
     update(cache, { data }) {
       if (user) {
-        if (data?.createLike) {
+        const cachedAuthor = cache.readQuery({
+          query: GET_AUTHOR,
+          variables: {
+            username: user,
+            poemsLimit: 5,
+            savedPoemsLimit: 5,
+            likedPoemsLimit: 5,
+            followedByLimit: 10,
+            followingLimit: 10
+          },
+        })
+        if (cachedAuthor && data?.createLike && props.poemId) {
+          const newLike = data.createLike;
+          const newNode = { node: newLike, cursor: newLike.id };
+          const poemRef = cache.identify({ __typename: "Poem", id: props.poemId });
+
+          cache.writeQuery({
+            query: GET_AUTHOR,
+            variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
+            data: {
+              ...cachedAuthor,
+              authorByUsername: {
+                ...cachedAuthor?.authorByUsername,
+                likedPoems: {
+                  edges: [newNode, ...cachedAuthor.authorByUsername.likedPoems.edges],
+                  pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+                }
+              }
+            }
+          })
+
+          cache.modify({
+            id: poemRef,
+            fields: {
+              likedByCurrentUser() { return newLike },
+            }
+          })
+        }
+      }
+    },
+  })
+
+  const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
+    update(cache, { data }) {
+      if (user) {
+        const cachedAuthor = cache.readQuery({
+          query: GET_AUTHOR,
+          variables: {
+            username: user,
+            poemsLimit: 5,
+            savedPoemsLimit: 5,
+            likedPoemsLimit: 5,
+            followedByLimit: 10,
+            followingLimit: 10
+          },
+        })
+        if (cachedAuthor && data?.removeLike && props.poemId) {
+          cache.writeQuery({
+            query: GET_AUTHOR,
+            variables: {
+              username: user,
+              poemsLimit: 5,
+              savedPoemsLimit: 5,
+              likedPoemsLimit: 5,
+              followedByLimit: 10,
+              followingLimit: 10
+            },
+            data: {
+              ...cachedAuthor,
+              authorByUsername: {
+                ...cachedAuthor.authorByUsername,
+                likedPoems: {
+                  edges: cachedAuthor.authorByUsername.likedPoems.edges.filter((edge) => (
+                    edge?.node?.id !== data.removeLike.id
+                  )),
+                  pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+                }
+              }
+            }
+          })
           cache.modify({
             id: cache.identify({ __typename: "Poem", id: props.poemId }),
             fields: {
-              likedByCurrentUser() { return data.createLike },
+              likedByCurrentUser() { return null },
               likesCount(existingCount = 0) {
-                return existingCount + 1;
+                return existingCount - 1;
               }
             }
           })
         }
       }
     },
-    refetchQueries: [
-      {
-        query: GET_AUTHOR,
-        variables: {
-          username: user,
-          poemsLimit: 5,
-          followedByLimit: 10,
-          followingLimit: 10,
-          likedPoemsLimit: 5,
-          savedPoemsLimit: 5
-        }
-      }
-    ],
-    awaitRefetchQueries: true
-  })
-
-  const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
-    update(cache, { data }) {
-      if (data?.removeLike) {
-        cache.modify({
-          id: cache.identify({ __typename: "Poem", id: props.poemId}),
-          fields: {
-            likedByCurrentUser() { return null },
-            likesCount(existingCount = 0) {
-              return existingCount - 1;
-            }
-          }
-        })
-      }
-    },
-    refetchQueries: [
-      {
-        query: GET_AUTHOR,
-        variables: {
-          username: user,
-          poemsLimit: 5,
-          followedByLimit: 10,
-          followingLimit: 10,
-          likedPoemsLimit: 5,
-          savedPoemsLimit: 5
-        }
-      }
-    ],
-    awaitRefetchQueries: true
   })
 
   useEffect(() => {
     if (!user) setIsLiked(false);
   }, [user])
+
+  useEffect(() => {
+    setIsLiked(!!props.likedByCurrentUser);
+  }, [props.likedByCurrentUser])
 
   const handleClick = () => {
     if (props.poemId && !createLoading && !removeLoading && user) {

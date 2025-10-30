@@ -71,6 +71,11 @@ const client = new ApolloClient({
             "poemId"
           ]),
           likes: relayStylePagination([
+            "poemId",
+            "authorId"
+          ]),
+          savedBy: relayStylePagination([
+            "poemId",
             "authorId"
           ])
         }

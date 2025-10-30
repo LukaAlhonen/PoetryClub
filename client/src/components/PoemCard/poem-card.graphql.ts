@@ -28,5 +28,15 @@ export const POEM_CARD_FRAGMENT = gql(`
                 username
             }
         }
+        savedByCurrentUser {
+            id
+            author {
+                id
+                username
+            }
+            poem {
+                id
+            }
+        }
     }
 `);
