@@ -48,10 +48,17 @@ export const Poem: Resolvers["Poem"] = {
     return services.poemService.getSavedPoemsCount({ poemId: id });
   },
 
-  likedByCurrentUser: async ({ id}, _, { user, services }) => {
+  likedByCurrentUser: async ({ id }, _, { user, services }) => {
     if (!user) return null;
     const likes = await services.likeService.getLikes({ poemId: id, authorId: user.authorId });
     if (likes.length !== 1) return null;
     return likes[0];
+  },
+
+  savedByCurrentUser: async ({ id }, _, { user, services }) => {
+    if (!user) return null;
+    const savedPoems = await services.savedPoemService.getSavedPoems({ poemId: id, authorId: user.authorId });
+    if (savedPoems.length !== 1) return null;
+    return savedPoems[0]
   }
 };

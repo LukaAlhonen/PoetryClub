@@ -680,6 +680,7 @@ export type Poem = {
   likesCount: Scalars['Int']['output'];
   savedBy: SavedPoemsConnection;
   savedByCount: Scalars['Int']['output'];
+  savedByCurrentUser?: Maybe<SavedPoem>;
   text: Scalars['String']['output'];
   title: Scalars['String']['output'];
   views: Scalars['Int']['output'];
