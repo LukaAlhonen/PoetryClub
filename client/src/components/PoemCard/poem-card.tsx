@@ -6,13 +6,15 @@ import { POEM_CARD_FRAGMENT } from "./poem-card.graphql";
 import { dateFormatter } from "../../utils/formatters";
 import Spinner from "../spinner";
 import LikeButton from "../../containers/LikeButton/like-button";
+import { keyframes } from "@emotion/react";
 
 import CommentSVG from "../../assets/icons/comment.svg?react";
 import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import ArrowIcon from "../../assets/icons/arrow-right.svg?react";
 import UserIcon from "../../assets/icons/user.svg?react";
-import { keyframes } from "@emotion/react";
+import SavedSVG from "../../assets/icons/bookmark.svg?react";
+import SaveButton from "../../containers/SaveButton/save-button";
 
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
@@ -63,6 +65,12 @@ const PoemCard = (props: PoemCardProps) => {
               {poem?.commentsCount}
             </span>
           </CommentsButton>
+          <SaveButton poemId={poem?.id} savedByCurrentUser={poem?.savedByCurrentUser}>
+            <SavedIcon />
+            <span data-testid="savedByCount">
+              {poem?.savedByCount}
+            </span>
+          </SaveButton>
         </StatsContainer>
         <TagsContainer>
           <ViewsButton />
@@ -273,6 +281,7 @@ const CommentsButton = styled(Link)({
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
   alignItems: "center",
   marginLeft: "0.5rem",
+  marginRight: "0.5rem",
   font: "inherit",
   fontFamily: "inherit",
   fontSize: "inherit",
@@ -299,6 +308,15 @@ const LikeIcon = styled(ThumbSVG)({
   marginRight: "0.3em",
   "& path": {
     fill: "currentColor"
+  }
+})
+
+const SavedIcon = styled(SavedSVG)({
+  width: "1.5rem",
+  height: "1.5rem",
+  marginRight: "0.3rem",
+  "& path": {
+    fill: "currentcolor"
   }
 })
 

@@ -10,6 +10,7 @@ import { INCREMENT_POEM_VIEWS } from "../../../containers/PoemDetail/poem-detail
 import type { IncrementPoemViewsMutation } from "../../../__generated__/graphql";
 
 beforeAll(() => {
+  vi.spyOn(console, "error").mockImplementation(() => { })
   // dummy intersectionobserver mock
   const mockIntersectionObserver = vi.fn()
   mockIntersectionObserver.mockReturnValue({
