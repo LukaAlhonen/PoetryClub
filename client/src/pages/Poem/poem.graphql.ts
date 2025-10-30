@@ -5,7 +5,6 @@ export const GET_POEM = gql(`
       $poemId: ID!
       $commentsLimit: Int
       $commentsCursor: ID
-      $authorId: ID
     ) {
       poem(id: $poemId) {
           id
@@ -15,28 +14,6 @@ export const GET_POEM = gql(`
                   node {
                       id
                       ...CommentFragment
-                  }
-                  cursor
-              }
-              pageInfo {
-                  hasNextPage
-                  hasPreviousPage
-                  startCursor
-                  endCursor
-                  pageSize
-              }
-          }
-          likes (authorId: $authorId) {
-              edges {
-                  node {
-                      id
-                      poem {
-                          id
-                      }
-                      author {
-                          id
-                          username
-                      }
                   }
                   cursor
               }

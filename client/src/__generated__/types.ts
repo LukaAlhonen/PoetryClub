@@ -343,6 +343,7 @@ export type Poem = {
   datePublished: Scalars['Date']['output'];
   id: Scalars['ID']['output'];
   inCollection?: Maybe<Collection>;
+  likedByCurrentUser?: Maybe<Like>;
   likes: LikesConnection;
   likesCount: Scalars['Int']['output'];
   savedBy: SavedPoemsConnection;
@@ -541,7 +542,7 @@ export type CommentFragmentFragment = { __typename?: 'Comment', id: string, text
 
 export type FollowedAuthorFragmentFragment = { __typename?: 'Author', id: string, username: string };
 
-export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null };
+export type PoemCardFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null };
 
 export type CreateCommentMutationVariables = Exact<{
   poemId: Scalars['ID']['input'];
@@ -563,7 +564,7 @@ export type CreateLikeMutationVariables = Exact<{
 }>;
 
 
-export type CreateLikeMutation = { __typename?: 'Mutation', createLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } };
+export type CreateLikeMutation = { __typename?: 'Mutation', createLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }, author: { __typename?: 'Author', id: string, username: string } } };
 
 export type RemoveLikeMutationVariables = Exact<{
   likeId: Scalars['ID']['input'];
@@ -572,7 +573,7 @@ export type RemoveLikeMutationVariables = Exact<{
 
 export type RemoveLikeMutation = { __typename?: 'Mutation', removeLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } };
 
-export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } };
+export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string }, likedByCurrentUser?: { __typename?: 'Like', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string } } | null };
 
 export type IncrementPoemViewsMutationVariables = Exact<{
   poemId: Scalars['ID']['input'];
@@ -596,18 +597,21 @@ export type GetAuthorQueryVariables = Exact<{
   followedByCursor?: InputMaybe<Scalars['ID']['input']>;
   followingLimit?: InputMaybe<Scalars['Int']['input']>;
   followingCursor?: InputMaybe<Scalars['ID']['input']>;
-  currentUserId?: InputMaybe<Scalars['ID']['input']>;
+  likedPoemsLimit?: InputMaybe<Scalars['Int']['input']>;
+  likedPoemsCursor?: InputMaybe<Scalars['ID']['input']>;
+  savedPoemsLimit?: InputMaybe<Scalars['Int']['input']>;
+  savedPoemsCursor?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type GetAuthorQuery = { __typename?: 'Query', authorByUsername: { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number, poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, likes: { __typename?: 'LikesConnection', edges: Array<{ __typename?: 'LikesEdge', node?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }> }, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, followedBy: { __typename?: 'FollowedAuthorsConnection', edges: Array<{ __typename?: 'FollowedAuthorsEdge', cursor: string, node?: { __typename?: 'FollowedAuthor', id: string, follower: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null, pageSize?: number | null } }, following: { __typename?: 'FollowedAuthorsConnection', edges: Array<{ __typename?: 'FollowedAuthorsEdge', cursor: string, node?: { __typename?: 'FollowedAuthor', id: string, following: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null, pageSize?: number | null } } } };
+export type GetAuthorQuery = { __typename?: 'Query', authorByUsername: { __typename?: 'Author', id: string, username: string, dateJoined: any, followedByCount: number, followingCount: number, poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, likedPoems: { __typename?: 'LikesConnection', edges: Array<{ __typename?: 'LikesEdge', cursor: string, node?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, savedPoems: { __typename?: 'SavedPoemsConnection', edges: Array<{ __typename?: 'SavedPoemsEdge', cursor: string, node?: { __typename?: 'SavedPoem', id: string, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, followedBy: { __typename?: 'FollowedAuthorsConnection', edges: Array<{ __typename?: 'FollowedAuthorsEdge', cursor: string, node?: { __typename?: 'FollowedAuthor', id: string, follower: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null, pageSize?: number | null } }, following: { __typename?: 'FollowedAuthorsConnection', edges: Array<{ __typename?: 'FollowedAuthorsEdge', cursor: string, node?: { __typename?: 'FollowedAuthor', id: string, following: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null, pageSize?: number | null } } } };
 
 export type CreatePoemMutationVariables = Exact<{
   input: CreatePoemInput;
 }>;
 
 
-export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } };
+export type CreatePoemMutation = { __typename?: 'Mutation', createPoem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String']['input'];
@@ -621,30 +625,27 @@ export type GetPoemQueryVariables = Exact<{
   poemId: Scalars['ID']['input'];
   commentsLimit?: InputMaybe<Scalars['Int']['input']>;
   commentsCursor?: InputMaybe<Scalars['ID']['input']>;
-  authorId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, comments: { __typename?: 'CommentsConnection', edges: Array<{ __typename?: 'CommentsEdge', cursor: string, node?: { __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, likes: { __typename?: 'LikesConnection', edges: Array<{ __typename?: 'LikesEdge', cursor: string, node?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string } } };
+export type GetPoemQuery = { __typename?: 'Query', poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, comments: { __typename?: 'CommentsConnection', edges: Array<{ __typename?: 'CommentsEdge', cursor: string, node?: { __typename?: 'Comment', id: string, text: string, datePublished: any, author: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string }, likedByCurrentUser?: { __typename?: 'Like', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string } } | null } };
 
 export type GetPoemsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   after?: InputMaybe<Scalars['ID']['input']>;
-  authorId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type GetPoemsQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, likes: { __typename?: 'LikesConnection', edges: Array<{ __typename?: 'LikesEdge', cursor: string, node?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
+export type GetPoemsQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
 
 export type GetPoemsWithFilterQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   after?: InputMaybe<Scalars['ID']['input']>;
   filter?: InputMaybe<GetPoemsFilter>;
-  currentUserId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type GetPoemsWithFilterQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, likes: { __typename?: 'LikesConnection', edges: Array<{ __typename?: 'LikesEdge', cursor: string, node?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } }, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
+export type GetPoemsWithFilterQuery = { __typename?: 'Query', poems: { __typename?: 'PoemsConnection', edges: Array<{ __typename?: 'PoemsEdge', cursor: string, node?: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null } | null }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null, pageSize?: number | null } } };
 
 export type SignupMutationVariables = Exact<{
   input: CreateAuthorInput;

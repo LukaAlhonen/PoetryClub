@@ -1,12 +1,13 @@
 import { createTestServer } from "../../utils/tests/apollo-test-server.js";
 import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
-import { GetPoemQuery } from "../../__generated__/graphql.js";
+import { GetPoemQuery, GetPoemsQuery, LoginMutation } from "../../__generated__/graphql.js";
 
-import { GET_POEM } from "../../__tests__/queries/index.js";
+import { GET_POEM, GET_POEMS } from "../../__tests__/queries/index.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
 import { PoemWithRelations } from "../../types/extended-types.js";
+import { LOGIN } from "../../__tests__/mutations/login.js";
 
 describe("Graphql Mutation integration tests", () => {
   // DB seeded with:
@@ -427,4 +428,70 @@ describe("Graphql Mutation integration tests", () => {
       }
     }
   });
+
+  // const testLogin = async ({
+  //   username = "author1",
+  //   password = "password",
+  //   testServer,
+  // }: {
+  //   username?: String;
+  //   password?: String;
+  //   testServer: TestServer;
+  // }) => {
+  //   const response = await testServer.executeOperation<LoginMutation>({
+  //     query: LOGIN,
+  //     variables: {
+  //       username,
+  //       password,
+  //     },
+  //   });
+
+  //   if (response.body.kind === "single") {
+  //     const login = response.body.singleResult.data?.login;
+  //     const errors = response.body.singleResult.errors;
+
+  //     if (errors) console.error(errors);
+
+  //     return login;
+  //   } else {
+  //     throw new Error("Invalid response type");
+  //   }
+  // };
+  test("likedByCurentUser", async () => {
+    const loginResponse = await testServer.executeOperation<LoginMutation>({
+      query: LOGIN,
+      variables: {
+        username: "author1",
+        password: "password"
+      }
+    })
+
+    if (loginResponse.body.kind === "single") {
+      const login = loginResponse.body.singleResult.data?.login;
+      const errors = loginResponse.body.singleResult.errors;
+
+      expect(errors).toBeUndefined();
+
+      // all authors have liked their own poems
+      const poemResponse = await testServer.executeOperation<GetPoemsQuery>({
+        query: GET_POEMS,
+        variables: {
+          filter: {
+            authorId: login.author.id
+          },
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      })
+
+      if (poemResponse.body.kind === "single") {
+        const poems = poemResponse.body.singleResult.data?.poems;
+
+        poems.edges.forEach((edge) => {
+          expect(edge.node.likedByCurrentUser.author.id).toStrictEqual(login.author.id)
+        })
+      }
+    }
+  })
 });

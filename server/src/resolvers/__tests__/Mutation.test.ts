@@ -125,6 +125,9 @@ describe("Graphql Mutation integration tests", () => {
   let savedPoems: SavedPoemWithRelations[] = [];
   let followedAuthors: FollowedAuthorWithRelations[] = [];
 
+  beforeAll(() => {
+    vi.spyOn(console, "error").mockImplementation(() => { })
+  })
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
@@ -1682,7 +1685,6 @@ describe("Graphql Mutation integration tests", () => {
 
       if (errors) console.error(errors);
 
-      console.log(collection, errors);
       expect(collection).toBeDefined();
 
       // make sure collection was updated

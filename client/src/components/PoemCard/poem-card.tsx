@@ -13,13 +13,9 @@ import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import ArrowIcon from "../../assets/icons/arrow-right.svg?react";
 import UserIcon from "../../assets/icons/user.svg?react";
 import { keyframes } from "@emotion/react";
-import type { CreateLikeMutation } from "../../__generated__/graphql";
 
 interface PoemCardProps {
   poem?: FragmentType<typeof POEM_CARD_FRAGMENT>;
-  isLiked?: boolean;
-  likeId?: string | null;
-  like?: CreateLikeMutation["createLike"]; // Pretty much all queries use the same shape for the like type
 }
 
 const PoemCard = (props: PoemCardProps) => {
@@ -55,7 +51,7 @@ const PoemCard = (props: PoemCardProps) => {
       </TextContainer>
       <PoemFooter>
         <StatsContainer>
-          <LikeButton like={props.like} poemId={poem?.id} isLiked={props.isLiked} likeId={props.likeId}>
+          <LikeButton poemId={poem?.id} likedByCurrentUser={poem?.likedByCurrentUser}>
             <LikeIcon />
             <span data-testid="likesCount">
               {poem?.likesCount}
@@ -264,17 +260,6 @@ const svgButtonStyles = {
   margin: "0 0.5em 0 0.5em",
   height: "1em",
 };
-
-// const CommentsButton = styled(CommentsIcon)({
-//   ...svgButtonStyles,
-//   "& path": {
-//     fill: colors.backgroundBlack,
-//     transition: "fill 0.15s ease",
-//   },
-//   "&:hover path": {
-//     fill: colors.wineRed,
-//   },
-// });
 
 const CommentsButton = styled(Link)({
   textDecoration: "none",

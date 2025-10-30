@@ -18,6 +18,16 @@ export const POEM_DETAIL_FRAGMENT = gql(`
         likesCount
         commentsCount
         savedByCount
+        likedByCurrentUser {
+            id
+            author {
+                id
+                username
+            }
+            poem {
+                id
+            }
+        }
     }
 `)
 

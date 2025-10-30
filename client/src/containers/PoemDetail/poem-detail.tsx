@@ -11,7 +11,7 @@ import UserIcon from "../../assets/icons/user.svg?react";
 import CommentSVG from "../../assets/icons/comment.svg?react";
 import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
-import type { CreateLikeMutation, IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables } from "../../__generated__/graphql";
+import type { IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables } from "../../__generated__/graphql";
 import { useEffect, useRef } from "react";
 
 interface PoemDetailProps {
@@ -20,9 +20,6 @@ interface PoemDetailProps {
   poem?: FragmentType<typeof POEM_DETAIL_FRAGMENT> | null;
   onCommentButtonClick?: () => void;
   displayCommentForm?: boolean;
-  isLiked?: boolean;
-  likeId?: string | null;
-  like?: CreateLikeMutation["createLike"];
 }
 
 const PoemDetail = (props: PoemDetailProps) => {
@@ -87,7 +84,7 @@ const PoemDetail = (props: PoemDetailProps) => {
         <TextContainer>{poem.text}</TextContainer>
         <PoemFooter>
           <StatsContainer>
-            <LikeButton isLiked={props.isLiked} poemId={poem?.id} likeId={props.likeId} like={props.like}>
+            <LikeButton poemId={poem?.id} likedByCurrentUser={poem?.likedByCurrentUser}>
               <LikeIcon/>
               <span data-testid="likesCount">
                 {poem?.likesCount}
@@ -123,7 +120,7 @@ const PoemDetailContainer = styled.div({
   minWidth: "15em",
   alignSelf: "center",
   justifySelf: "center",
-  margin: "1em"
+  // margin: "1em"
 });
 
 const PoemContainer = styled.div({

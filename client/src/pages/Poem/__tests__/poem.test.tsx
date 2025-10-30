@@ -48,18 +48,17 @@ const mockPoem: PoemModel = {
   commentsCount: 10,
   likesCount: 50,
   inCollection: null,
+  likedByCurrentUser: null,
   savedByCount: 7,
   comments: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
   likes: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
   savedBy: { edges: [], pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: "", endCursor: "", pageSize: 0}},
 }
 
-// const mockPoemCardFragment = makeFragmentData(mockPoem, POEM_CARD_FRAGMENT)
-
 const getPoemMock: MockLink.MockedResponse<GetPoemQuery> = {
   request: {
     query: GET_POEM,
-    variables: { poemId: "p_01", commentsLimit: 5, authorId: null }
+    variables: { poemId: "p_01", commentsLimit: 5 }
   },
   result: {
     data: {

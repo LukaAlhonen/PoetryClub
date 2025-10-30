@@ -9,6 +9,7 @@ import type { GetPoemsWithFilterQuery, GetPoemsWithFilterQueryVariables, PoemsCo
 import { GET_POEMS_WITH_FILTER } from "../search.graphql";
 
 beforeAll(() => {
+  vi.spyOn(console, "error").mockImplementation(() => { })
   // dummy intersectionobserver mock
   const mockIntersectionObserver = vi.fn()
   mockIntersectionObserver.mockReturnValue({
@@ -30,6 +31,7 @@ const mockPoems: PoemsConnection = {
         title: "poem_01",
         text: "poem_01_text",
         datePublished: date,
+        likedByCurrentUser: null,
         author: {
           __typename: "Author",
           id: "a_01",
@@ -94,6 +96,7 @@ const mockPoems: PoemsConnection = {
       title: "poem_02",
       text: "poem_02_text",
       datePublished: date,
+      likedByCurrentUser: null,
       author: {
         __typename: "Author",
         id: "a_01",
@@ -158,6 +161,7 @@ const mockPoems: PoemsConnection = {
         title: "poem_03",
         text: "poem_03_text",
         datePublished: date,
+        likedByCurrentUser: null,
         author: {
           __typename: "Author",
           id: "a_02",
@@ -222,6 +226,7 @@ const mockPoems: PoemsConnection = {
         title: "poem_04",
         text: "poem_04_text",
         datePublished: date,
+        likedByCurrentUser: null,
         author: {
           __typename: "Author",
           id: "a_02",
@@ -371,7 +376,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, currentUserId: null },
+      variables: { first: 5 },
     },
     result: {
       data: {
@@ -382,7 +387,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, currentUserId: null, filter: { filter: "0" } },
+      variables: { first: 5, filter: { filter: "0" } },
     },
     result: {
       data: {
@@ -393,7 +398,7 @@ const mocks: MockLink.MockedResponse<GetPoemsWithFilterQuery, GetPoemsWithFilter
   {
     request: {
       query: GET_POEMS_WITH_FILTER,
-      variables: { first: 5, currentUserId: null, filter: { filter: "01" } },
+      variables: { first: 5, filter: { filter: "01" } },
     },
     result: {
       data: {

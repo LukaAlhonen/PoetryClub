@@ -24,12 +24,11 @@ export const Poem: Resolvers["Poem"] = {
     return services.poemService.getCommentsCount({ poemId: id });
   },
 
-  likes: ({ id }, { first, after, authorId }, { services }) => {
+  likes: ({ id }, { first, after }, { services }) => {
     return services.likeService.getLikesConnection({
       first,
       after,
       poemId: id,
-      authorId
     });
   },
 
@@ -48,4 +47,11 @@ export const Poem: Resolvers["Poem"] = {
   savedByCount: ({ id }, _, { services }) => {
     return services.poemService.getSavedPoemsCount({ poemId: id });
   },
+
+  likedByCurrentUser: async ({ id}, _, { user, services }) => {
+    if (!user) return null;
+    const likes = await services.likeService.getLikes({ poemId: id, authorId: user.authorId });
+    if (likes.length !== 1) return null;
+    return likes[0];
+  }
 };
