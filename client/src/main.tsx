@@ -61,6 +61,8 @@ const client = new ApolloClient({
           following: relayStylePagination([
             "followerId"
           ]),
+          likedPoems: relayStylePagination(),
+          savedPoems: relayStylePagination()
         }
       },
       Poem: {

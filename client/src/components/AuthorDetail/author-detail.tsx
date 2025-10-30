@@ -76,7 +76,8 @@ const AuthorDetailContainer = styled.div({
   boxSizing: "border-box",
   border: "0.15rem solid gray",
   padding: "2.5em",
-  margin: "1em",
+  // margin: "1em",
+  marginBottom: "1em",
   background: colors.textEggshell,
   color: colors.backgroundBlack
 })

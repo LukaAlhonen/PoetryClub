@@ -41,7 +41,8 @@ const PoemsContainer = styled.div({
   minHeight: "100vh",
   gridTemplateColumns: "repeat(auto-fit, minmax(20em, 1fr))",
   justifyContent: "center",
-  padding: "1em",
+  paddingTop: "1rem",
+  paddingBottom: "2rem",
   boxSizing: "border-box",
 });
 

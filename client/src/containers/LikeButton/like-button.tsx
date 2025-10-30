@@ -5,6 +5,7 @@ import { CREATE_LIKE, REMOVE_LIKE } from "./like-button.graphql";
 import colors from "../../colors";
 import { useAuth } from "../../context/use-auth";
 import { useEffect, useState } from "react";
+import { GET_AUTHOR } from "../../pages/Author/author.graphql";
 
 interface LikeButtonProps {
   children: React.ReactNode;
@@ -18,44 +19,64 @@ const LikeButton = (props: LikeButtonProps) => {
 
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
     update(cache, { data }) {
-      cache.modify({
-        id: cache.identify({ __typename: "Poem", id: props.poemId}),
-        fields: {
-          likesCount(existingCount = 0) {
-            return existingCount + 1;
-          }
+      if (user) {
+        if (data?.createLike) {
+          cache.modify({
+            id: cache.identify({ __typename: "Poem", id: props.poemId }),
+            fields: {
+              likedByCurrentUser() { return data.createLike },
+              likesCount(existingCount = 0) {
+                return existingCount + 1;
+              }
+            }
+          })
         }
-      })
-      if (data?.createLike) {
-        cache.modify({
-          id: cache.identify({ __typename: "Poem", id: props.poemId}),
-          fields: {
-            likedByCurrentUser() { return data.createLike }
-          }
-        })
       }
-    }
+    },
+    refetchQueries: [
+      {
+        query: GET_AUTHOR,
+        variables: {
+          username: user,
+          poemsLimit: 5,
+          followedByLimit: 10,
+          followingLimit: 10,
+          likedPoemsLimit: 5,
+          savedPoemsLimit: 5
+        }
+      }
+    ],
+    awaitRefetchQueries: true
   })
 
   const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
     update(cache, { data }) {
-      cache.modify({
-        id: cache.identify({ __typename: "Poem", id: props.poemId}),
-        fields: {
-          likesCount(existingCount = 0) {
-            return existingCount - 1;
-          }
-        }
-      })
       if (data?.removeLike) {
         cache.modify({
           id: cache.identify({ __typename: "Poem", id: props.poemId}),
           fields: {
-            likedByCurrentUser() { return null }
+            likedByCurrentUser() { return null },
+            likesCount(existingCount = 0) {
+              return existingCount - 1;
+            }
           }
         })
       }
-    }
+    },
+    refetchQueries: [
+      {
+        query: GET_AUTHOR,
+        variables: {
+          username: user,
+          poemsLimit: 5,
+          followedByLimit: 10,
+          followingLimit: 10,
+          likedPoemsLimit: 5,
+          savedPoemsLimit: 5
+        }
+      }
+    ],
+    awaitRefetchQueries: true
   })
 
   useEffect(() => {

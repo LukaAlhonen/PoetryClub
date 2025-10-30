@@ -120,7 +120,7 @@ const PoemDetailContainer = styled.div({
   minWidth: "15em",
   alignSelf: "center",
   justifySelf: "center",
-  margin: "1em"
+  // margin: "1em"
 });
 
 const PoemContainer = styled.div({

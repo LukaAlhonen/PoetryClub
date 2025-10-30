@@ -6,7 +6,6 @@ import HomeSVG from "../assets/icons/home.svg?react";
 import SearchSVG from "../assets/icons/search.svg?react";
 import ComposeSVG from "../assets/icons/plus.svg?react";
 import UserSVG from "../assets/icons/user.svg?react";
-import BookMarksSVG from "../assets/icons/book-alt.svg?react";
 import SignupSVG from "../assets/icons/user-add.svg?react";
 import LogoutSVG from "../assets/icons/exit.svg?react";
 import colors from "../colors";
@@ -34,10 +33,6 @@ const LeftNav = () => {
       <BottomNav>
         { user ? (
           <>
-            <NavLink to="/">
-              <BookMarksIcon />
-              Bookmarks
-            </NavLink>
             <NavLink to={`/author/${user}`}>
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
@@ -133,10 +128,6 @@ const SearchIcon = styled(SearchSVG)({
 });
 
 const ComposeIcon = styled(ComposeSVG)({
-  ...navImg,
-});
-
-const BookMarksIcon = styled(BookMarksSVG)({
   ...navImg,
 });
 

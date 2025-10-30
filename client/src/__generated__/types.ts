@@ -564,7 +564,7 @@ export type CreateLikeMutationVariables = Exact<{
 }>;
 
 
-export type CreateLikeMutation = { __typename?: 'Mutation', createLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } };
+export type CreateLikeMutation = { __typename?: 'Mutation', createLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, author: { __typename?: 'Author', id: string, username: string }, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, likedByCurrentUser?: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } | null }, author: { __typename?: 'Author', id: string, username: string } } };
 
 export type RemoveLikeMutationVariables = Exact<{
   likeId: Scalars['ID']['input'];

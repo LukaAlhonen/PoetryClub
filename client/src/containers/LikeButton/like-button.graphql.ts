@@ -6,6 +6,7 @@ export const CREATE_LIKE = gql(`
             id
             poem {
                 id
+                ...PoemCardFragment
             }
             author {
                 id
