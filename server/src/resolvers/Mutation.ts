@@ -387,6 +387,9 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.authorService.createAuthor(input);
     } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        console.log(err.meta)
+      }
       handlePrismaError(err, "createAuthor");
     }
   },
