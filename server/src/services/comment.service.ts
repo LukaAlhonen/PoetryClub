@@ -27,7 +27,7 @@ export class CommentService {
     });
     if (cached) return cached;
 
-    const comment = await this.prisma.comment.findFirst({
+    const comment = await this.prisma.comment.findUniqueOrThrow({
       where: { id: id },
       include: { author: true, poem: true },
     });

@@ -100,8 +100,6 @@ const testLogin = async ({
     if (errors) console.error(errors);
 
     return login;
-  } else {
-    throw new Error("Invalid response type");
   }
 };
 
@@ -155,6 +153,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const login = response.body.singleResult.data?.login;
       const errors = response.body.singleResult.errors;
@@ -167,8 +167,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(login.author).toBeDefined();
       expect(login.author.id).toBeDefined();
       expect(login.author.username).toStrictEqual("author1");
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -181,14 +179,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const login = response.body.singleResult.data?.login;
       const errors = response.body.singleResult.errors;
 
       expect(login).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -201,14 +199,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const login = response.body.singleResult.data?.login;
       const errors = response.body.singleResult.errors;
 
       expect(login).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -220,6 +218,8 @@ describe("Graphql Mutation integration tests", () => {
         authorization: `Bearer ${login.token}`,
       },
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const logout = response.body.singleResult.data?.logout;
@@ -238,14 +238,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response2.body.kind).toStrictEqual("single")
+
     if (response2.body.kind === "single") {
       const author = response2.body.singleResult.data?.removeAuthor;
       const errors = response2.body.singleResult.errors;
 
       expect(author).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -268,6 +268,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.createPoem;
       const errors = response.body.singleResult.errors;
@@ -280,8 +282,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(poem.title).toStrictEqual(title);
       expect(poem.text).toStrictEqual(text);
       expect(poem.author.id).toStrictEqual(login.author.id);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -299,14 +299,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.createPoem;
       const errors = response.body.singleResult.errors;
 
       expect(poem).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -317,6 +317,9 @@ describe("Graphql Mutation integration tests", () => {
     const collectionsResponse = await testServer.executeOperation<GetCollectionsQuery>({
       query: GET_COLLECTIONS
     })
+
+    expect(collectionsResponse.body.kind).toStrictEqual("single")
+
     if (collectionsResponse.body.kind === "single") {
       const collections = collectionsResponse.body.singleResult.data?.collections;
 
@@ -338,12 +341,14 @@ describe("Graphql Mutation integration tests", () => {
         }
       })
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         expect(response.body.singleResult.data).toBeNull();
         expect(response.body.singleResult.errors).toBeDefined();
 
         // make sure poem was not created
-        const result2 = await testServer.executeOperation<GetPoemsQuery>({
+        const response2 = await testServer.executeOperation<GetPoemsQuery>({
           query: GET_POEMS,
           variables: {
             filter: {
@@ -352,8 +357,10 @@ describe("Graphql Mutation integration tests", () => {
           }
         })
 
-        if (result2.body.kind === "single") {
-          const poems = result2.body.singleResult.data?.poems;
+        expect(response2.body.kind).toStrictEqual("single")
+
+        if (response2.body.kind === "single") {
+          const poems = response2.body.singleResult.data?.poems;
 
           expect(poems.pageInfo.pageSize).toBe(0);
           expect(poems.edges).toStrictEqual([])
@@ -377,6 +384,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const author = response.body.singleResult.data?.createAuthor;
       const errors = response.body.singleResult.errors;
@@ -390,8 +399,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(author.email).toStrictEqual(email);
       //@ts-ignore
       expect(author.password).toBeUndefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -410,6 +417,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const author = response.body.singleResult.data?.signup;
       const errors = response.body.singleResult.errors;
@@ -423,8 +432,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(author.email).toStrictEqual(email);
       //@ts-ignore
       expect(author.password).toBeUndefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -443,6 +450,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.createCollection;
       const errors = response.body.singleResult.errors;
@@ -455,8 +464,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(collection.poems.edges).toStrictEqual([]);
       expect(collection.dateCreated).toBeDefined();
       expect(collection.author.id).toStrictEqual(login.author.id);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -471,14 +478,14 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.createCollection;
       const errors = response.body.singleResult.errors;
 
       expect(errors).toBeDefined();
       expect(collection).toBeUndefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -495,6 +502,8 @@ describe("Graphql Mutation integration tests", () => {
         authorization: `Bearer ${login.token}`,
       },
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const comment = response.body.singleResult.data?.createComment;
@@ -521,14 +530,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const comment = response.body.singleResult.data?.createComment;
       const errors = response.body.singleResult.errors;
 
       expect(comment).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -546,6 +555,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const like = response.body.singleResult.data?.createLike;
       const errors = response.body.singleResult.errors;
@@ -557,8 +568,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(like.datePublished).toBeDefined();
       expect(like.author.id).toStrictEqual(login.author.id);
       expect(like.poem.id).toStrictEqual(testPoems[0].id);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -570,14 +579,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const like = response.body.singleResult.data?.createLike;
       const errors = response.body.singleResult.errors;
 
       expect(like).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -598,6 +607,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     );
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const savedPoem = response.body.singleResult.data?.createSavedPoem;
       const errors = response.body.singleResult.errors;
@@ -609,8 +620,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(savedPoem.dateSaved).toBeDefined();
       expect(savedPoem.author.id).toStrictEqual(login.author.id);
       expect(savedPoem.poem.id).toStrictEqual(testPoems[0].id);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -624,14 +633,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     );
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const savedPoem = response.body.singleResult.data?.createSavedPoem;
       const errors = response.body.singleResult.errors;
 
       expect(errors).toBeDefined();
       expect(savedPoem).toBeUndefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -653,10 +662,10 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(authorResponse.body.kind).toStrictEqual("single")
+
     if (authorResponse.body.kind === "single") {
       author = authorResponse.body.singleResult.data?.createAuthor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const response =
@@ -670,6 +679,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const followedAuthor =
         response.body.singleResult.data?.createFollowedAuthor;
@@ -681,8 +692,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(followedAuthor.dateFollowed).toBeDefined();
       expect(followedAuthor.follower.id).toStrictEqual(login.author.id);
       expect(followedAuthor.following.id).toStrictEqual(author.id);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -702,10 +711,10 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(authorResponse.body.kind).toStrictEqual("single")
+
     if (authorResponse.body.kind === "single") {
       author = authorResponse.body.singleResult.data?.createAuthor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const response =
@@ -716,6 +725,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const followedAuthor =
         response.body.singleResult.data?.createFollowedAuthor;
@@ -723,8 +734,6 @@ describe("Graphql Mutation integration tests", () => {
 
       expect(errors).toBeDefined();
       expect(followedAuthor).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -737,6 +746,8 @@ describe("Graphql Mutation integration tests", () => {
         authorization: `Bearer ${login.token}`,
       },
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const author = response.body.singleResult.data?.removeAuthor;
@@ -755,17 +766,15 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const author = response2.body.singleResult.data?.authorById;
         const errors = response2.body.singleResult.errors;
 
         expect(errors).toBeDefined();
         expect(author).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -787,6 +796,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.removeCollection;
       const errors = response.body.singleResult.errors;
@@ -804,17 +815,15 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const collection = response2.body.singleResult.data?.collection;
         const errors = response2.body.singleResult.errors;
 
         expect(collection).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -827,14 +836,14 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.removeCollection;
       const errors = response.body.singleResult.errors;
 
       expect(collection).toBeUndefined();
       expect(errors).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
 
     // make sure collection was not removed
@@ -845,14 +854,14 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response2.body.kind).toStrictEqual("single")
+
     if (response2.body.kind === "single") {
       const collection = response2.body.singleResult.data?.collection;
       const errors = response2.body.singleResult.errors;
 
       expect(collection).toBeDefined();
       expect(errors).toBeUndefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -875,6 +884,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.removeCollection;
       const errors = response.body.singleResult.errors;
@@ -890,17 +901,15 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const collection = response2.body.singleResult.data?.collection;
         const errors = response2.body.singleResult.errors;
 
         expect(collection).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -910,7 +919,7 @@ describe("Graphql Mutation integration tests", () => {
       (comment) => comment.authorId === login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveCommentMutation>({
+    const response = await testServer.executeOperation<RemoveCommentMutation>({
       query: REMOVE_COMMENT,
       variables: {
         commentId: commentToRemove.id,
@@ -920,9 +929,11 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const comment = result.body.singleResult.data?.removeComment;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const comment = response.body.singleResult.data?.removeComment;
+      const errors = response.body.singleResult.errors;
 
       if (errors) console.error(errors);
 
@@ -930,63 +941,61 @@ describe("Graphql Mutation integration tests", () => {
       expect(comment.id).toBeDefined();
 
       // make sure comment was removed
-      const result2 = await testServer.executeOperation<GetCommentQuery>({
+      const response2 = await testServer.executeOperation<GetCommentQuery>({
         query: GET_COMMENT,
         variables: {
           id: comment.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const comment = result2.body.singleResult.data?.comment;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const comment = response2.body.singleResult.data?.comment;
+        const errors = response2.body.singleResult.errors;
 
         expect(comment).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("removeComment, without authentication", async () => {
     const commentToRemove = comments[0];
 
-    const result = await testServer.executeOperation<RemoveCommentMutation>({
+    const response = await testServer.executeOperation<RemoveCommentMutation>({
       query: REMOVE_COMMENT,
       variables: {
         commentId: commentToRemove.id,
       },
     });
 
-    if (result.body.kind === "single") {
-      const comment = result.body.singleResult.data?.removeComment;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const comment = response.body.singleResult.data?.removeComment;
+      const errors = response.body.singleResult.errors;
 
       expect(comment).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure comment was not removed
-      const result2 = await testServer.executeOperation<GetCommentQuery>({
+      const response2 = await testServer.executeOperation<GetCommentQuery>({
         query: GET_COMMENT,
         variables: {
           id: commentToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const comment = result2.body.singleResult.data?.comment;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const comment = response2.body.singleResult.data?.comment;
+        const errors = response2.body.singleResult.errors;
 
         expect(comment).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -996,7 +1005,7 @@ describe("Graphql Mutation integration tests", () => {
       (comment) => comment.authorId !== login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveCommentMutation>({
+    const response = await testServer.executeOperation<RemoveCommentMutation>({
       query: REMOVE_COMMENT,
       variables: {
         commentId: commentToRemove.id,
@@ -1006,32 +1015,32 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const comment = result.body.singleResult.data?.removeComment;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const comment = response.body.singleResult.data?.removeComment;
+      const errors = response.body.singleResult.errors;
 
       expect(comment).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure comment was not removed
-      const result2 = await testServer.executeOperation<GetCommentQuery>({
+      const response2 = await testServer.executeOperation<GetCommentQuery>({
         query: GET_COMMENT,
         variables: {
           id: commentToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const comment = result2.body.singleResult.data?.comment;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const comment = response2.body.singleResult.data?.comment;
+        const errors = response2.body.singleResult.errors;
 
         expect(comment).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1041,7 +1050,7 @@ describe("Graphql Mutation integration tests", () => {
       (followedAuthor) => followedAuthor.followerId === login.author.id,
     )[0];
 
-    const result =
+    const response =
       await testServer.executeOperation<RemoveFollowedAuthorMutation>({
         query: REMOVE_FOLLOWED_AUTHOR,
         variables: {
@@ -1052,10 +1061,12 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
-    if (result.body.kind === "single") {
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
       const followedAuthor =
-        result.body.singleResult.data?.removeFollowedAuthor;
-      const errors = result.body.singleResult.errors;
+        response.body.singleResult.data?.removeFollowedAuthor;
+      const errors = response.body.singleResult.errors;
 
       if (errors) console.error(errors);
 
@@ -1063,7 +1074,7 @@ describe("Graphql Mutation integration tests", () => {
       expect(followedAuthor.id).toBeDefined();
 
       // make sure followedAuthor was removed
-      const result2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
+      const response2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
         {
           query: GET_FOLLOWED_AUTHOR,
           variables: {
@@ -1072,24 +1083,22 @@ describe("Graphql Mutation integration tests", () => {
         },
       );
 
-      if (result2.body.kind === "single") {
-        const followedAuthor = result2.body.singleResult.data?.followedAuthor;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const followedAuthor = response2.body.singleResult.data?.followedAuthor;
+        const errors = response2.body.singleResult.errors;
 
         expect(followedAuthor).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("removeFollowedAuthor, without authentication", async () => {
     const followedAuthorToRemove = followedAuthors[0];
 
-    const result =
+    const response =
       await testServer.executeOperation<RemoveFollowedAuthorMutation>({
         query: REMOVE_FOLLOWED_AUTHOR,
         variables: {
@@ -1097,16 +1106,18 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
-    if (result.body.kind === "single") {
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
       const followedAuthor =
-        result.body.singleResult.data?.removeFollowedAuthor;
-      const errors = result.body.singleResult.errors;
+        response.body.singleResult.data?.removeFollowedAuthor;
+      const errors = response.body.singleResult.errors;
 
       expect(followedAuthor).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure followedAuthor was not removed
-      const result2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
+      const response2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
         {
           query: GET_FOLLOWED_AUTHOR,
           variables: {
@@ -1115,17 +1126,15 @@ describe("Graphql Mutation integration tests", () => {
         },
       );
 
-      if (result2.body.kind === "single") {
-        const followedAuthor = result2.body.singleResult.data?.followedAuthor;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const followedAuthor = response2.body.singleResult.data?.followedAuthor;
+        const errors = response2.body.singleResult.errors;
 
         expect(followedAuthor).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1135,7 +1144,7 @@ describe("Graphql Mutation integration tests", () => {
       (followedAuthor) => followedAuthor.followerId !== login.author.id,
     )[0];
 
-    const result =
+    const response =
       await testServer.executeOperation<RemoveFollowedAuthorMutation>({
         query: REMOVE_FOLLOWED_AUTHOR,
         variables: {
@@ -1146,16 +1155,18 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
-    if (result.body.kind === "single") {
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
       const followedAuthor =
-        result.body.singleResult.data?.removeFollowedAuthor;
-      const errors = result.body.singleResult.errors;
+        response.body.singleResult.data?.removeFollowedAuthor;
+      const errors = response.body.singleResult.errors;
 
       expect(followedAuthor).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure followedAuthor was not removed
-      const result2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
+      const response2 = await testServer.executeOperation<GetFollowedAuthorQuery>(
         {
           query: GET_FOLLOWED_AUTHOR,
           variables: {
@@ -1164,17 +1175,15 @@ describe("Graphql Mutation integration tests", () => {
         },
       );
 
-      if (result2.body.kind === "single") {
-        const followedAuthor = result2.body.singleResult.data?.followedAuthor;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const followedAuthor = response2.body.singleResult.data?.followedAuthor;
+        const errors = response2.body.singleResult.errors;
 
         expect(followedAuthor).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1184,7 +1193,7 @@ describe("Graphql Mutation integration tests", () => {
       (like) => like.authorId === login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveLikeMutation>({
+    const response = await testServer.executeOperation<RemoveLikeMutation>({
       query: REMOVE_LIKE,
       variables: {
         likeId: likeToRemove.id,
@@ -1194,9 +1203,11 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const like = result.body.singleResult.data?.removeLike;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const like = response.body.singleResult.data?.removeLike;
+      const errors = response.body.singleResult.errors;
 
       if (errors) console.error(errors);
 
@@ -1204,63 +1215,61 @@ describe("Graphql Mutation integration tests", () => {
       expect(like.id).toBeDefined();
 
       // make sure like was removed
-      const result2 = await testServer.executeOperation<GetLikeQuery>({
+      const response2 = await testServer.executeOperation<GetLikeQuery>({
         query: GET_LIKE,
         variables: {
           id: like.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const like = result2.body.singleResult.data?.like;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const like = response2.body.singleResult.data?.like;
+        const errors = response2.body.singleResult.errors;
 
         expect(like).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("removeLike, without authentication", async () => {
     const likeToRemove = likes[0];
 
-    const result = await testServer.executeOperation<RemoveLikeMutation>({
+    const response = await testServer.executeOperation<RemoveLikeMutation>({
       query: REMOVE_LIKE,
       variables: {
         likeId: likeToRemove.id,
       },
     });
 
-    if (result.body.kind === "single") {
-      const like = result.body.singleResult.data?.removeLike;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const like = response.body.singleResult.data?.removeLike;
+      const errors = response.body.singleResult.errors;
 
       expect(like).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure like was not removed
-      const result2 = await testServer.executeOperation<GetLikeQuery>({
+      const response2 = await testServer.executeOperation<GetLikeQuery>({
         query: GET_LIKE,
         variables: {
           id: likeToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const like = result2.body.singleResult.data?.like;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const like = response2.body.singleResult.data?.like;
+        const errors = response2.body.singleResult.errors;
 
         expect(like).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1270,7 +1279,7 @@ describe("Graphql Mutation integration tests", () => {
       (like) => like.authorId !== login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveLikeMutation>({
+    const response = await testServer.executeOperation<RemoveLikeMutation>({
       query: REMOVE_LIKE,
       variables: {
         likeId: likeToRemove.id,
@@ -1280,32 +1289,32 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const like = result.body.singleResult.data?.removeLike;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const like = response.body.singleResult.data?.removeLike;
+      const errors = response.body.singleResult.errors;
 
       expect(like).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure like was not removed
-      const result2 = await testServer.executeOperation<GetLikeQuery>({
+      const response2 = await testServer.executeOperation<GetLikeQuery>({
         query: GET_LIKE,
         variables: {
           id: likeToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const like = result2.body.singleResult.data?.like;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const like = response2.body.singleResult.data?.like;
+        const errors = response2.body.singleResult.errors;
 
         expect(like).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1315,7 +1324,7 @@ describe("Graphql Mutation integration tests", () => {
       (poem) => poem.authorId === login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemovePoemMutation>({
+    const response = await testServer.executeOperation<RemovePoemMutation>({
       query: REMOVE_POEM,
       variables: {
         poemId: poemToRemove.id,
@@ -1325,9 +1334,11 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const poem = result.body.singleResult.data?.removePoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.removePoem;
+      const errors = response.body.singleResult.errors;
 
       if (errors) console.error(errors);
 
@@ -1335,63 +1346,61 @@ describe("Graphql Mutation integration tests", () => {
       expect(poem.id).toBeDefined();
 
       // make sure poem was removed
-      const result2 = await testServer.executeOperation<GetPoemQuery>({
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
         query: GET_POEM,
         variables: {
           id: poem.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const poem = result2.body.singleResult.data?.poem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response2.body.singleResult.errors;
 
         expect(poem).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("removePoem, without authentication", async () => {
     const poemToRemove = poems[0];
 
-    const result = await testServer.executeOperation<RemovePoemMutation>({
+    const response = await testServer.executeOperation<RemovePoemMutation>({
       query: REMOVE_POEM,
       variables: {
         poemId: poemToRemove.id,
       },
     });
 
-    if (result.body.kind === "single") {
-      const poem = result.body.singleResult.data?.removePoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.removePoem;
+      const errors = response.body.singleResult.errors;
 
       expect(poem).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure poem was not removed
-      const result2 = await testServer.executeOperation<GetPoemQuery>({
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
         query: GET_POEM,
         variables: {
           id: poemToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const poem = result2.body.singleResult.data?.poem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response2.body.singleResult.errors;
 
         expect(poem).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1401,7 +1410,7 @@ describe("Graphql Mutation integration tests", () => {
       (poem) => poem.authorId !== login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemovePoemMutation>({
+    const response = await testServer.executeOperation<RemovePoemMutation>({
       query: REMOVE_POEM,
       variables: {
         poemId: poemToRemove.id,
@@ -1411,32 +1420,32 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const poem = result.body.singleResult.data?.removePoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const poem = response.body.singleResult.data?.removePoem;
+      const errors = response.body.singleResult.errors;
 
       expect(poem).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure poem was not removed
-      const result2 = await testServer.executeOperation<GetPoemQuery>({
+      const response2 = await testServer.executeOperation<GetPoemQuery>({
         query: GET_POEM,
         variables: {
           id: poemToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const poem = result2.body.singleResult.data?.poem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const poem = response2.body.singleResult.data?.poem;
+        const errors = response2.body.singleResult.errors;
 
         expect(poem).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1446,7 +1455,7 @@ describe("Graphql Mutation integration tests", () => {
       (savedPoem) => savedPoem.authorId === login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveSavedPoemMutation>({
+    const response = await testServer.executeOperation<RemoveSavedPoemMutation>({
       query: REMOVE_SAVED_POEM,
       variables: {
         savedPoemId: savedPoemToRemove.id,
@@ -1456,9 +1465,11 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const savedPoem = result.body.singleResult.data?.removeSavedPoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const savedPoem = response.body.singleResult.data?.removeSavedPoem;
+      const errors = response.body.singleResult.errors;
 
       if (errors) console.error(errors);
 
@@ -1466,63 +1477,61 @@ describe("Graphql Mutation integration tests", () => {
       expect(savedPoem.id).toBeDefined();
 
       // make sure savedPoem was removed
-      const result2 = await testServer.executeOperation<GetSavedPoemQuery>({
+      const response2 = await testServer.executeOperation<GetSavedPoemQuery>({
         query: GET_SAVED_POEM,
         variables: {
           id: savedPoem.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const savedPoem = result2.body.singleResult.data?.savedPoem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const savedPoem = response2.body.singleResult.data?.savedPoem;
+        const errors = response2.body.singleResult.errors;
 
         expect(savedPoem).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("removeSavedPoem, without authentication", async () => {
     const savedPoemToRemove = savedPoems[0];
 
-    const result = await testServer.executeOperation<RemoveSavedPoemMutation>({
+    const response = await testServer.executeOperation<RemoveSavedPoemMutation>({
       query: REMOVE_SAVED_POEM,
       variables: {
         savedPoemId: savedPoemToRemove.id,
       },
     });
 
-    if (result.body.kind === "single") {
-      const savedPoem = result.body.singleResult.data?.removeSavedPoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const savedPoem = response.body.singleResult.data?.removeSavedPoem;
+      const errors = response.body.singleResult.errors;
 
       expect(savedPoem).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure savedPoem was not removed
-      const result2 = await testServer.executeOperation<GetSavedPoemQuery>({
+      const response2 = await testServer.executeOperation<GetSavedPoemQuery>({
         query: GET_SAVED_POEM,
         variables: {
           id: savedPoemToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const savedPoem = result2.body.singleResult.data?.savedPoem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const savedPoem = response2.body.singleResult.data?.savedPoem;
+        const errors = response2.body.singleResult.errors;
 
         expect(savedPoem).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1532,7 +1541,7 @@ describe("Graphql Mutation integration tests", () => {
       (savedPoem) => savedPoem.authorId !== login.author.id,
     )[0];
 
-    const result = await testServer.executeOperation<RemoveSavedPoemMutation>({
+    const response = await testServer.executeOperation<RemoveSavedPoemMutation>({
       query: REMOVE_SAVED_POEM,
       variables: {
         savedPoemId: savedPoemToRemove.id,
@@ -1542,32 +1551,32 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
-    if (result.body.kind === "single") {
-      const savedPoem = result.body.singleResult.data?.removeSavedPoem;
-      const errors = result.body.singleResult.errors;
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const savedPoem = response.body.singleResult.data?.removeSavedPoem;
+      const errors = response.body.singleResult.errors;
 
       expect(savedPoem).toBeUndefined();
       expect(errors).toBeDefined();
 
       // make sure savedPoem was not removed
-      const result2 = await testServer.executeOperation<GetSavedPoemQuery>({
+      const response2 = await testServer.executeOperation<GetSavedPoemQuery>({
         query: GET_SAVED_POEM,
         variables: {
           id: savedPoemToRemove.id,
         },
       });
 
-      if (result2.body.kind === "single") {
-        const savedPoem = result2.body.singleResult.data?.savedPoem;
-        const errors = result2.body.singleResult.errors;
+      expect(response2.body.kind).toStrictEqual("single")
+
+      if (response2.body.kind === "single") {
+        const savedPoem = response2.body.singleResult.data?.savedPoem;
+        const errors = response2.body.singleResult.errors;
 
         expect(savedPoem).toBeDefined();
         expect(errors).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1591,6 +1600,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const author = response.body.singleResult.data?.updateAuthor;
       const errors = response.body.singleResult.errors;
@@ -1610,14 +1621,14 @@ describe("Graphql Mutation integration tests", () => {
         },
       );
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const author = response2.body.singleResult.data?.removeAuthor;
         const errors = response2.body.singleResult.errors;
 
         expect(author).toBeUndefined();
         expect(errors).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
 
       // make sure author was updated
@@ -1628,6 +1639,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response3.body.kind).toStrictEqual("single")
+
       if (response3.body.kind === "single") {
         const author = response3.body.singleResult.data?.authorById;
         const errors = response3.body.singleResult.errors;
@@ -1637,8 +1650,6 @@ describe("Graphql Mutation integration tests", () => {
         expect(author).toBeDefined();
         expect(author.username).toStrictEqual(input.username);
         expect(author.email).toStrictEqual(input.email);
-      } else {
-        throw new Error("invalid response kind");
       }
 
       // make sure login works with new username and password
@@ -1651,8 +1662,6 @@ describe("Graphql Mutation integration tests", () => {
       expect(newLogin).toBeDefined();
       expect(newLogin.author.id).toStrictEqual(authorToUpdate.id);
       expect(newLogin.token).toBeDefined();
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1679,6 +1688,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.updateCollection;
       const errors = response.body.singleResult.errors;
@@ -1693,6 +1704,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: collectionToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const collection = response2.body.singleResult.data?.collection;
         const errors = response.body.singleResult.errors;
@@ -1700,11 +1713,7 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(collection.title).toStrictEqual(input.title);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1724,6 +1733,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.updateCollection;
       const errors = response.body.singleResult.errors;
@@ -1737,6 +1748,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: collectionToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const collection = response2.body.singleResult.data?.collection;
         const errors = response.body.singleResult.errors;
@@ -1744,11 +1757,7 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(collection.title).toStrictEqual(collectionToUpdate.title);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1775,6 +1784,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const collection = response.body.singleResult.data?.updateCollection;
       const errors = response.body.singleResult.errors;
@@ -1788,6 +1799,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: collectionToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const collection = response2.body.singleResult.data?.collection;
         const errors = response.body.singleResult.errors;
@@ -1795,11 +1808,7 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(collection.title).toStrictEqual(collectionToUpdate.title);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1827,6 +1836,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.updatePoem;
       const errors = response.body.singleResult.errors;
@@ -1841,6 +1852,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: poemToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const poem = response2.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -1850,11 +1863,7 @@ describe("Graphql Mutation integration tests", () => {
         expect(poem.title).toStrictEqual(input.title);
         expect(poem.text).toStrictEqual(input.text);
         expect(poem.views).toStrictEqual(input.views);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1875,6 +1884,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.updatePoem;
       const errors = response.body.singleResult.errors;
@@ -1888,6 +1899,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: poemToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const poem = response2.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -1897,11 +1910,7 @@ describe("Graphql Mutation integration tests", () => {
         expect(poem.title).toStrictEqual(poemToUpdate.title);
         expect(poem.text).toStrictEqual(poemToUpdate.text);
         expect(poem.views).toStrictEqual(poemToUpdate.views);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1929,6 +1938,8 @@ describe("Graphql Mutation integration tests", () => {
       },
     });
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.updatePoem;
       const errors = response.body.singleResult.errors;
@@ -1942,6 +1953,8 @@ describe("Graphql Mutation integration tests", () => {
         variables: { id: poemToUpdate.id },
       });
 
+      expect(response2.body.kind).toStrictEqual("single")
+
       if (response2.body.kind === "single") {
         const poem = response2.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -1951,11 +1964,7 @@ describe("Graphql Mutation integration tests", () => {
         expect(poem.title).toStrictEqual(poemToUpdate.title);
         expect(poem.text).toStrictEqual(poemToUpdate.text);
         expect(poem.views).toStrictEqual(poemToUpdate.views);
-      } else {
-        throw new Error("invalid response kind");
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -1967,6 +1976,9 @@ describe("Graphql Mutation integration tests", () => {
     const collectionsResponse = await testServer.executeOperation<GetCollectionsQuery>({
       query: GET_COLLECTIONS
     })
+
+    expect(collectionsResponse.body.kind).toStrictEqual("single")
+
     if (collectionsResponse.body.kind === "single") {
       const collections = collectionsResponse.body.singleResult.data?.collections;
 
@@ -1985,6 +1997,8 @@ describe("Graphql Mutation integration tests", () => {
         }
       })
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         expect(response.body.singleResult.data).toBeUndefined();
         expect(response.body.singleResult.errors).toBeDefined();
@@ -1996,6 +2010,8 @@ describe("Graphql Mutation integration tests", () => {
             id: poemToUpdate.id
           }
         })
+
+        expect(poemResponse.body.kind).toStrictEqual("single")
 
         if (poemResponse.body.kind === "single") {
           const poem = poemResponse.body.singleResult.data?.poem;
@@ -2015,6 +2031,8 @@ describe("Graphql Mutation integration tests", () => {
           poemId: poemToUpdate.id,
         },
       });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const poem = response.body.singleResult.data?.incrementPoemViews;

@@ -42,6 +42,10 @@ describe("CommentService integration tests", () => {
     }
   });
 
+  test("getComment, with invalid id", async () => {
+    await expect(services.commentService.getComment({ id: "kkk" })).rejects.toThrow();
+  })
+
   test("getComments", async () => {
     const result = await services.commentService.getComments()
     expect(result).toBeDefined();
@@ -159,7 +163,7 @@ describe("CommentService integration tests", () => {
     const result = await services.commentService.removeComment({id: comments[0].id})
 
     // make sure comment was removed
-    await expect(services.commentService.getComment({id: result.id})).resolves.toBeNull()
+    await expect(services.commentService.getComment({ id: result.id })).rejects.toThrow();
     await expect(services.commentService.getComments()).resolves.toHaveLength(15)
   })
 

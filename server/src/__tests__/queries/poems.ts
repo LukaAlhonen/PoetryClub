@@ -101,6 +101,16 @@ export const GET_POEMS = gql(`
                            username
                        }
                    }
+                   savedByCurrentUser {
+                       id
+                       poem {
+                           id
+                       }
+                       author {
+                           id
+                           username
+                       }
+                   }
                }
            }
            pageInfo {

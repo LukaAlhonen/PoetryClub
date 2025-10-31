@@ -50,6 +50,8 @@ describe("Graphql Mutation integration tests", () => {
           },
         });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const followedAuthor = response.body.singleResult.data?.followedAuthor;
         const errors = response.body.singleResult.errors;
@@ -73,6 +75,8 @@ describe("Graphql Mutation integration tests", () => {
             id: followedAuthor.id,
           },
         });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const followedAuthor = response.body.singleResult.data?.followedAuthor;

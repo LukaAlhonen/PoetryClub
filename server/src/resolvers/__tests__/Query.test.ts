@@ -42,6 +42,16 @@ import { LOGIN } from "../../__tests__/mutations/login.js";
 import { ME } from "../../__tests__/queries/me.js";
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
+import { randomUUID } from "crypto";
+import { GraphQLFormattedError } from "graphql";
+
+const verifyP2025Errors = ({errors, modelName}:{ errors: readonly GraphQLFormattedError[];  modelName: string}) => {
+  expect(errors).toBeDefined();
+  expect(errors).toHaveLength(1);
+  expect(errors[0].extensions).toHaveProperty("code"),
+  expect(errors[0].extensions.code).toStrictEqual("BAD_USER_INPUT"),
+  expect(errors[0].message).toStrictEqual(`${modelName} does not exist`)
+}
 
 describe("Graphql Query integration tests", () => {
   // DB seeded with:
@@ -55,21 +65,38 @@ describe("Graphql Query integration tests", () => {
   const cache = new CacheAPI({ prefix: "Query" });
   const services = createServices({ prisma, cache });
   let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
+  const testId = randomUUID();
+  let poems = [];
+  let authors = [];
+  let comments = [];
+  let collections = [];
+  let likes = [];
+  let savedPoems = [];
+  let followedAuthors = [];
 
   beforeEach(async () => {
     await cache.delByPattern({ pattern: "*" });
     testServer = await createTestServer({ services });
-    await seed({ prisma });
+    const result = await seed({ prisma });
+    poems = result.poems;
+    authors = result.authors;
+    comments = result.comments;
+    collections = result.collections;
+    likes = result.likes;
+    savedPoems = result.savedPoems;
+    followedAuthors = result.followedAuthors;
   });
   afterAll(async () => {
     await testServer.cleanup();
     await cache.delByPattern({ pattern: "*" });
   });
 
-  test("poems, without filter or pagination, succeeds", async () => {
+  test("poems, without filter or pagination", async () => {
     const response = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const poems = response.body.singleResult.data?.poems;
@@ -79,16 +106,16 @@ describe("Graphql Query integration tests", () => {
       expect(poems).toBeDefined();
       expect(poems.pageInfo.pageSize).toStrictEqual(8)
       expect(poems.edges).toHaveLength(poems.pageInfo.pageSize);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("poems, with pagination, succeeds", async () => {
+  test("poems, with pagination", async () => {
     const initialResponse = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
       variables: { first: 4 },
     });
+
+    expect(initialResponse.body.kind).toStrictEqual("single");
 
     let cursor = "";
 
@@ -105,15 +132,14 @@ describe("Graphql Query integration tests", () => {
       expect(poems.pageInfo.hasPreviousPage).toBe(false)
       expect(poems.pageInfo.endCursor).toStrictEqual(poems.edges[poems.pageInfo.pageSize-1].node.id)
       cursor = poems.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
-
     // get last 4 poems
     const secondResponse = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
       variables: { first: 4, after: cursor },
     });
+
+    expect(secondResponse.body.kind).toStrictEqual("single");
 
     if (secondResponse.body.kind === "single") {
       const poems = secondResponse.body.singleResult.data?.poems;
@@ -125,12 +151,10 @@ describe("Graphql Query integration tests", () => {
       expect(poems.pageInfo.pageSize).toBe(4);
       expect(poems.pageInfo.hasPreviousPage).toBe(true);
       expect(poems.pageInfo.hasNextPage).toBe(false)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("poems, with filter, succeeds", async () => {
+  test("poems, with filter", async () => {
     // half of poems should end with 0
     const response = await testServer.executeOperation<GetPoemsQuery>({
       query: GET_POEMS,
@@ -140,6 +164,8 @@ describe("Graphql Query integration tests", () => {
         },
       },
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const poems = response.body.singleResult.data?.poems;
@@ -153,48 +179,54 @@ describe("Graphql Query integration tests", () => {
       poems.edges.forEach((edge) => {
         expect(edge.node.title.endsWith("0"));
       });
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("poem, succeeds", async () => {
-    const poemsResponse = await testServer.executeOperation<GetPoemsQuery>({
-      query: GET_POEMS,
-    });
-    if (poemsResponse.body.kind === "single") {
-      const poems = poemsResponse.body.singleResult.data?.poems;
-      for (const edge of poems.edges) {
-        const response = await testServer.executeOperation<GetPoemQuery>({
-          query: GET_POEM,
-          variables: { id: edge.node.id },
-        });
+  test("poem", async () => {
+    for (const poem of poems) {
+      const response = await testServer.executeOperation<GetPoemQuery>({
+        query: GET_POEM,
+        variables: { id: poem.id },
+      });
 
-        if (response.body.kind === "single") {
-          const poem = response.body.singleResult.data?.poem;
-          const errors = response.body.singleResult.errors;
+      expect(response.body.kind).toStrictEqual("single")
 
-          if (errors) console.error(errors);
+      if (response.body.kind === "single") {
+        const poem = response.body.singleResult.data?.poem;
+        const errors = response.body.singleResult.errors;
 
-          expect(poem).toBeDefined();
-          expect(poem.id).toBeDefined();
-          expect(poem.title).toBeDefined();
-          expect(poem.text).toBeDefined();
-          expect(poem.datePublished).toBeDefined();
-          expect(poem.views).toBe(0);
-        } else {
-          throw new Error("invalid response kind");
-        }
+        if (errors) console.error(errors);
+
+        expect(poem).toBeDefined();
+        expect(poem.id).toBeDefined();
+        expect(poem.title).toBeDefined();
+        expect(poem.text).toBeDefined();
+        expect(poem.datePublished).toBeDefined();
+        expect(poem.views).toBe(0);
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("authors, wihout pagination or filter, succeeds", async () => {
+  test("poem, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetPoemQuery>({
+      query: GET_POEM,
+      variables: { id: testId}
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.poem).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "Poem"})
+    }
+  })
+
+  test("authors, wihout pagination or filter", async () => {
     const response = await testServer.executeOperation<GetAuthorsQuery>({
       query: GET_AUTHORS,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const authors = response.body.singleResult.data?.authors;
@@ -204,12 +236,10 @@ describe("Graphql Query integration tests", () => {
 
       expect(authors).toBeDefined();
       expect(authors.edges).toHaveLength(4);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("authors, with pagination, succeeds", async () => {
+  test("authors, with pagination", async () => {
     let cursor = "";
     const initialResponse = await testServer.executeOperation<GetAuthorsQuery>({
       query: GET_AUTHORS,
@@ -217,6 +247,8 @@ describe("Graphql Query integration tests", () => {
         first: 3,
       },
     });
+
+    expect(initialResponse.body.kind).toStrictEqual("single")
 
     if (initialResponse.body.kind === "single") {
       const authors = initialResponse.body.singleResult.data?.authors;
@@ -231,8 +263,6 @@ describe("Graphql Query integration tests", () => {
       expect(authors.pageInfo.hasPreviousPage).toBe(false)
 
       cursor = authors.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse = await testServer.executeOperation<GetAuthorsQuery>({
@@ -242,6 +272,8 @@ describe("Graphql Query integration tests", () => {
         after: cursor,
       },
     });
+
+    expect(secondResponse.body.kind).toStrictEqual("single")
 
     if (secondResponse.body.kind === "single") {
       const authors = secondResponse.body.singleResult.data?.authors;
@@ -254,18 +286,18 @@ describe("Graphql Query integration tests", () => {
       expect(authors.pageInfo.pageSize).toStrictEqual(authors.edges.length)
       expect(authors.pageInfo.hasNextPage).toBe(false)
       expect(authors.pageInfo.hasPreviousPage).toBe(true)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("authors, with filter, succeeds", async () => {
+  test("authors, with filter", async () => {
     const response = await testServer.executeOperation<GetAuthorsQuery>({
       query: GET_AUTHORS,
       variables: {
         usernameContains: "1",
       },
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const authors = response.body.singleResult.data?.authors;
@@ -276,84 +308,98 @@ describe("Graphql Query integration tests", () => {
       expect(authors).toBeDefined();
       expect(authors.edges).toHaveLength(1);
       expect(authors.edges[0].node.username).toBe("author1");
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("authorByUsername, succeeds", async () => {
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data?.authors;
-      for (const authorEdge of authors.edges) {
-        const response =
-          await testServer.executeOperation<GetAuthorByUsernameQuery>({
-            query: GET_AUTHOR_BY_USERNAME,
-            variables: {
-              username: authorEdge.node.username,
-            },
-          });
-
-        if (response.body.kind === "single") {
-          const author = response.body.singleResult.data?.authorByUsername;
-
-          expect(author).toBeDefined();
-          assert(author !== null);
-          expect(author.id).toBeDefined();
-          expect(author.username).toBeDefined();
-          expect(author.email).toBeDefined();
-          // @ts-ignore
-          expect(author.password).toBeUndefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
-    }
-  });
-
-  test("authorById, success", async () => {
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data?.authors;
-      for (const authorEdge of authors.edges) {
-        const response = await testServer.executeOperation<GetAuthorByIdQuery>({
-          query: GET_AUTHOR_BY_ID,
+  test("authorByUsername", async () => {
+    for (const author of authors) {
+      const response =
+        await testServer.executeOperation<GetAuthorByUsernameQuery>({
+          query: GET_AUTHOR_BY_USERNAME,
           variables: {
-            id: authorEdge.node.id,
+            username: author.username,
           },
         });
 
-        if (response.body.kind === "single") {
-          const author = response.body.singleResult.data?.authorById;
+      expect(response.body.kind).toStrictEqual("single")
 
-          expect(author).toBeDefined();
-          assert(author !== null);
-          expect(author.id).toBeDefined();
-          expect(author.username).toBeDefined();
-          expect(author.email).toBeDefined();
-          // @ts-ignore
-          expect(author.password).toBeUndefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
+      if (response.body.kind === "single") {
+        const author = response.body.singleResult.data?.authorByUsername;
+
+        expect(author).toBeDefined();
+        assert(author !== null);
+        expect(author.id).toBeDefined();
+        expect(author.username).toBeDefined();
+        expect(author.email).toBeDefined();
+        // @ts-ignore
+        expect(author.password).toBeUndefined();
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("comments, wihout pagination or filter, succeeds", async () => {
+  test("authorByUsername, invalid username", async () => {
+    const response = await testServer.executeOperation<GetAuthorByUsernameQuery>({
+      query: GET_AUTHOR_BY_USERNAME,
+      variables: { username: "kksdfsdf"}
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      const author = response.body.singleResult.data?.authorByUsername;
+      const errors = response.body.singleResult.errors;
+
+      expect(author).toBeUndefined();
+      expect(errors).toBeDefined();
+      verifyP2025Errors({ errors, modelName: "Author" });
+    }
+  })
+
+  test("authorById", async () => {
+    for (const author of authors) {
+      const response = await testServer.executeOperation<GetAuthorByIdQuery>({
+        query: GET_AUTHOR_BY_ID,
+        variables: {
+          id: author.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const author = response.body.singleResult.data?.authorById;
+
+        expect(author).toBeDefined();
+        assert(author !== null);
+        expect(author.id).toBeDefined();
+        expect(author.username).toBeDefined();
+        expect(author.email).toBeDefined();
+        // @ts-ignore
+        expect(author.password).toBeUndefined();
+      }
+    }
+  });
+
+  test("authorById, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetAuthorByIdQuery>({
+      query: GET_AUTHOR_BY_ID,
+      variables: { id: testId }
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.authorById).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "Author" });
+    }
+  })
+
+  test("comments, wihout pagination or filter", async () => {
     const response = await testServer.executeOperation<GetCommentsQuery>({
       query: GET_COMMENTS,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const comments = response.body.singleResult.data?.comments;
@@ -364,12 +410,10 @@ describe("Graphql Query integration tests", () => {
       expect(comments).toBeDefined();
       expect(comments.edges).toHaveLength(16);
       expect(comments.pageInfo.pageSize).toBe(16)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("comments, with pagination, succeeds", async () => {
+  test("comments, with pagination", async () => {
     let cursor = "";
     const initialResponse = await testServer.executeOperation<GetCommentsQuery>(
       {
@@ -379,6 +423,8 @@ describe("Graphql Query integration tests", () => {
         },
       },
     );
+
+    expect(initialResponse.body.kind).toStrictEqual("single")
 
     if (initialResponse.body.kind === "single") {
       const comments = initialResponse.body.singleResult.data?.comments;
@@ -393,8 +439,6 @@ describe("Graphql Query integration tests", () => {
       expect(comments.pageInfo.hasPreviousPage).toBe(false)
 
       cursor = comments.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse = await testServer.executeOperation<GetCommentsQuery>({
@@ -404,6 +448,8 @@ describe("Graphql Query integration tests", () => {
         after: cursor,
       },
     });
+
+    expect(secondResponse.body.kind).toStrictEqual("single")
 
     if (secondResponse.body.kind === "single") {
       const comments = secondResponse.body.singleResult.data?.comments;
@@ -416,121 +462,104 @@ describe("Graphql Query integration tests", () => {
       expect(comments.pageInfo.pageSize).toBe(6)
       expect(comments.pageInfo.hasNextPage).toBe(false)
       expect(comments.pageInfo.hasPreviousPage).toBe(true)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
   test("comments, with filter", async () => {
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data.authors;
-
-      for (const authorEdge of authors.edges) {
-        const commentResponse =
-          await testServer.executeOperation<GetCommentsQuery>({
-            query: GET_COMMENTS,
-            variables: {
-              authorId: authorEdge.node.id,
-            },
-          });
-
-        if (commentResponse.body.kind === "single") {
-          const comments = commentResponse.body.singleResult.data?.comments;
-          const errors = commentResponse.body.singleResult.errors;
-
-          if (errors) console.error(errors);
-
-          expect(comments).toBeDefined();
-          expect(comments.edges).toHaveLength(4);
-          expect(comments.pageInfo.pageSize).toBe(4)
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
-    }
-
-    const poemsResponse = await testServer.executeOperation<GetPoemsQuery>({
-      query: GET_POEMS,
-    });
-
-    if (poemsResponse.body.kind === "single") {
-      const poems = poemsResponse.body.singleResult.data.poems;
-
-      for (const edge of poems.edges) {
-        const commentResponse =
-          await testServer.executeOperation<GetCommentsQuery>({
-            query: GET_COMMENTS,
-            variables: {
-              poemId: edge.node.id,
-            },
-          });
-
-        if (commentResponse.body.kind === "single") {
-          const comments = commentResponse.body.singleResult.data?.comments;
-          const errors = commentResponse.body.singleResult.errors;
-
-          if (errors) console.error(errors);
-
-          expect(comments).toBeDefined();
-          expect(comments.edges).toHaveLength(2);
-          expect(comments.pageInfo.pageSize).toBe(2)
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
-    }
-  });
-
-  test("comment, succeeds", async () => {
-    const commentsResponse =
-      await testServer.executeOperation<GetCommentsQuery>({
-        query: GET_COMMENTS,
-      });
-
-    if (commentsResponse.body.kind === "single") {
-      const comments = commentsResponse.body.singleResult.data?.comments;
-
-      for (const commentEdge of comments.edges) {
-        const response = await testServer.executeOperation<GetCommentQuery>({
-          query: GET_COMMENT,
+    for (const author of authors) {
+      const response =
+        await testServer.executeOperation<GetCommentsQuery>({
+          query: GET_COMMENTS,
           variables: {
-            id: commentEdge.node.id,
+            authorId: author.id,
           },
         });
 
-        if (response.body.kind === "single") {
-          const comment = response.body.singleResult.data?.comment;
-          const errors = response.body.singleResult.errors;
+      expect(response.body.kind).toStrictEqual("single")
 
-          if (errors) console.error(errors);
+      if (response.body.kind === "single") {
+        const comments = response.body.singleResult.data?.comments;
+        const errors = response.body.singleResult.errors;
 
-          expect(comment).toBeDefined();
-          assert(comment !== null);
+        if (errors) console.error(errors);
 
-          expect(comment.id).toBeDefined();
-          expect(comment.text).toBeDefined();
-          expect(comment.datePublished).toBeDefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
+        expect(comments).toBeDefined();
+        expect(comments.edges).toHaveLength(4);
+        expect(comments.pageInfo.pageSize).toBe(4)
       }
-    } else {
-      throw new Error("invalid response kind");
+    }
+
+    for (const poem of poems) {
+      const response =
+        await testServer.executeOperation<GetCommentsQuery>({
+          query: GET_COMMENTS,
+          variables: {
+            poemId: poem.id,
+          },
+        });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const comments = response.body.singleResult.data?.comments;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(comments).toBeDefined();
+        expect(comments.edges).toHaveLength(2);
+        expect(comments.pageInfo.pageSize).toBe(2)
+      }
     }
   });
 
-  test("collections, without pagination or filter, succeeds", async () => {
+  test("comment", async () => {
+    for (const comment of comments) {
+      const response = await testServer.executeOperation<GetCommentQuery>({
+        query: GET_COMMENT,
+        variables: {
+          id: comment.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const comment = response.body.singleResult.data?.comment;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(comment).toBeDefined();
+        assert(comment !== null);
+
+        expect(comment.id).toBeDefined();
+        expect(comment.text).toBeDefined();
+        expect(comment.datePublished).toBeDefined();
+      }
+    }
+  });
+
+  test("comment, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetCommentQuery>({
+      query: GET_COMMENT,
+      variables: { id: testId }
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.comment).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "Comment"})
+    }
+  })
+
+  test("collections, without pagination or filter", async () => {
     const response = await testServer.executeOperation<GetCollectionsQuery>({
       query: GET_COLLECTIONS,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const collections = response.body.singleResult.data?.collections;
@@ -541,12 +570,10 @@ describe("Graphql Query integration tests", () => {
       expect(collections).toBeDefined();
       expect(collections.edges).toHaveLength(4)
       expect(collections.pageInfo.pageSize).toBe(4)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("collections, with pagination, succeeds", async () => {
+  test("collections, with pagination", async () => {
     let cursor = "";
     const initialResponse =
       await testServer.executeOperation<GetCollectionsQuery>({
@@ -555,6 +582,8 @@ describe("Graphql Query integration tests", () => {
           first: 3,
         },
       });
+
+    expect(initialResponse.body.kind).toStrictEqual("single")
 
     if (initialResponse.body.kind === "single") {
       const collections = initialResponse.body.singleResult.data?.collections;
@@ -568,8 +597,6 @@ describe("Graphql Query integration tests", () => {
       expect(collections.pageInfo.hasPreviousPage).toBe(false)
 
       cursor = collections.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse =
@@ -581,6 +608,8 @@ describe("Graphql Query integration tests", () => {
         },
       });
 
+    expect(secondResponse.body.kind).toStrictEqual("single")
+
     if (secondResponse.body.kind === "single") {
       const collections = secondResponse.body.singleResult.data?.collections;
       const errors = secondResponse.body.singleResult.errors;
@@ -591,12 +620,10 @@ describe("Graphql Query integration tests", () => {
       expect(collections.edges).toHaveLength(1);
       expect(collections.pageInfo.hasNextPage).toBe(false)
       expect(collections.pageInfo.hasPreviousPage).toBe(true)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("collections, with filter, succeeds", async () => {
+  test("collections, with filter", async () => {
     const response1 = await testServer.executeOperation<GetCollectionsQuery>({
       query: GET_COLLECTIONS,
       variables: {
@@ -606,14 +633,14 @@ describe("Graphql Query integration tests", () => {
       },
     });
 
+    expect(response1.body.kind).toStrictEqual("single")
+
     if (response1.body.kind === "single") {
       const collections = response1.body.singleResult.data?.collections;
 
       expect(collections).toBeDefined();
       expect(collections.edges).toHaveLength(1);
       expect(collections.pageInfo.pageSize).toBe(1);
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const response2 = await testServer.executeOperation<GetCollectionsQuery>({
@@ -625,89 +652,84 @@ describe("Graphql Query integration tests", () => {
       },
     });
 
+    expect(response2.body.kind).toStrictEqual("single")
+
     if (response2.body.kind === "single") {
       const collections = response2.body.singleResult.data?.collections;
 
       expect(collections).toBeDefined();
       expect(collections.edges).toHaveLength(1);
       expect(collections.pageInfo.pageSize).toBe(1);
-    } else {
-      throw new Error("invalid response kind");
     }
 
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data?.authors;
-
-      for (const authorEdge of authors.edges) {
-        const response = await testServer.executeOperation<GetCollectionsQuery>(
-          {
-            query: GET_COLLECTIONS,
-            variables: {
-              filter: {
-                authorId: authorEdge.node.id,
-              },
+    for (const author of authors) {
+      const response = await testServer.executeOperation<GetCollectionsQuery>(
+        {
+          query: GET_COLLECTIONS,
+          variables: {
+            filter: {
+              authorId: author.id,
             },
           },
-        );
+        },
+      );
 
-        if (response.body.kind === "single") {
-          const collections = response.body.singleResult.data?.collections;
+      expect(response.body.kind).toStrictEqual("single")
 
-          expect(collections).toBeDefined();
-          expect(collections.edges).toHaveLength(1);
-          expect(collections.pageInfo.pageSize).toBe(1);
-        } else {
-          throw new Error("invalid response kind");
-        }
+      if (response.body.kind === "single") {
+        const collections = response.body.singleResult.data?.collections;
+
+        expect(collections).toBeDefined();
+        expect(collections.edges).toHaveLength(1);
+        expect(collections.pageInfo.pageSize).toBe(1);
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("collection, without pagination or filter, succeeds", async () => {
-    const collectionsResponse =
-      await testServer.executeOperation<GetCollectionsQuery>({
-        query: GET_COLLECTIONS,
+  test("collection, without pagination or filter", async () => {
+    for (const collection of collections) {
+      const response = await testServer.executeOperation<GetCollectionQuery>({
+        query: GET_COLLECTION,
+        variables: {
+          id: collection.id,
+        },
       });
 
-    if (collectionsResponse.body.kind === "single") {
-      const collections =
-        collectionsResponse.body.singleResult.data?.collections;
+      expect(response.body.kind).toStrictEqual("single")
 
-      for (const collectionEdge of collections.edges) {
-        const response = await testServer.executeOperation<GetCollectionQuery>({
-          query: GET_COLLECTION,
-          variables: {
-            id: collectionEdge.node.id,
-          },
-        });
+      if (response.body.kind === "single") {
+        const collection = response.body.singleResult.data?.collection;
 
-        if (response.body.kind === "single") {
-          const collection = response.body.singleResult.data?.collection;
-
-          expect(collection).toBeDefined();
-          assert(collection !== null);
-          expect(collection.id).toBeDefined();
-          expect(collection.title).toBeDefined();
-          expect(collection.dateCreated).toBeDefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
+        expect(collection).toBeDefined();
+        assert(collection !== null);
+        expect(collection.id).toBeDefined();
+        expect(collection.title).toBeDefined();
+        expect(collection.dateCreated).toBeDefined();
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("likes, without pagination or filter, succeeds", async () => {
+  test("collection, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetCollectionQuery>({
+      query: GET_COLLECTION,
+      variables: { id: testId }
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    expect(response.body.kind).toStrictEqual("single");
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.collection).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "Collection"})
+    }
+  })
+
+  test("likes, without pagination or filter", async () => {
     const response = await testServer.executeOperation<GetLikesQuery>({
       query: GET_LIKES,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const likes = response.body.singleResult.data?.likes;
@@ -718,12 +740,10 @@ describe("Graphql Query integration tests", () => {
       expect(likes).toBeDefined();
       expect(likes.edges).toHaveLength(8);
       expect(likes.pageInfo.pageSize).toBe(8)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("likes, with pagination, succeeds", async () => {
+  test("likes, with pagination", async () => {
     let cursor = "";
     const initialResponse = await testServer.executeOperation<GetLikesQuery>({
       query: GET_LIKES,
@@ -731,6 +751,8 @@ describe("Graphql Query integration tests", () => {
         first: 5,
       },
     });
+
+    expect(initialResponse.body.kind).toStrictEqual("single")
 
     if (initialResponse.body.kind === "single") {
       const likes = initialResponse.body.singleResult.data?.likes;
@@ -742,8 +764,6 @@ describe("Graphql Query integration tests", () => {
       expect(likes.edges).toHaveLength(5);
       expect(likes.pageInfo.pageSize).toBe(5)
       cursor = likes.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse = await testServer.executeOperation<GetLikesQuery>({
@@ -754,6 +774,8 @@ describe("Graphql Query integration tests", () => {
       },
     });
 
+    expect(secondResponse.body.kind).toStrictEqual("single")
+
     if (secondResponse.body.kind === "single") {
       const likes = secondResponse.body.singleResult.data?.likes;
       const errors = secondResponse.body.singleResult.errors;
@@ -763,103 +785,89 @@ describe("Graphql Query integration tests", () => {
       expect(likes).toBeDefined();
       expect(likes.edges).toHaveLength(3);
       expect(likes.pageInfo.pageSize).toBe(3)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("likes, with filter, succeeds", async () => {
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
+  test("likes, with filter", async () => {
+    for (const author of authors) {
+      const response = await testServer.executeOperation<GetLikesQuery>({
+        query: GET_LIKES,
+        variables: {
+          authorId: author.id,
+        },
+      });
 
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data?.authors;
+      expect(response.body.kind).toStrictEqual("single")
 
-      for (const authorEdge of authors.edges) {
-        const response = await testServer.executeOperation<GetLikesQuery>({
-          query: GET_LIKES,
-          variables: {
-            authorId: authorEdge.node.id,
-          },
-        });
-
-        if (response.body.kind === "single") {
-          const likes = response.body.singleResult.data?.likes;
-          expect(likes.edges).toHaveLength(2);
-        } else {
-          throw new Error("invalid response kind");
-        }
+      if (response.body.kind === "single") {
+        const likes = response.body.singleResult.data?.likes;
+        expect(likes.edges).toHaveLength(2);
       }
-    } else {
-      throw new Error("invalid response kind");
     }
 
-    const poemsResponse = await testServer.executeOperation<GetPoemsQuery>({
-      query: GET_POEMS,
-    });
+    for (const poem of poems) {
+      const response = await testServer.executeOperation<GetLikesQuery>({
+        query: GET_LIKES,
+        variables: {
+          poemId: poem.id,
+        },
+      });
 
-    if (poemsResponse.body.kind === "single") {
-      const poems = poemsResponse.body.singleResult.data?.poems.edges.map((edge) => edge.node);
+      expect(response.body.kind).toStrictEqual("single")
 
-      for (const poem of poems) {
-        const response = await testServer.executeOperation<GetLikesQuery>({
-          query: GET_LIKES,
-          variables: {
-            poemId: poem.id,
-          },
-        });
-
-        if (response.body.kind === "single") {
-          const likes = response.body.singleResult.data?.likes;
-          expect(likes.edges).toHaveLength(1);
-        } else {
-          throw new Error("invalid response kind");
-        }
+      if (response.body.kind === "single") {
+        const likes = response.body.singleResult.data?.likes;
+        expect(likes.edges).toHaveLength(1);
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("like, succeeds", async () => {
-    const likesResponse = await testServer.executeOperation<GetLikesQuery>({
-      query: GET_LIKES,
-    });
+  test("like", async () => {
+    for (const like of likes) {
+      const response = await testServer.executeOperation<GetLikeQuery>({
+        query: GET_LIKE,
+        variables: {
+          id: like.id,
+        },
+      });
 
-    if (likesResponse.body.kind === "single") {
-      for (const like of likesResponse.body.singleResult.data?.likes.edges.map((edge) => edge.node)) {
-        const response = await testServer.executeOperation<GetLikeQuery>({
-          query: GET_LIKE,
-          variables: {
-            id: like.id,
-          },
-        });
+      expect(response.body.kind).toStrictEqual("single")
 
-        if (response.body.kind === "single") {
-          const like = response.body.singleResult.data?.like;
-          const errors = response.body.singleResult.errors;
+      if (response.body.kind === "single") {
+        const like = response.body.singleResult.data?.like;
+        const errors = response.body.singleResult.errors;
 
-          if (errors) console.error(errors);
+        if (errors) console.error(errors);
 
-          expect(like).toBeDefined();
-          expect(like.id).toBeDefined();
-          expect(like.author).toBeDefined();
-          expect(like.poem).toBeDefined();
-          expect(like.datePublished).toBeDefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
+        expect(like).toBeDefined();
+        expect(like.id).toBeDefined();
+        expect(like.author).toBeDefined();
+        expect(like.poem).toBeDefined();
+        expect(like.datePublished).toBeDefined();
       }
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("savedPoems, witout pagination or filter, succeeds", async () => {
+  test("like, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetLikeQuery>({
+      query: GET_LIKE,
+      variables: { id: testId }
+    })
+
+    expect(response.body.kind).toStrictEqual("single")
+
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.like).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "Like" })
+    }
+  })
+
+  test("savedPoems, witout pagination or filter", async () => {
     const response = await testServer.executeOperation<GetSavedPoemsQuery>({
       query: GET_SAVED_POEMS,
     });
+
+    expect(response.body.kind).toStrictEqual("single")
 
     if (response.body.kind === "single") {
       const savedPoems = response.body.singleResult.data?.savedPoems;
@@ -868,8 +876,6 @@ describe("Graphql Query integration tests", () => {
       if (errors) console.error(errors);
 
       expect(savedPoems.edges).toHaveLength(8);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
@@ -883,6 +889,8 @@ describe("Graphql Query integration tests", () => {
         },
       });
 
+    expect(initialResponse.body.kind).toStrictEqual("single")
+
     if (initialResponse.body.kind === "single") {
       const savedPoems = initialResponse.body.singleResult.data?.savedPoems;
       const errors = initialResponse.body.singleResult.errors;
@@ -895,8 +903,6 @@ describe("Graphql Query integration tests", () => {
       expect(savedPoems.pageInfo.hasPreviousPage).toBe(false);
 
       cursor = savedPoems.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse =
@@ -907,6 +913,8 @@ describe("Graphql Query integration tests", () => {
           after: cursor,
         },
       });
+
+    expect(secondResponse.body.kind).toStrictEqual("single")
 
     if (secondResponse.body.kind === "single") {
       const savedPoems = secondResponse.body.singleResult.data?.savedPoems;
@@ -921,121 +929,108 @@ describe("Graphql Query integration tests", () => {
     }
   });
 
-  test("savedPoems, with filter, succeeds", async () => {
-    const poemsResponse = await testServer.executeOperation<GetPoemsQuery>({
-      query: GET_POEMS,
-    });
-
-    if (poemsResponse.body.kind === "single") {
-      const poems = poemsResponse.body.singleResult.data.poems.edges.map((edge) => edge.node)
-      for (const poem of poems) {
-        const response = await testServer.executeOperation<GetSavedPoemsQuery>({
-          query: GET_SAVED_POEMS,
-          variables: {
-            poemId: poem.id,
-          },
-        });
-
-        if (response.body.kind === "single") {
-          const savedPoems = response.body.singleResult.data?.savedPoems;
-          const errors = response.body.singleResult.errors;
-
-          if (errors) console.error(errors);
-
-          expect(savedPoems).toBeDefined();
-          assert(savedPoems !== null);
-          expect(savedPoems.edges).toHaveLength(1);
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
-    }
-
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      for (const author of authorsResponse.body.singleResult.data.authors.edges.map((edge) => edge.node)) {
-        const response = await testServer.executeOperation<GetSavedPoemsQuery>({
-          query: GET_SAVED_POEMS,
-          variables: {
-            authorId: author.id,
-          },
-        });
-
-        if (response.body.kind === "single") {
-          const savedPoems = response.body.singleResult.data?.savedPoems;
-          const errors = response.body.singleResult.errors;
-
-          if (errors) console.error(errors);
-
-          expect(savedPoems).toBeDefined();
-          assert(savedPoems !== null);
-          expect(savedPoems.edges).toHaveLength(2);
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
-    }
-  });
-
-  test("savedPoem, succeeds", async () => {
-    const savedPoemsResponse =
-      await testServer.executeOperation<GetSavedPoemsQuery>({
+  test("savedPoems, with filter", async () => {
+    for (const poem of poems) {
+      const response = await testServer.executeOperation<GetSavedPoemsQuery>({
         query: GET_SAVED_POEMS,
+        variables: {
+          poemId: poem.id,
+        },
       });
 
-    if (savedPoemsResponse.body.kind === "single") {
-      for (const savedPoem of savedPoemsResponse.body.singleResult.data
-        ?.savedPoems.edges.map((edge) => edge.node)) {
-        const response = await testServer.executeOperation<GetSavedPoemQuery>({
-          query: GET_SAVED_POEM,
-          variables: {
-            id: savedPoem.id,
-          },
-        });
+      expect(response.body.kind).toStrictEqual("single")
 
-        if (response.body.kind === "single") {
-          const savedPoem = response.body.singleResult.data?.savedPoem;
-          const errors = response.body.singleResult.errors;
+      if (response.body.kind === "single") {
+        const savedPoems = response.body.singleResult.data?.savedPoems;
+        const errors = response.body.singleResult.errors;
 
-          if (errors) console.error(errors);
+        if (errors) console.error(errors);
 
-          expect(savedPoem).toBeDefined();
-          expect(savedPoem.id).toBeDefined();
-          expect(savedPoem.dateSaved).toBeDefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
+        expect(savedPoems).toBeDefined();
+        assert(savedPoems !== null);
+        expect(savedPoems.edges).toHaveLength(1);
       }
-    } else {
-      throw new Error("invalid response kind");
+    }
+
+    for (const author of authors) {
+      const response = await testServer.executeOperation<GetSavedPoemsQuery>({
+        query: GET_SAVED_POEMS,
+        variables: {
+          authorId: author.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const savedPoems = response.body.singleResult.data?.savedPoems;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(savedPoems).toBeDefined();
+        assert(savedPoems !== null);
+        expect(savedPoems.edges).toHaveLength(2);
+      }
     }
   });
 
-  test("followedAuthors, without pagination or filter, succeeds", async () => {
+  test("savedPoem", async () => {
+    for (const savedPoem of savedPoems) {
+      const response = await testServer.executeOperation<GetSavedPoemQuery>({
+        query: GET_SAVED_POEM,
+        variables: {
+          id: savedPoem.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const savedPoem = response.body.singleResult.data?.savedPoem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(savedPoem).toBeDefined();
+        expect(savedPoem.id).toBeDefined();
+        expect(savedPoem.dateSaved).toBeDefined();
+      }
+    }
+  });
+
+  test("savedPoem, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetSavedPoemQuery>({
+      query: GET_SAVED_POEM,
+      variables: { id: testId}
+    })
+
+    expect(response.body.kind).toStrictEqual("single");
+
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.savedPoem).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "SavedPoem"})
+    }
+  })
+
+  test("followedAuthors, without pagination or filter", async () => {
     const response = await testServer.executeOperation<GetFollowedAuthorsQuery>(
       {
         query: GET_FOLLOWED_AUTHORS,
       },
     );
 
+    expect(response.body.kind).toStrictEqual("single")
+
     if (response.body.kind === "single") {
       const followedAuthors = response.body.singleResult.data?.followedAuthors;
 
       expect(followedAuthors).toBeDefined();
       expect(followedAuthors.edges).toHaveLength(12);
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("followedAuthors, with pagination, succeeds", async () => {
+  test("followedAuthors, with pagination", async () => {
     let cursor = "";
     const initialResponse =
       await testServer.executeOperation<GetFollowedAuthorsQuery>({
@@ -1044,6 +1039,8 @@ describe("Graphql Query integration tests", () => {
           first: 10,
         },
       });
+
+    expect(initialResponse.body.kind).toStrictEqual("single")
 
     if (initialResponse.body.kind === "single") {
       const followedAuthors =
@@ -1056,8 +1053,6 @@ describe("Graphql Query integration tests", () => {
       expect(followedAuthors.pageInfo.hasPreviousPage).toBe(false)
 
       cursor = followedAuthors.pageInfo.endCursor;
-    } else {
-      throw new Error("invalid response kind");
     }
 
     const secondResponse =
@@ -1065,6 +1060,8 @@ describe("Graphql Query integration tests", () => {
         query: GET_FOLLOWED_AUTHORS,
         variables: { first: 10, after: cursor },
       });
+
+    expect(secondResponse.body.kind).toStrictEqual("single")
 
     if (secondResponse.body.kind === "single") {
       const followedAuthors =
@@ -1075,19 +1072,10 @@ describe("Graphql Query integration tests", () => {
       expect(followedAuthors.pageInfo.pageSize).toBe(2);
       expect(followedAuthors.pageInfo.hasNextPage).toBe(false)
       expect(followedAuthors.pageInfo.hasPreviousPage).toBe(true)
-    } else {
-      throw new Error("invalid response kind");
     }
   });
 
-  test("followedAuthors, with filter, succeeds", async () => {
-    const authorsResponse = await testServer.executeOperation<GetAuthorsQuery>({
-      query: GET_AUTHORS,
-    });
-
-    if (authorsResponse.body.kind === "single") {
-      const authors = authorsResponse.body.singleResult.data?.authors.edges.map((edge) => edge.node);
-
+  test("followedAuthors, with filter", async () => {
       for (const author of authors) {
         const followerResponse =
           await testServer.executeOperation<GetFollowedAuthorsQuery>({
@@ -1097,14 +1085,14 @@ describe("Graphql Query integration tests", () => {
             },
           });
 
+        expect(followerResponse.body.kind).toStrictEqual("single")
+
         if (followerResponse.body.kind === "single") {
           const followedAuthors =
             followerResponse.body.singleResult.data?.followedAuthors;
 
           expect(followedAuthors).toBeDefined();
           expect(followedAuthors.edges).toHaveLength(3);
-        } else {
-          throw new Error("invalid response kind");
         }
 
         const followingResponse =
@@ -1115,56 +1103,57 @@ describe("Graphql Query integration tests", () => {
             },
           });
 
+        expect(followingResponse.body.kind).toStrictEqual("single")
+
         if (followingResponse.body.kind === "single") {
           const followedAuthors =
             followingResponse.body.singleResult.data?.followedAuthors;
 
           expect(followedAuthors).toBeDefined();
           expect(followedAuthors.edges).toHaveLength(3);
-        } else {
-          throw new Error("invalid response kind");
         }
       }
-    } else {
-      throw new Error("invalid response kind");
+  });
+
+  test("followedAuthor", async () => {
+    for (const followedAuthor of followedAuthors) {
+      const response =
+        await testServer.executeOperation<GetFollowedAuthorQuery>({
+          query: GET_FOLLOWED_AUTHOR,
+          variables: {
+            id: followedAuthor.id,
+          },
+        });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const followedAuthor =
+          response.body.singleResult.data?.followedAuthor;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(followedAuthor).toBeDefined();
+        expect(followedAuthor.id).toBeDefined();
+        expect(followedAuthor.dateFollowed).toBeDefined();
+      }
     }
   });
 
-  test("followedAuthor, succeeds", async () => {
-    const followedAuthorsResponse =
-      await testServer.executeOperation<GetFollowedAuthorsQuery>({
-        query: GET_FOLLOWED_AUTHORS,
-      });
+  test("followedAuthor, with invalid id", async () => {
+    const response = await testServer.executeOperation<GetFollowedAuthorQuery>({
+      query: GET_FOLLOWED_AUTHOR,
+      variables: { id: testId }
+    })
 
-    if (followedAuthorsResponse.body.kind === "single") {
-      for (const followedAuthor of followedAuthorsResponse.body.singleResult
-        .data?.followedAuthors.edges.map((edge) => edge.node)) {
-        const response =
-          await testServer.executeOperation<GetFollowedAuthorQuery>({
-            query: GET_FOLLOWED_AUTHOR,
-            variables: {
-              id: followedAuthor.id,
-            },
-          });
+    expect(response.body.kind).toStrictEqual("single");
 
-        if (response.body.kind === "single") {
-          const followedAuthor =
-            response.body.singleResult.data?.followedAuthor;
-          const errors = response.body.singleResult.errors;
-
-          if (errors) console.error(errors);
-
-          expect(followedAuthor).toBeDefined();
-          expect(followedAuthor.id).toBeDefined();
-          expect(followedAuthor.dateFollowed).toBeDefined();
-        } else {
-          throw new Error("invalid response kind");
-        }
-      }
-    } else {
-      throw new Error("invalid response kind");
+    if (response.body.kind === "single") {
+      expect(response.body.singleResult.data?.followedAuthor).toBeUndefined();
+      verifyP2025Errors({ errors: response.body.singleResult.errors, modelName: "FollowedAuthor" })
     }
-  });
+  })
 
   test("me", async () => {
     const loginResponse = await testServer.executeOperation<LoginMutation>({
@@ -1175,6 +1164,8 @@ describe("Graphql Query integration tests", () => {
       },
     });
 
+    expect(loginResponse.body.kind).toStrictEqual("single")
+
     if (loginResponse.body.kind === "single") {
       const login = loginResponse.body.singleResult.data?.login;
       const response = await testServer.executeOperation<MeQuery>({
@@ -1183,6 +1174,8 @@ describe("Graphql Query integration tests", () => {
           authorization: `Bearer ${login.token}`,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const me = response.body.singleResult.data?.me;

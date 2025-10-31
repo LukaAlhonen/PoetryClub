@@ -39,6 +39,10 @@ describe("SavedPoemService integration tests", () => {
     }
   });
 
+  test("getSavedPoem", async () => {
+    await expect(services.savedPoemService.getSavedPoem({ id: "kksdfd" })).rejects.toThrow();
+  })
+
   test("getSavedPoems", async () => {
     const result = await services.savedPoemService.getSavedPoems();
     expect(result).toBeDefined();
@@ -159,7 +163,7 @@ describe("SavedPoemService integration tests", () => {
     const result = await services.savedPoemService.removeSavedPoem({id: savedPoems[0].id})
 
     // make sure savedPoem was removed
-    await expect(services.savedPoemService.getSavedPoem({id: result.id})).resolves.toBeNull()
+    await expect(services.savedPoemService.getSavedPoem({ id: result.id })).rejects.toThrow();
     await expect(services.savedPoemService.getSavedPoems()).resolves.toHaveLength(7)
   })
 

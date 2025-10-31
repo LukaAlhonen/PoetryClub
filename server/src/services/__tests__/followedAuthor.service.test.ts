@@ -41,6 +41,10 @@ describe("FollowedAuthorService integration tests", () => {
     }
   });
 
+  test("getFollowedAuthor, with invalid id", async () => {
+    await expect(services.followedAuthorService.getFollowedAuthor({ id: "kkk" })).rejects.toThrow();
+  })
+
   test("getFollowedAuthors", async () => {
     const result = await services.followedAuthorService.getFollowedAuthors()
     expect(result).toBeDefined()
@@ -151,7 +155,7 @@ describe("FollowedAuthorService integration tests", () => {
     expect(result).toBeDefined()
 
     // make sure followedAuthor was removed
-    await expect(services.followedAuthorService.getFollowedAuthor({id: result.id})).resolves.toBeNull()
+    await expect(services.followedAuthorService.getFollowedAuthor({ id: result.id })).rejects.toThrow();
     await expect(services.followedAuthorService.getFollowedAuthors()).resolves.toHaveLength(11)
   })
 

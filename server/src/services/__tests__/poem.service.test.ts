@@ -40,6 +40,10 @@ describe("PoemService integration tests", () => {
     }
   });
 
+  test("getPoem, with invalid id", async () => {
+    await expect(services.poemService.getPoem({ id: "kkkkk" })).rejects.toThrow();
+  })
+
   test("getPoems", async () => {
     const result = await services.poemService.getPoems();
 
@@ -267,7 +271,7 @@ describe("PoemService integration tests", () => {
     expect(result).toBeDefined();
 
     // make sure poem was removed
-    await expect(services.poemService.getPoem({id: result.id})).resolves.toBeNull()
+    await expect(services.poemService.getPoem({ id: result.id })).rejects.toThrow();
     await expect(services.poemService.getPoems()).resolves.toHaveLength(7)
   })
 

@@ -6,6 +6,8 @@ import config from "../config.js";
 import { MyJwtPayload } from "../types/auth.js";
 import { AuthorService } from "../services/author.service.js";
 import { randomUUID } from "node:crypto";
+import { GraphQLError } from "graphql";
+import { Prisma } from "../../generated/prisma/index.js";
 
 /**
  * Verifies user is logged in and auth token is valid
@@ -19,15 +21,18 @@ const verifyUser = async ({
   user: MyJwtPayload;
   authorService: AuthorService;
 }) => {
-  if (!user) throw new Error("not authenticated");
+  if (!user)
+    throw new GraphQLError("not authenticated", {
+      extensions: { code: "UNAUTHENITCATED" },
+    });
   const author = await authorService.getAuthorById({
     id: user.authorId,
     omitAuthVersion: false,
   });
-  if (!author) throw new Error("user not found");
-  if (!(author.authVersion === user.authVersion)) {
-    throw new Error("token no longer valid");
-  }
+  if (!author || author.authVersion !== user.authVersion)
+    throw new GraphQLError("not authenticated", {
+      extensions: { code: "UNAUTHENITCATED" },
+    });
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -35,31 +40,54 @@ export const Mutation: Resolvers["Mutation"] = {
   createPoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
-    // make sure collection belongs to author
-    if (input.collectionId) {
-      const collection = await services.collectionService.getCollection({
-        id: input.collectionId,
-      });
-      if (collection.authorId !== user.authorId) {
-        throw new Error(`cannot add poem to collection`);
-      }
-    }
-
     try {
+      // make sure collection belongs to author
+      if (input.collectionId) {
+        const collection = await services.collectionService.getCollection({
+          id: input.collectionId,
+        });
+        if (collection.authorId !== user.authorId) {
+          // throw new Error(`cannot add poem to collection`);
+          throw new GraphQLError("Cannot add poem to collection", {
+            extensions: { code: "UNAUTHORIZED" },
+          });
+        }
+      }
+
       return services.poemService.createPoem({
         ...input,
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createPoem");
+      handlePrismaError({ err })
+      // if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      //   if (err.code === "P2002") {
+      //     if (err.meta) {
+      //       console.log(err.meta);
+      //     }
+      //     throw new GraphQLError(
+      //       `A Poem with the title ${input.title} already exists`,
+      //       { extensions: { code: "BAD_USER_INPUT" } },
+      //     );
+      //   } else {
+      //     throw new GraphQLError("An unexpected error occured", {
+      //       extensions: { code: "INTERNAL_SERVER_ERROR" },
+      //     });
+      //   }
+      // } else {
+      //   throw new GraphQLError("An unexpected error occured", {
+      //     extensions: { code: "INTERNAL_SERVER_ERROR" },
+      //   });
+      // }
     }
   },
 
-  createAuthor: (_, { input }, { services }) => {
+  createAuthor: async (_, { input }, { services }) => {
     try {
-      return services.authorService.createAuthor(input);
+      const author = await services.authorService.createAuthor(input);
+      return author;
     } catch (err) {
-      handlePrismaError(err, "createAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -67,13 +95,14 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.commentService.createComment({
+      const comment = await services.commentService.createComment({
         poemId,
         text,
         authorId: user.authorId,
       });
+      return comment;
     } catch (err) {
-      handlePrismaError(err, "createComment");
+      handlePrismaError({err});
     }
   },
 
@@ -81,12 +110,13 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.collectionService.createCollection({
+      const collection = await services.collectionService.createCollection({
         title,
         authorId: user.authorId,
       });
+      return collection;
     } catch (err) {
-      handlePrismaError(err, "createCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -94,12 +124,13 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.savedPoemService.createSavedPoem({
+      const savedPoem = await services.savedPoemService.createSavedPoem({
         poemId,
         authorId: user.authorId,
       });
+      return savedPoem;
     } catch (err) {
-      handlePrismaError(err, "createSavedPoem");
+      handlePrismaError({err});
     }
   },
 
@@ -107,12 +138,13 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.likeService.createLike({
+      const like = await services.likeService.createLike({
         poemId,
         authorId: user.authorId,
       });
+      return like
     } catch (err) {
-      handlePrismaError(err, "createLike");
+      handlePrismaError({err});
     }
   },
 
@@ -120,12 +152,13 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.followedAuthorService.createFollowedAuthor({
+      const followedAuthor = await services.followedAuthorService.createFollowedAuthor({
         authorId: user.authorId,
         followingId,
       });
+      return followedAuthor;
     } catch (err) {
-      handlePrismaError(err, "createFollowedAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -133,26 +166,27 @@ export const Mutation: Resolvers["Mutation"] = {
   updatePoem: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
-    // make sure collection belongs to author
-    if (input.collectionId) {
-      const collection = await services.collectionService.getCollection({
-        id: input.collectionId,
-      });
-      if (collection.authorId !== user.authorId) {
-        throw new Error(`cannot add poem to collection`);
-      }
-    }
-
-    const poem = await services.poemService.getPoem({ id: input.poemId });
-
-    if (poem.authorId !== user.authorId) {
-      throw new Error("not authorised");
-    }
-
     try {
-      return services.poemService.updatePoem(input);
+      // make sure collection belongs to author
+      if (input.collectionId) {
+        const collection = await services.collectionService.getCollection({
+          id: input.collectionId,
+        });
+        if (collection.authorId !== user.authorId) {
+          throw new GraphQLError(`cannot add poem to collection`, { extensions: { code: "BAD_USER_INPUT" } });
+        }
+      }
+
+      const poem = await services.poemService.getPoem({ id: input.poemId });
+
+      if (poem.authorId !== user.authorId) {
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUHTORIZED" } });
+      }
+
+      const updatedPoem = await services.poemService.updatePoem(input);
+      return updatedPoem;
     } catch (err) {
-      handlePrismaError(err, "updatePoem");
+      handlePrismaError({err});
     }
   },
 
@@ -162,31 +196,33 @@ export const Mutation: Resolvers["Mutation"] = {
     const authVersion = randomUUID();
 
     try {
-      return services.authorService.updateAuthor({
+      const updatedAuthor = await services.authorService.updateAuthor({
         authorId: user.authorId,
         authVersion,
         ...input,
       });
+      return updatedAuthor;
     } catch (err) {
-      handlePrismaError(err, "updateAuthor");
+      handlePrismaError({err});
     }
   },
 
   updateCollection: async (_, { input }, { user, services }) => {
     await verifyUser({ user, authorService: services.authorService });
 
-    const collection = await services.collectionService.getCollection({
-      id: input.id,
-    });
-
-    if (collection.authorId !== user.authorId) {
-      throw new Error("not authenticated");
-    }
-
     try {
-      return services.collectionService.updateCollection(input);
+      const collection = await services.collectionService.getCollection({
+        id: input.id,
+      });
+
+      if (collection.authorId !== user.authorId) {
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
+      }
+
+      const updatedCollection = await services.collectionService.updateCollection(input);
+      return updatedCollection;
     } catch (err) {
-      handlePrismaError(err, "updateCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -195,9 +231,10 @@ export const Mutation: Resolvers["Mutation"] = {
     await verifyUser({ user, authorService: services.authorService });
 
     try {
-      return services.authorService.removeAuthor({ id: user.authorId });
+      const removedAuthor = await services.authorService.removeAuthor({ id: user.authorId });
+      return removedAuthor;
     } catch (err) {
-      handlePrismaError(err, "removeAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -208,16 +245,13 @@ export const Mutation: Resolvers["Mutation"] = {
       const poem = await services.poemService.getPoem({ id: poemId });
 
       if (poem.authorId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removePoem");
-    }
 
-    try {
-      return services.poemService.removePoem({ id: poemId });
+      const removedPoem = await services.poemService.removePoem({ id: poemId });
+      return removedPoem;
     } catch (err) {
-      handlePrismaError(err, "removePoem");
+      handlePrismaError({err});
     }
   },
 
@@ -230,16 +264,13 @@ export const Mutation: Resolvers["Mutation"] = {
       });
 
       if (comment.authorId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removeComment");
-    }
 
-    try {
-      return services.commentService.removeComment({ id: commentId });
+      const removedComment = await services.commentService.removeComment({ id: commentId });
+      return removedComment;
     } catch (err) {
-      handlePrismaError(err, "removeComment");
+      handlePrismaError({err});
     }
   },
 
@@ -252,16 +283,13 @@ export const Mutation: Resolvers["Mutation"] = {
       });
 
       if (collection.authorId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removeCollection");
-    }
 
-    try {
-      return services.collectionService.removeCollection({ id: collectionId });
+      const removedCollection = await services.collectionService.removeCollection({ id: collectionId });
+      return removedCollection;
     } catch (err) {
-      handlePrismaError(err, "removeCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -272,16 +300,13 @@ export const Mutation: Resolvers["Mutation"] = {
       const like = await services.likeService.getLike({ id: likeId });
 
       if (like.authorId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removeLike");
-    }
 
-    try {
-      return services.likeService.removeLike({ id: likeId });
+      const removedLike = await services.likeService.removeLike({ id: likeId });
+      return removedLike;
     } catch (err) {
-      handlePrismaError(err, "removeLike");
+      handlePrismaError({err});
     }
   },
 
@@ -294,16 +319,13 @@ export const Mutation: Resolvers["Mutation"] = {
       });
 
       if (savedPoem.authorId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removeSavedPoem");
-    }
 
-    try {
-      return services.savedPoemService.removeSavedPoem({ id: savedPoemId });
+      const removedSavedPoem = await services.savedPoemService.removeSavedPoem({ id: savedPoemId });
+      return removedSavedPoem;
     } catch (err) {
-      handlePrismaError(err, "removeSavedPoem");
+      handlePrismaError({err});
     }
   },
 
@@ -317,65 +339,68 @@ export const Mutation: Resolvers["Mutation"] = {
         });
 
       if (followedAuthor.followerId !== user.authorId) {
-        throw new Error("not authorised");
+        throw new GraphQLError("Not authorized", { extensions: { code: "UNAUTHORIZED" } });
       }
-    } catch (err) {
-      handlePrismaError(err, "removeFollowedAuthor");
-    }
 
-    try {
-      return services.followedAuthorService.removeFollowedAuthor({
+      const removedFollowedAuthor = await services.followedAuthorService.removeFollowedAuthor({
         id: followedAuthorId,
       });
+      return removedFollowedAuthor;
     } catch (err) {
-      handlePrismaError(err, "removeFollowedAuthor");
+      handlePrismaError({err});
     }
   },
 
   incrementPoemViews: async (_, { poemId }, { services }) => {
     try {
-      return services.poemService.incrementPoemViews({ poemId });
+      const poem = await services.poemService.incrementPoemViews({ poemId });
+      return poem;
     } catch (err) {
-      handlePrismaError(err, "incrementPoemViews");
+      handlePrismaError({err});
     }
   },
 
   // auth
   login: async (_, { username, password }, { services }) => {
-    const author = await services.authorService.getAuthorByUsername({
-      username,
-      omitPassword: false,
-      omitAuthVersion: false,
-    });
+    try {
+      const author = await services.authorService.getAuthorByUsername({
+        username,
+        omitPassword: false,
+        omitAuthVersion: false,
+      });
 
-    if (!author) {
-      throw new Error("Incorrect username or password");
+      if (!author) {
+        throw new GraphQLError("Incorrect username or password", { extensions: { code: "BAD_USER_INPUT" } });
+      }
+
+      const passwordIsValid = await argon2.verify(author.password, password);
+
+      if (!passwordIsValid) {
+        throw new GraphQLError("Incorrect username or password", { extensions: { code: "BAD_USER_INPUT" } });
+      }
+
+      const accessToken = jwt.sign(
+        {
+          authorId: author.id,
+          email: author.email,
+          authVersion: author.authVersion,
+        },
+        config.JWT_SECRET,
+        { expiresIn: "1d" },
+      );
+
+      return { token: accessToken, author };
+    } catch (err) {
+      handlePrismaError({ err })
     }
-
-    const passwordIsValid = await argon2.verify(author.password, password);
-
-    if (!passwordIsValid) {
-      throw new Error("Incorrect username or password");
-    }
-
-    const accessToken = jwt.sign(
-      {
-        authorId: author.id,
-        email: author.email,
-        authVersion: author.authVersion,
-      },
-      config.JWT_SECRET,
-      { expiresIn: "1d" },
-    );
-
-    return { token: accessToken, author };
   },
 
   signup: async (_, { input }, { services }) => {
     try {
-      return services.authorService.createAuthor(input);
+      const newAuthor = await services.authorService.createAuthor(input);
+      return newAuthor;
     } catch (err) {
-      handlePrismaError(err, "createAuthor");
+      handlePrismaError({ err });
     }
   },
 

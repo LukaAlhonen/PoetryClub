@@ -27,7 +27,7 @@ export class FollowedAuthorService {
     });
     if (cached) return cached;
 
-    const followedAuthor = await this.prisma.followedAuthor.findUnique({
+    const followedAuthor = await this.prisma.followedAuthor.findUniqueOrThrow({
       where: { id },
       include: {
         follower: true,

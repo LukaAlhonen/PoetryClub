@@ -39,6 +39,10 @@ describe("LikeService integration tests", () => {
     }
   });
 
+  test("getLike, with invalid id", async () => {
+    await expect(services.likeService.getLike({ id: "kkk" })).rejects.toThrow();
+  })
+
   test("getLikes", async () => {
     const result = await services.likeService.getLikes()
 
@@ -134,7 +138,7 @@ describe("LikeService integration tests", () => {
     expect(result).toBeDefined();
 
     // make sure like was removed
-    await expect(services.likeService.getLike({ id: result.id })).resolves.toBeNull();
+    await expect(services.likeService.getLike({ id: result.id })).rejects.toThrow();
     await expect(services.likeService.getLikes()).resolves.toHaveLength(7)
   })
 
