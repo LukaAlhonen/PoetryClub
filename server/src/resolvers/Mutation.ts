@@ -6,6 +6,8 @@ import config from "../config.js";
 import { MyJwtPayload } from "../types/auth.js";
 import { AuthorService } from "../services/author.service.js";
 import { randomUUID } from "node:crypto";
+import { GraphQLError } from "graphql";
+import { Prisma } from "../../generated/prisma/index.js";
 
 /**
  * Verifies user is logged in and auth token is valid
@@ -19,15 +21,12 @@ const verifyUser = async ({
   user: MyJwtPayload;
   authorService: AuthorService;
 }) => {
-  if (!user) throw new Error("not authenticated");
+  if (!user) throw new GraphQLError("not authenticated", { extensions: { code: "UNAUTHENITCATED"}});
   const author = await authorService.getAuthorById({
     id: user.authorId,
     omitAuthVersion: false,
   });
-  if (!author) throw new Error("user not found");
-  if (!(author.authVersion === user.authVersion)) {
-    throw new Error("token no longer valid");
-  }
+  if (!author || author.authVersion !== user.authVersion) throw new GraphQLError("not authenticated", { extensions: { code: "UNAUTHENITCATED"}});
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -41,7 +40,8 @@ export const Mutation: Resolvers["Mutation"] = {
         id: input.collectionId,
       });
       if (collection.authorId !== user.authorId) {
-        throw new Error(`cannot add poem to collection`);
+        // throw new Error(`cannot add poem to collection`);
+        throw new GraphQLError("Cannot add poem to collection", { extensions: { code: "UNAUTHORIZED"}})
       }
     }
 
@@ -51,7 +51,19 @@ export const Mutation: Resolvers["Mutation"] = {
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createPoem");
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          if (err.meta) {
+            console.log(err.meta)
+          }
+          throw new GraphQLError(`A Poem with the title ${input.title} already exists`, { extensions: { code: "BAD_USER_INPUT"}})
+        } else {
+          throw new GraphQLError("An unexpected error occured", { extensions: { code: "INTERNAL_SERVER_ERROR"}})
+        }
+      }
+      else {
+        throw new GraphQLError("An unexpected error occured", { extensions: { code: "INTERNAL_SERVER_ERROR"}})
+      }
     }
   },
 
