@@ -1,11 +1,22 @@
 import { Resolvers } from "../__generated__/types.js";
+import { handlePrismaError } from "../utils/prisma-error-handler.js";
 
 export const Comment: Resolvers["Comment"] = {
-  poem: ({ poemId }, _, { services }) => {
-    return services.poemService.getPoem({ id: poemId });
+  poem: async ({ poemId }, _, { services }) => {
+    try {
+      const poem = await services.poemService.getPoem({ id: poemId });
+      return poem;
+    } catch (err) {
+      handlePrismaError({err})
+    }
   },
 
-  author: ({ authorId }, _, { services }) => {
-    return services.authorService.getAuthorById({ id: authorId });
+  author: async ({ authorId }, _, { services }) => {
+    try {
+      const author = await services.authorService.getAuthorById({ id: authorId });
+      return author
+    } catch (err) {
+      handlePrismaError({err})
+    }
   },
 };

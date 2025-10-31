@@ -45,6 +45,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const comment = response.body.singleResult.data?.comment;
         const errors = response.body.singleResult.errors;
@@ -67,6 +69,8 @@ describe("Graphql Mutation integration tests", () => {
           id: comment.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const comment = response.body.singleResult.data?.comment;

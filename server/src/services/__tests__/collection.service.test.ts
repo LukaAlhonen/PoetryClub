@@ -45,7 +45,7 @@ describe("CollectionService integration tests", () => {
   test("getColleciton, with invalid id", async () => {
     await expect(
       services.collectionService.getCollection({ id: testId }),
-    ).resolves.toStrictEqual(null);
+    ).rejects.toThrow();
   });
 
   test("getCollections", async () => {
@@ -233,15 +233,13 @@ describe("CollectionService integration tests", () => {
   });
 
   test("removeCollection", async () => {
-    const result = await services.collectionService.removeCollection({
+    await services.collectionService.removeCollection({
       id: collections[0].id,
     });
 
     // make sure collection was removed
-    const result2 = await services.collectionService.getCollection({
-      id: collections[0].id,
-    });
-    expect(result2).toBeNull();
+    await expect(services.collectionService.getCollection({ id: collections[0].id })).rejects.toThrow();
+
     // make sure only 3 collections remain
     const result3 = await services.collectionService.getCollections();
     expect(result3).toHaveLength(3);

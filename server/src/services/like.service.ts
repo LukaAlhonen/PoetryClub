@@ -21,7 +21,7 @@ export class LikeService {
     const cached = await this.cache.get<LikeWithRelations>({ key: cacheKey });
     if (cached) return cached;
 
-    const like = await this.prisma.like.findUnique({
+    const like = await this.prisma.like.findUniqueOrThrow({
       where: {
         id: id,
       },

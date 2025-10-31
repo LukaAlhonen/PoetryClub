@@ -174,7 +174,7 @@ export class PoemService {
       return cached;
     }
 
-    const poem = await this.prisma.poem.findUnique({
+    const poem = await this.prisma.poem.findUniqueOrThrow({
       where: { id: id },
       include: {
         author: true,

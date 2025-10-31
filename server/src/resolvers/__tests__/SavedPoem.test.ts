@@ -47,6 +47,8 @@ describe("Graphql SavedPoem integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const savedPoem = response.body.singleResult.data?.savedPoem;
         const errors = response.body.singleResult.errors;
@@ -69,6 +71,8 @@ describe("Graphql SavedPoem integration tests", () => {
           id: savedPoem.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const savedPoem = response.body.singleResult.data?.savedPoem;

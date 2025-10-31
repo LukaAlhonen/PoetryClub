@@ -50,7 +50,7 @@ describe("AuthorService integration tests", () => {
   test("getAuthorById, invalid id", async () => {
     await expect(
       services.authorService.getAuthorById({ id: testId }),
-    ).resolves.toStrictEqual({});
+    ).rejects.toThrow();
   });
 
   test("getAuthorByUsername", async () => {
@@ -69,7 +69,7 @@ describe("AuthorService integration tests", () => {
   test("getAuthorByUsername, invalid username", async () => {
     await expect(
       services.authorService.getAuthorByUsername({ username: "kkkkkkkkkk" }),
-    ).resolves.toStrictEqual({});
+    ).rejects.toThrow();
   });
 
   test("getAuthors", async () => {
@@ -245,7 +245,7 @@ describe("AuthorService integration tests", () => {
     // make sure author was deleted
     await expect(
       services.authorService.getAuthorById({ id: authors[0].id }),
-    ).resolves.toStrictEqual({});
+    ).rejects.toThrow();
   });
 
   test("removeAuthor, with invalid id", async () => {

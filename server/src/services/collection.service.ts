@@ -53,7 +53,7 @@ export class CollectionService {
       key: cacheKey,
     });
     if (cached) return cached;
-    const collection = await this.prisma.collection.findUnique({
+    const collection = await this.prisma.collection.findUniqueOrThrow({
       where: { id: id },
       include: { author: true, poems: true },
     });

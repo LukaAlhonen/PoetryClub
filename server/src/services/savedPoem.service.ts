@@ -27,7 +27,7 @@ export class SavedPoemService {
     });
     if (cached) return cached;
 
-    const savedPoem = await this.prisma.savedPoem.findUnique({
+    const savedPoem = await this.prisma.savedPoem.findUniqueOrThrow({
       where: { id },
       include: {
         author: true,

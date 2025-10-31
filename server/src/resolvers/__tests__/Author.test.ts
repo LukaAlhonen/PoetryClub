@@ -47,6 +47,8 @@ describe("Graphql Author integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
         expect(author.poems).toBeDefined();
@@ -71,6 +73,8 @@ describe("Graphql Author integration tests", () => {
             poemsLimit: 1,
           },
         });
+
+      expect(initialResponse.body.kind).toStrictEqual("single")
 
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
@@ -98,6 +102,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -122,6 +128,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -149,6 +157,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -175,6 +185,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -199,6 +211,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -226,6 +240,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -252,6 +268,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -276,6 +294,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -303,6 +323,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -329,6 +351,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -353,6 +377,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -380,6 +406,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -406,6 +434,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -430,6 +460,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -457,6 +489,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -483,6 +517,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -508,6 +544,8 @@ describe("Graphql Author integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
         expect(author.followedByCount).toBe(3);
@@ -523,6 +561,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;
@@ -550,6 +590,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const author = initialResponse.body.singleResult.data?.authorById;
 
@@ -576,6 +618,8 @@ describe("Graphql Author integration tests", () => {
           },
         });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const author = secondResponse.body.singleResult.data?.authorById;
 
@@ -600,6 +644,8 @@ describe("Graphql Author integration tests", () => {
           id: author.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const author = response.body.singleResult.data?.authorById;

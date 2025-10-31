@@ -52,6 +52,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -77,6 +79,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -98,6 +102,8 @@ describe("Graphql Mutation integration tests", () => {
           id: poem.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
@@ -129,6 +135,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const poem = initialResponse.body.singleResult.data?.poem;
         const errors = initialResponse.body.singleResult.errors;
@@ -158,6 +166,8 @@ describe("Graphql Mutation integration tests", () => {
           commentsCursor: cursor,
         },
       });
+
+      expect(secondResponse.body.kind).toStrictEqual("single")
 
       if (secondResponse.body.kind === "single") {
         const poem = secondResponse.body.singleResult.data?.poem;
@@ -189,6 +199,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -211,6 +223,8 @@ describe("Graphql Mutation integration tests", () => {
           id: poem.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
@@ -242,6 +256,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const poem = initialResponse.body.singleResult.data?.poem;
         const errors = initialResponse.body.singleResult.errors;
@@ -271,6 +287,8 @@ describe("Graphql Mutation integration tests", () => {
           likesCursor: cursor,
         },
       });
+
+      expect(secondResponse.body.kind).toStrictEqual("single")
 
       if (secondResponse.body.kind === "single") {
         const poem = secondResponse.body.singleResult.data?.poem;
@@ -302,6 +320,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
         const errors = response.body.singleResult.errors;
@@ -324,6 +344,8 @@ describe("Graphql Mutation integration tests", () => {
           id: poem.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
@@ -355,6 +377,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const poem = initialResponse.body.singleResult.data?.poem;
         const errors = initialResponse.body.singleResult.errors;
@@ -385,6 +409,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(secondResponse.body.kind).toStrictEqual("single")
+
       if (secondResponse.body.kind === "single") {
         const poem = secondResponse.body.singleResult.data?.poem;
         const errors = secondResponse.body.singleResult.errors;
@@ -414,6 +440,8 @@ describe("Graphql Mutation integration tests", () => {
           id: poem.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const poem = response.body.singleResult.data?.poem;
@@ -466,6 +494,8 @@ describe("Graphql Mutation integration tests", () => {
       }
     })
 
+    expect(loginResponse.body.kind).toStrictEqual("single")
+
     if (loginResponse.body.kind === "single") {
       const login = loginResponse.body.singleResult.data?.login;
       const errors = loginResponse.body.singleResult.errors;
@@ -485,11 +515,55 @@ describe("Graphql Mutation integration tests", () => {
         },
       })
 
+      expect(poemResponse.body.kind).toStrictEqual("single")
+
       if (poemResponse.body.kind === "single") {
         const poems = poemResponse.body.singleResult.data?.poems;
 
         poems.edges.forEach((edge) => {
           expect(edge.node.likedByCurrentUser.author.id).toStrictEqual(login.author.id)
+        })
+      }
+    }
+  })
+
+  test("savedByCurentUser", async () => {
+    const loginResponse = await testServer.executeOperation<LoginMutation>({
+      query: LOGIN,
+      variables: {
+        username: "author1",
+        password: "password"
+      }
+    })
+
+    expect(loginResponse.body.kind).toStrictEqual("single")
+
+    if (loginResponse.body.kind === "single") {
+      const login = loginResponse.body.singleResult.data?.login;
+      const errors = loginResponse.body.singleResult.errors;
+
+      expect(errors).toBeUndefined();
+
+      // all authors have saved their own poems
+      const poemResponse = await testServer.executeOperation<GetPoemsQuery>({
+        query: GET_POEMS,
+        variables: {
+          filter: {
+            authorId: login.author.id
+          },
+        },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      })
+
+      expect(poemResponse.body.kind).toStrictEqual("single")
+
+      if (poemResponse.body.kind === "single") {
+        const poems = poemResponse.body.singleResult.data?.poems;
+
+        poems.edges.forEach((edge) => {
+          expect(edge.node.savedByCurrentUser.author.id).toStrictEqual(login.author.id)
         })
       }
     }

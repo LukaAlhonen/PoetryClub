@@ -47,6 +47,8 @@ describe("Graphql Mutation integration tests", () => {
         },
       });
 
+      expect(response.body.kind).toStrictEqual("single")
+
       if (response.body.kind === "single") {
         const collection = response.body.singleResult.data?.collection;
         const errors = response.body.singleResult.errors;
@@ -68,6 +70,8 @@ describe("Graphql Mutation integration tests", () => {
           id: collection.id,
         },
       });
+
+      expect(response.body.kind).toStrictEqual("single")
 
       if (response.body.kind === "single") {
         const collection = response.body.singleResult.data?.collection;
@@ -97,6 +101,8 @@ describe("Graphql Mutation integration tests", () => {
           },
         });
 
+      expect(initialResponse.body.kind).toStrictEqual("single")
+
       if (initialResponse.body.kind === "single") {
         const collection = initialResponse.body.singleResult.data?.collection;
         const errors = initialResponse.body.singleResult.errors;
@@ -125,6 +131,8 @@ describe("Graphql Mutation integration tests", () => {
             poemsCursor: cursor,
           },
         });
+
+      expect(secondResponse.body.kind).toStrictEqual("single")
 
       if (secondResponse.body.kind === "single") {
         const collection = secondResponse.body.singleResult.data?.collection;

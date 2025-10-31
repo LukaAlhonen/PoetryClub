@@ -32,7 +32,7 @@ const isUniqueConstraintError = (e: PrismaError): e is UniqueConstraintError => 
   );
 };
 
-export const handlePrismaError = ({ err }: { err: PrismaError }) => {
+export const handlePrismaError = ({ err }: { err: PrismaError | GraphQLError }) => {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       if (isUniqueConstraintError(err)) {
@@ -51,10 +51,13 @@ export const handlePrismaError = ({ err }: { err: PrismaError }) => {
       const modelName = (err as RecordNotFoundError).meta.modelName;
       throw new GraphQLError(`${modelName} does not exist`, { extensions: { code: "BAD_USER_INPUT"} })
     } else {
+      console.log(err)
       throw new GraphQLError("An unexpected error occured", {
         extensions: { code: "INTERNAL_SERVER_ERROR" },
       });
     }
+  } else if (err instanceof GraphQLError) {
+    throw err;
   } else {
     throw new GraphQLError("An unexpected error occured", {
       extensions: { code: "INTERNAL_SERVER_ERROR" },
