@@ -21,12 +21,18 @@ const verifyUser = async ({
   user: MyJwtPayload;
   authorService: AuthorService;
 }) => {
-  if (!user) throw new GraphQLError("not authenticated", { extensions: { code: "UNAUTHENITCATED"}});
+  if (!user)
+    throw new GraphQLError("not authenticated", {
+      extensions: { code: "UNAUTHENITCATED" },
+    });
   const author = await authorService.getAuthorById({
     id: user.authorId,
     omitAuthVersion: false,
   });
-  if (!author || author.authVersion !== user.authVersion) throw new GraphQLError("not authenticated", { extensions: { code: "UNAUTHENITCATED"}});
+  if (!author || author.authVersion !== user.authVersion)
+    throw new GraphQLError("not authenticated", {
+      extensions: { code: "UNAUTHENITCATED" },
+    });
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -41,7 +47,9 @@ export const Mutation: Resolvers["Mutation"] = {
       });
       if (collection.authorId !== user.authorId) {
         // throw new Error(`cannot add poem to collection`);
-        throw new GraphQLError("Cannot add poem to collection", { extensions: { code: "UNAUTHORIZED"}})
+        throw new GraphQLError("Cannot add poem to collection", {
+          extensions: { code: "UNAUTHORIZED" },
+        });
       }
     }
 
@@ -54,15 +62,21 @@ export const Mutation: Resolvers["Mutation"] = {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
           if (err.meta) {
-            console.log(err.meta)
+            console.log(err.meta);
           }
-          throw new GraphQLError(`A Poem with the title ${input.title} already exists`, { extensions: { code: "BAD_USER_INPUT"}})
+          throw new GraphQLError(
+            `A Poem with the title ${input.title} already exists`,
+            { extensions: { code: "BAD_USER_INPUT" } },
+          );
         } else {
-          throw new GraphQLError("An unexpected error occured", { extensions: { code: "INTERNAL_SERVER_ERROR"}})
+          throw new GraphQLError("An unexpected error occured", {
+            extensions: { code: "INTERNAL_SERVER_ERROR" },
+          });
         }
-      }
-      else {
-        throw new GraphQLError("An unexpected error occured", { extensions: { code: "INTERNAL_SERVER_ERROR"}})
+      } else {
+        throw new GraphQLError("An unexpected error occured", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     }
   },
@@ -385,10 +399,14 @@ export const Mutation: Resolvers["Mutation"] = {
 
   signup: async (_, { input }, { services }) => {
     try {
-      return services.authorService.createAuthor(input);
+      const newAuthor = await services.authorService.createAuthor(input);
+      return newAuthor;
+      // return services.authorService.createAuthor(input);
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        console.log(err.meta)
+        console.log("hello");
+        console.error(err.meta.target);
+        throw new Error();
       }
       handlePrismaError(err, "createAuthor");
     }
