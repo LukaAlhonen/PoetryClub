@@ -39,7 +39,7 @@ export class AuthorService {
       return cached;
     }
 
-    const author = await this.prisma.author.findUnique({
+    const author = await this.prisma.author.findUniqueOrThrow({
       where: { id: id },
       include: {
         poems: true,
@@ -90,7 +90,7 @@ export class AuthorService {
       return cached;
     }
 
-    const author = await this.prisma.author.findFirst({
+    const author = await this.prisma.author.findUniqueOrThrow({
       where: { username: username },
       include: {
         poems: true,

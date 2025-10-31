@@ -85,7 +85,7 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.authorService.createAuthor(input);
     } catch (err) {
-      handlePrismaError(err, "createAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -99,7 +99,7 @@ export const Mutation: Resolvers["Mutation"] = {
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createComment");
+      handlePrismaError({err});
     }
   },
 
@@ -112,7 +112,7 @@ export const Mutation: Resolvers["Mutation"] = {
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -125,7 +125,7 @@ export const Mutation: Resolvers["Mutation"] = {
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createSavedPoem");
+      handlePrismaError({err});
     }
   },
 
@@ -138,7 +138,7 @@ export const Mutation: Resolvers["Mutation"] = {
         authorId: user.authorId,
       });
     } catch (err) {
-      handlePrismaError(err, "createLike");
+      handlePrismaError({err});
     }
   },
 
@@ -151,7 +151,7 @@ export const Mutation: Resolvers["Mutation"] = {
         followingId,
       });
     } catch (err) {
-      handlePrismaError(err, "createFollowedAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -178,7 +178,7 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.poemService.updatePoem(input);
     } catch (err) {
-      handlePrismaError(err, "updatePoem");
+      handlePrismaError({err});
     }
   },
 
@@ -194,7 +194,7 @@ export const Mutation: Resolvers["Mutation"] = {
         ...input,
       });
     } catch (err) {
-      handlePrismaError(err, "updateAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -212,7 +212,7 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.collectionService.updateCollection(input);
     } catch (err) {
-      handlePrismaError(err, "updateCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -223,7 +223,7 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.authorService.removeAuthor({ id: user.authorId });
     } catch (err) {
-      handlePrismaError(err, "removeAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -237,13 +237,13 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removePoem");
+      handlePrismaError({err});
     }
 
     try {
       return services.poemService.removePoem({ id: poemId });
     } catch (err) {
-      handlePrismaError(err, "removePoem");
+      handlePrismaError({err});
     }
   },
 
@@ -259,13 +259,13 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removeComment");
+      handlePrismaError({err});
     }
 
     try {
       return services.commentService.removeComment({ id: commentId });
     } catch (err) {
-      handlePrismaError(err, "removeComment");
+      handlePrismaError({err});
     }
   },
 
@@ -281,13 +281,13 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removeCollection");
+      handlePrismaError({err});
     }
 
     try {
       return services.collectionService.removeCollection({ id: collectionId });
     } catch (err) {
-      handlePrismaError(err, "removeCollection");
+      handlePrismaError({err});
     }
   },
 
@@ -301,13 +301,13 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removeLike");
+      handlePrismaError({err});
     }
 
     try {
       return services.likeService.removeLike({ id: likeId });
     } catch (err) {
-      handlePrismaError(err, "removeLike");
+      handlePrismaError({err});
     }
   },
 
@@ -323,13 +323,13 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removeSavedPoem");
+      handlePrismaError({err});
     }
 
     try {
       return services.savedPoemService.removeSavedPoem({ id: savedPoemId });
     } catch (err) {
-      handlePrismaError(err, "removeSavedPoem");
+      handlePrismaError({err});
     }
   },
 
@@ -346,7 +346,7 @@ export const Mutation: Resolvers["Mutation"] = {
         throw new Error("not authorised");
       }
     } catch (err) {
-      handlePrismaError(err, "removeFollowedAuthor");
+      handlePrismaError({err});
     }
 
     try {
@@ -354,7 +354,7 @@ export const Mutation: Resolvers["Mutation"] = {
         id: followedAuthorId,
       });
     } catch (err) {
-      handlePrismaError(err, "removeFollowedAuthor");
+      handlePrismaError({err});
     }
   },
 
@@ -362,7 +362,7 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       return services.poemService.incrementPoemViews({ poemId });
     } catch (err) {
-      handlePrismaError(err, "incrementPoemViews");
+      handlePrismaError({err});
     }
   },
 
@@ -401,14 +401,8 @@ export const Mutation: Resolvers["Mutation"] = {
     try {
       const newAuthor = await services.authorService.createAuthor(input);
       return newAuthor;
-      // return services.authorService.createAuthor(input);
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        console.log("hello");
-        console.error(err.meta.target);
-        throw new Error();
-      }
-      handlePrismaError(err, "createAuthor");
+      handlePrismaError({ err });
     }
   },
 

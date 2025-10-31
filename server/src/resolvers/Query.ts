@@ -1,126 +1,201 @@
+import { GraphQLError } from "graphql";
 import { Resolvers } from "../__generated__/types.js";
+import { handlePrismaError } from "../utils/prisma-error-handler.js";
 
 export const Query: Resolvers["Query"] = {
-  poem: (_, { id }, { services }) => {
-    return services.poemService.getPoem({ id });
+  poem: async (_, { id }, { services }) => {
+    try {
+      const poem = await services.poemService.getPoem({ id });
+      return poem;
+    } catch(err) {
+      handlePrismaError({ err });
+    }
   },
 
-  poems: (_, { first, after, filter }, { services }) => {
-    return services.poemService.getPoemsConnection({ first, after, filter });
+  poems: async (_, { first, after, filter }, { services }) => {
+    try {
+      const poems = await services.poemService.getPoemsConnection({ first, after, filter });
+      return poems;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  authorById: (_, { id }, { services }) => {
-    return services.authorService.getAuthorById({ id });
+  authorById: async (_, { id }, { services }) => {
+    try {
+      const author = await services.authorService.getAuthorById({ id });
+      return author;
+    } catch (err) {
+      handlePrismaError({ err });
+    }
   },
 
-  authors: (
+  authors: async (
     _,
     { first, after, usernameContains },
     { services },
   ) => {
-    return services.authorService.getAuthorsConnection({
-      first,
-      after,
-      usernameContains,
-    });
+    try {
+      const authors = await services.authorService.getAuthorsConnection({
+        first,
+        after,
+        usernameContains,
+      });
+      return authors;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  comment: (_, { id }, { services }) => {
-    return services.commentService.getComment({ id });
+  comment: async (_, { id }, { services }) => {
+    try {
+      const comment = await  services.commentService.getComment({ id });
+      return comment;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  comments: (
+  comments: async (
     _,
     { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.commentService.getCommentsConnection({
-      first,
-      after,
-      authorId,
-      poemId,
-    });
+    try {
+      const comments = await services.commentService.getCommentsConnection({
+        first,
+        after,
+        authorId,
+        poemId,
+      });
+      return comments;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  authorByUsername: (_, { username }, { services }) => {
-    return services.authorService.getAuthorByUsername({
-      username,
-    });
+  authorByUsername: async (_, { username }, { services }) => {
+    try {
+      const author = await services.authorService.getAuthorByUsername({ username });
+      return author;
+    } catch (err) {
+      handlePrismaError({ err });
+    }
   },
 
-  collection: (_, { id }, { services }) => {
-    return services.collectionService.getCollection({ id });
+  collection: async (_, { id }, { services }) => {
+    try {
+      const collection = await services.collectionService.getCollection({ id });
+      return collection;
+    } catch (err) {
+      handlePrismaError({ err });
+    }
   },
 
-  collections: (_, { first, after, filter }, { services }) => {
-    return services.collectionService.getCollectionsConnection({ first, after, filter });
+  collections: async (_, { first, after, filter }, { services }) => {
+    try {
+      const collections = await services.collectionService.getCollectionsConnection({ first, after, filter });
+      return collections;
+    } catch (err) {
+      handlePrismaError({ err });
+    }
   },
 
-  like: (_, { id }, { services }) => {
-    return services.likeService.getLike({ id });
+  like: async (_, { id }, { services }) => {
+    try {
+      const like = await services.likeService.getLike({ id });
+      return like;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  likes: (
+  likes: async (
     _,
     { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.likeService.getLikesConnection({ first, after, authorId, poemId });
+    try {
+      const likes = await services.likeService.getLikesConnection({ first, after, authorId, poemId });
+      return likes;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  savedPoem: (_, { id }, { services }) => {
-    return services.savedPoemService.getSavedPoem({ id });
+  savedPoem: async (_, { id }, { services }) => {
+    try {
+      const savedPoem = await services.savedPoemService.getSavedPoem({ id });
+      return savedPoem;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  savedPoems: (
+  savedPoems: async (
     _,
     { first, after, authorId, poemId },
     { services },
   ) => {
-    return services.savedPoemService.getSavedPoemsConnection({
-      first,
-      after,
-      authorId,
-      poemId,
-    });
+    try {
+      const savedPoems = await services.savedPoemService.getSavedPoemsConnection({
+        first,
+        after,
+        authorId,
+        poemId,
+      });
+      return savedPoems;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  followedAuthor: (_, { id }, { services }) => {
-    return services.followedAuthorService.getFollowedAuthor({ id });
+  followedAuthor: async (_, { id }, { services }) => {
+    try {
+      const followedAuthor = await services.followedAuthorService.getFollowedAuthor({ id });
+      return followedAuthor;
+    } catch (err) {
+      handlePrismaError({ err })
+    }
   },
 
-  followedAuthors: (
+  followedAuthors: async (
     _,
     { first, after, followerId, followingId },
     { services },
   ) => {
-    return services.followedAuthorService.getFollowedAuthorsConnection({
-      first,
-      after,
-      followerId,
-      followingId,
-    });
+    try {
+      const followedAuthors = await services.followedAuthorService.getFollowedAuthorsConnection({
+        first,
+        after,
+        followerId,
+        followingId,
+      });
+      return followedAuthors;
+    } catch (err) {
+      handlePrismaError({ err });
+    }
   },
 
   me: async (_, __, { user, services }) => {
     if (!user || user === null) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated", { extensions: { code: "UNAUTHENTICATED" }})
     }
 
-    const author = await services.authorService.getAuthorById({
-      id: user.authorId,
-      omitAuthVersion: false,
-    });
+    try {
+      const author = await services.authorService.getAuthorById({
+        id: user.authorId,
+        omitAuthVersion: false,
+      });
 
-    if (!author) {
-      throw new Error("user not found");
+      if (!(author.authVersion === user.authVersion)) {
+        throw new GraphQLError("Token no longer valid", { extensions: { code: "UNAUTHENTICATED"}});
+      }
+
+      const { authVersion, ...authorWithoutAuthVersion } = author;
+      return authorWithoutAuthVersion;
+    } catch (err) {
+      handlePrismaError({err})
     }
-
-    if (!(author.authVersion === user.authVersion)) {
-      throw new Error("token no longer valid");
-    }
-
-    const { authVersion, ...authorWithoutAuthVersion } = author;
-    return authorWithoutAuthVersion;
   },
 };
