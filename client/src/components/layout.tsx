@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "@emotion/styled";
-import LeftNav from "./left-nav";
+import LeftNav from "./LeftNav/left-nav";
 import colors from "../colors";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {

@@ -18,29 +18,41 @@ const FollowButton = (props: FollowButtonProps) => {
   const { username = "" } = useParams();
   const [followAuthorMutation, { loading, error }] = useMutation<FollowAuthorMutation, FollowAuthorMutationVariables>(FOLLOW_AUTHOR, {
     update(cache, { data }) {
-      // Write new followedAuthor object to cache
-      // Author who was followed
-      const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
-      if (cachedAuthor && data?.createFollowedAuthor) {
-        const newNode = { node: data.createFollowedAuthor, cursor: data.createFollowedAuthor.id }
-        cache.writeQuery({
-          query: GET_AUTHOR,
-          variables: { username, poemsLimit: 5 },
-          data: {
-            ...cachedAuthor,
-            authorByUsername: {
-              ...cachedAuthor.authorByUsername,
-              followedBy: {
-                edges: [newNode, ...cachedAuthor.authorByUsername.followedBy.edges],
-                pageInfo: cachedAuthor.authorByUsername.followedBy.pageInfo
+
+      if (user) {
+        // Write new followedAuthor object to cache
+        // Author who was followed
+        const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
+        if (cachedAuthor && data?.createFollowedAuthor) {
+          const newNode = { node: data.createFollowedAuthor, cursor: data.createFollowedAuthor.id }
+          cache.writeQuery({
+            query: GET_AUTHOR,
+            variables: { username, poemsLimit: 5 },
+            data: {
+              ...cachedAuthor,
+              authorByUsername: {
+                ...cachedAuthor.authorByUsername,
+                followedBy: {
+                  edges: [newNode, ...cachedAuthor.authorByUsername.followedBy.edges],
+                  pageInfo: cachedAuthor.authorByUsername.followedBy.pageInfo
+                }
               }
             }
-          }
-        })
-      }
+          })
 
-      // Author who followed
-      if (user) {
+          // Increment followedByCount
+          cache.modify({
+            id: cache.identify({ __typename: "Author", id: props.followingId }),
+            fields: {
+              followedByCurrentUser() { return data.createFollowedAuthor },
+              followedByCount(existingCount = 0) {
+                return existingCount + 1;
+              }
+            }
+          })
+        }
+
+        // Author who followed
         const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 } });
         if (cachedAuthor2 && data?.createFollowedAuthor) {
           const newNode = { node: data.createFollowedAuthor, cursor: data.createFollowedAuthor.id };
@@ -58,28 +70,18 @@ const FollowButton = (props: FollowButtonProps) => {
               }
             }
           })
+
+          // Increment followingCount
+          cache.modify({
+            id: cache.identify({ __typename: "Author", id: userId}),
+            fields: {
+              followingCount(existingCount = 0) {
+                return existingCount + 1;
+              }
+            }
+          })
         }
       }
-
-      // Increment followedByCount
-      cache.modify({
-        id: cache.identify({ __typename: "Author", id: props.followingId }),
-        fields: {
-          followedByCount(existingCount = 0) {
-            return existingCount + 1;
-          }
-        }
-      })
-
-      // Increment followingCount
-      cache.modify({
-        id: cache.identify({ __typename: "Author", id: userId}),
-        fields: {
-          followingCount(existingCount = 0) {
-            return existingCount + 1;
-          }
-        }
-      })
     }
   })
 

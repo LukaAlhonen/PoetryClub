@@ -7,5 +7,16 @@ export const AUTHOR_DETAIL_FRAGMENT = gql(`
         dateJoined
         followedByCount
         followingCount
+        followedByCurrentUser {
+            id
+            follower {
+                id
+                ...FollowedAuthorFragment
+            }
+            following {
+                id
+                ...FollowedAuthorFragment
+            }
+        }
     }
 `)

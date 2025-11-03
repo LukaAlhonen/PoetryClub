@@ -18,19 +18,6 @@ const LikeButton = (props: LikeButtonProps) => {
   const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
 
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
-    // update(cache, { data }) {
-    //   if (user) {
-
-    //     if (data?.createLike) {
-    //       cache.modify({
-    //         id: cache.identify({ __typename: "Poem", id: props.poemId }),
-    //         fields: {
-    //           likedByCurrentUser() { return data.createLike },
-    //         }
-    //       })
-    //     }
-    //   }
-    // },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({

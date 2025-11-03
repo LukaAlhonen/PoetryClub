@@ -29,11 +29,11 @@ const PoemCard = (props: PoemCardProps) => {
   return (
     <PoemContainer>
       <PoemHeader>
-        <PoemTitle to={poem ? `/poem/${poem?.id}` : "#"}>
+        <PoemTitle data-testid={`poem-title-link-${poem?.id}`} to={poem ? `/poem/${poem?.id}` : "#"}>
           {poem?.title ? <h3>{poem.title}</h3> : <LoadingText><h3>loading</h3></LoadingText>}
         </PoemTitle>
         <PoemSubHeader>
-          <UsernameContainer to={poem?.author?.username ? `/author/${poem.author.username}` : "#"}>
+          <UsernameContainer data-testid={`poem-author-link-${poem?.author?.id}`} to={poem?.author?.username ? `/author/${poem.author.username}` : "#"}>
             <UserButton></UserButton>
             {poem?.author?.username ?? null}
           </UsernameContainer>
@@ -44,7 +44,7 @@ const PoemCard = (props: PoemCardProps) => {
         {poem ?
           <>
             {poem.text}
-            <PoemLink to={poem ? `/poem/${poem?.id}` : "#"}>
+            <PoemLink data-testid={`poem-link-${poem?.id}`} to={poem ? `/poem/${poem?.id}` : "#"}>
               Show full poem <Arrow />
             </PoemLink>
           </>
@@ -53,19 +53,19 @@ const PoemCard = (props: PoemCardProps) => {
       </TextContainer>
       <PoemFooter>
         <StatsContainer>
-          <LikeButton poemId={poem?.id} likedByCurrentUser={poem?.likedByCurrentUser}>
+          <LikeButton data-testid={`like-button-${poem?.id}`} poemId={poem?.id} likedByCurrentUser={poem?.likedByCurrentUser}>
             <LikeIcon />
             <span data-testid="likesCount">
               {poem?.likesCount}
             </span>
           </LikeButton>
-          <CommentsButton to={poem ? `/poem/${poem?.id}#composeComment` : "#"}>
+          <CommentsButton data-testid={`comments-button-${poem?.id}`} to={poem ? `/poem/${poem?.id}#composeComment` : "#"}>
             <CommentIcon />
             <span data-testid="commentsCount">
               {poem?.commentsCount}
             </span>
           </CommentsButton>
-          <SaveButton poemId={poem?.id} savedByCurrentUser={poem?.savedByCurrentUser}>
+          <SaveButton data-testid={`save-button-${poem?.id}`} poemId={poem?.id} savedByCurrentUser={poem?.savedByCurrentUser}>
             <SavedIcon />
             <span data-testid="savedByCount">
               {poem?.savedByCount}

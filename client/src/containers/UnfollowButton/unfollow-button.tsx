@@ -13,68 +13,48 @@ interface UnfollowButtonProps {
   followedAuthorId?: string | null;
 }
 
-// update(cache, { data }) {
-//   // Write new followedAuthor object to cache
-//   // Author who was followed
-//   const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
-//   if (cachedAuthor && data?.createFollowedAuthor) {
-//     const newNode = { node: data.createFollowedAuthor, cursor: data.createFollowedAuthor.id }
-//     cache.writeQuery({
-//       query: GET_AUTHOR,
-//       variables: { username, poemsLimit: 5 },
-//       data: {
-//         ...cachedAuthor,
-//         authorByUsername: {
-//           ...cachedAuthor.authorByUsername,
-//           followedBy: {
-//             edges: [newNode, ...cachedAuthor.authorByUsername.followedBy.edges],
-//             pageInfo: cachedAuthor.authorByUsername.followedBy.pageInfo
-//           }
-//         }
-//       }
-//     })
-//   }
-
 const UnfollowButton = (props: UnfollowButtonProps) => {
   const { username = "" } = useParams();
   const { user, userId } = useAuth();
 
   const [unfollowAuthorMutation, { loading, error }] = useMutation<UnfollowAuthorMutation, UnfollowAuthorMutationVariables>(UNFOLLOW_AUTHOR, {
     update(cache, { data }) {
-      const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
-      if (cachedAuthor && data?.removeFollowedAuthor) {
-        const updatedEdges = cachedAuthor.authorByUsername.followedBy.edges.filter((edge) => (
-          edge?.node?.id !== data.removeFollowedAuthor.id
-        )) ?? [];
-        cache.writeQuery({
-          query: GET_AUTHOR,
-          variables: { username, poemsLimit: 5 },
-          data: {
-            ...cachedAuthor,
-            authorByUsername: {
-              ...cachedAuthor.authorByUsername,
-              followedBy: {
-                edges: updatedEdges,
-                pageInfo: cachedAuthor.authorByUsername.followedBy.pageInfo
-              }
-            }
-          }
-        })
-
-        cache.modify({
-          id: cache.identify({ __typename: "Author", id: data.removeFollowedAuthor.following.id}),
-          fields: {
-            followedByCount(existingCount = 0) {
-              return existingCount - 1;
-            }
-          }
-        })
-      }
 
       if (user) {
+        const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
+        if (cachedAuthor && data?.removeFollowedAuthor) {
+          const updatedEdges = cachedAuthor.authorByUsername.followedBy.edges.filter((edge) => (
+            edge?.node?.id !== data.removeFollowedAuthor.id
+          )) ?? [];
+          cache.writeQuery({
+            query: GET_AUTHOR,
+            variables: { username, poemsLimit: 5 },
+            data: {
+              ...cachedAuthor,
+              authorByUsername: {
+                ...cachedAuthor.authorByUsername,
+                followedBy: {
+                  edges: updatedEdges,
+                  pageInfo: cachedAuthor.authorByUsername.followedBy.pageInfo
+                }
+              }
+            }
+          })
+
+          cache.modify({
+            id: cache.identify({ __typename: "Author", id: data.removeFollowedAuthor.following.id}),
+            fields: {
+              followedByCurrentUser() { return null },
+              followedByCount(existingCount = 0) {
+                return existingCount - 1;
+              }
+            }
+          })
+        }
+
         const cachedAuthor2 = cache.readQuery({ query: GET_AUTHOR, variables: { username: user, poemsLimit: 5, followingLimit: 10, followedByLimit: 10 } });
         if (cachedAuthor2 && data?.removeFollowedAuthor) {
-          const updatedEdges = cachedAuthor2.authorByUsername.following.edges.filter((edge) => (
+          const updatedEdges2 = cachedAuthor2.authorByUsername.following.edges.filter((edge) => (
             edge?.node?.id !== data.removeFollowedAuthor.id
           )) ?? [];
           cache.writeQuery({
@@ -85,7 +65,7 @@ const UnfollowButton = (props: UnfollowButtonProps) => {
               authorByUsername: {
                 ...cachedAuthor2.authorByUsername,
                 following: {
-                  edges: updatedEdges,
+                  edges: updatedEdges2,
                   pageInfo: cachedAuthor2.authorByUsername.following.pageInfo
                 }
               }

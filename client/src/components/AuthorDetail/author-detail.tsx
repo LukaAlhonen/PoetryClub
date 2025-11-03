@@ -14,12 +14,10 @@ import UnfollowButton from "../../containers/UnfollowButton/unfollow-button";
 
 interface AuthorDetailProps {
   author?: FragmentType<typeof AUTHOR_DETAIL_FRAGMENT>;
-  isFollowed?: boolean;
-  followedAuthorId?: string | null;
 }
 
 const AuthorDetail = (props: AuthorDetailProps) => {
-  const { user } = useAuth();
+  const { user, userId } = useAuth();
   const author = useFragment(AUTHOR_DETAIL_FRAGMENT, props.author);
   const date = author?.dateJoined ? dateFormatter(author.dateJoined) : "";
 
@@ -36,7 +34,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
       </HeaderContainer>
       <FooterContainer>
         <StatsContainer>
-          <StatContainer to={author?.username ? `/author/${author.username}/followers` : "#"}>
+          <StatContainer data-testid={`followers-link-${author?.id}`} to={author?.username ? `/author/${author.username}/followers` : "#"}>
             {author?.followedByCount !== undefined && author?.followedByCount >= 0
               ?
                 <><UsersIcon />{author.followedByCount} <StatLinkContainer>Followers</StatLinkContainer></>
@@ -44,7 +42,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
                 null
             }
           </StatContainer>
-          <StatContainer to={author?.username ? `/author/${author.username}/following` : "#"}>
+          <StatContainer data-testid={`following-link-${author?.id}`} to={author?.username ? `/author/${author.username}/following` : "#"}>
             {author?.followingCount !== undefined && author?.followingCount >= 0
               ?
                 <><UsersIcon />{author.followingCount} <StatLinkContainer>Following</StatLinkContainer></>
@@ -55,10 +53,10 @@ const AuthorDetail = (props: AuthorDetailProps) => {
         </StatsContainer>
         {
           author?.username && user ? user !== author?.username &&
-            props.isFollowed ?
-              <UnfollowButton followedAuthorId={props.followedAuthorId} />
+            author?.followedByCurrentUser?.follower?.id === userId ?
+              <UnfollowButton data-testid={`unfollow-button-${author.id}`} followedAuthorId={author.followedByCurrentUser.id} />
               :
-              user !== author?.username && <FollowButton followingId={author?.id} />
+              user !== author?.username && <FollowButton data-testid={`follow-button-${author.id}`} followingId={author?.id} />
           : null
         }
       </FooterContainer>

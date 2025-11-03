@@ -19,7 +19,7 @@ import { useEffect } from "react"
 
 const Author = () => {
   const { username = "" } = useParams();
-  const { user, userId } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { loading, error, data, networkStatus, fetchMore } = useQuery<GetAuthorQuery, GetAuthorQueryVariables>(GET_AUTHOR, {
@@ -32,12 +32,6 @@ const Author = () => {
       savedPoemsLimit: 5,
     }
   })
-
-  const author = data?.authorByUsername;
-  const followers = author?.followedBy?.edges ?? [];
-  const followedEdge = followers.find(edge => edge?.node?.follower.id === userId);
-  const isFollowed = Boolean(followedEdge);
-  const followedAuthorId = followedEdge?.node?.id ?? null;
 
   const showFollowers = location.pathname.endsWith("/followers");
   const showFollowing = location.pathname.endsWith("/following");
@@ -99,7 +93,7 @@ const Author = () => {
           {
             !showFollowers && !showFollowing ? (
               <>
-                <AuthorDetail author={data?.authorByUsername} isFollowed={isFollowed} followedAuthorId={followedAuthorId}></AuthorDetail>
+                <AuthorDetail author={data?.authorByUsername}></AuthorDetail>
                 <LinksContainer>
                   <LinkContainer to={`/author/${username}`} isActive={poemsToDisplay === poems}>Poems</LinkContainer>
                   <LinkContainer to={`/author/${username}/likes`} isActive={poemsToDisplay === likedPoems}><LikeIcon />Likes</LinkContainer>

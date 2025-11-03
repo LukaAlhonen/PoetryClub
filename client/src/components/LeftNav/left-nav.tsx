@@ -1,16 +1,16 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/use-auth";
+import { useAuth } from "../../context/use-auth";
 
-import HomeSVG from "../assets/icons/home.svg?react";
-import SearchSVG from "../assets/icons/search.svg?react";
-import ComposeSVG from "../assets/icons/plus.svg?react";
-import UserSVG from "../assets/icons/user.svg?react";
-import SignupSVG from "../assets/icons/user-add.svg?react";
-import LogoutSVG from "../assets/icons/exit.svg?react";
-import colors from "../colors";
+import HomeSVG from "../../assets/icons/home.svg?react";
+import SearchSVG from "../../assets/icons/search.svg?react";
+import ComposeSVG from "../../assets/icons/plus.svg?react";
+import UserSVG from "../../assets/icons/user.svg?react";
+import SignupSVG from "../../assets/icons/user-add.svg?react";
+import LogoutSVG from "../../assets/icons/exit.svg?react";
+import colors from "../../colors";
 import { useApolloClient } from "@apollo/client/react";
-import { GET_POEMS } from "../pages/Poems/poems.graphql";
+import { GET_POEMS } from "../../pages/Poems/poems.graphql";
 
 const LeftNav = () => {
   const { user, logout } = useAuth();
