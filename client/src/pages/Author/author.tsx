@@ -95,9 +95,9 @@ const Author = () => {
               <>
                 <AuthorDetail author={data?.authorByUsername}></AuthorDetail>
                 <LinksContainer>
-                  <LinkContainer to={`/author/${username}`} isActive={poemsToDisplay === poems}>Poems</LinkContainer>
-                  <LinkContainer to={`/author/${username}/likes`} isActive={poemsToDisplay === likedPoems}><LikeIcon />Likes</LinkContainer>
-                  {user && user === username ? <LinkContainer to={`/author/${username}/saved`} isActive={poemsToDisplay === savedPoems}><SavedIcon />Saved</LinkContainer> : null}
+                  <LinkContainer data-testid={`poems-link-${username}`} to={`/author/${username}`} isActive={poemsToDisplay === poems}>Poems</LinkContainer>
+                  <LinkContainer data-testid={`likes-link-${username}`} to={`/author/${username}/likes`} isActive={poemsToDisplay === likedPoems}><LikeIcon />Likes</LinkContainer>
+                  {user && user === username ? <LinkContainer data-testid={`saved-link-${username}`} to={`/author/${username}/saved`} isActive={poemsToDisplay === savedPoems}><SavedIcon />Saved</LinkContainer> : null}
                 </LinksContainer>
                 <PoemGrid poems={poemsToDisplay} isLoading={isLoading} pageSize={data?.authorByUsername?.poems?.pageInfo?.pageSize} />
               </>
