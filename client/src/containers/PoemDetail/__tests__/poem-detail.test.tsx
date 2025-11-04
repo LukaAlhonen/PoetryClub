@@ -1,4 +1,4 @@
-import { expect, describe, test } from "vitest";
+import { vi, beforeEach, afterEach, expect, describe, test } from "vitest";
 import { screen } from "@testing-library/react";
 import type { Poem } from "../../../__generated__/types";
 import { renderMockProvider } from "../../../utils/test-utils";
@@ -11,6 +11,15 @@ import type { MockLink } from "@apollo/client/testing";
 import type { IncrementPoemViewsMutation } from "../../../__generated__/graphql";
 
 describe("PoemDetail unit tests", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  })
+
   const date = new Date()
 
   const mockPoem: Poem = {

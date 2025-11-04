@@ -118,4 +118,6 @@ describe("Author page unit tests", () => {
   test.todo("Removes like from poem and checks that it is removed from liked poems")
   test.todo("Saves poem and checks that it appears in saved poems")
   test.todo("Unsaves a poem and checks that it is removed from savd poems")
+  test.todo("Follows author and checks that followers was incremented")
+  test.todo("Unfollows author and checks that followers was decremented")
 });

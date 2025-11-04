@@ -4,9 +4,10 @@ import type { Comment as CommentType } from "../../../__generated__/types";
 import { renderMockProvider } from "../../../utils/test-utils";
 import { makeFragmentData } from "../../../__generated__";
 import { COMMENT_FRAGMENT } from "../comment.graphql";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { dateFormatter } from "../../../utils/formatters";
 import Comment from "../comment";
+import userEvent from "@testing-library/user-event";
 
 describe("Comment unit tests", () => {
   const date = new Date()
@@ -75,5 +76,33 @@ describe("Comment unit tests", () => {
     expect(await screen.findByText("comment_01")).toBeInTheDocument();
     expect(await screen.findByText("author_01")).toBeInTheDocument();
     expect(await screen.findByText(dateFormatter(date))).toBeInTheDocument();
+  })
+
+  test("clicks on author link and checks that page renders", async () => {
+    renderMockProvider({
+      component:
+        <MemoryRouter>
+          <Comment comment={mockCommentFragment} />
+          <Routes>
+            <Route path="/author/:username" element={<div>Author Page</div>} />
+            <Route path="/" element={<div></div>} /> {/* to silence err output about "/" route missing */}
+          </Routes>
+        </MemoryRouter>,
+    })
+
+    await userEvent.click(await screen.findByTestId("author-link-c_01"));
+
+    expect(await screen.findByText("Author Page")).toBeInTheDocument();
+  })
+
+  test("Renders Comment loading state", async () => {
+    renderMockProvider({
+      component:
+        <MemoryRouter>
+          <Comment isLoading={true} />
+        </MemoryRouter>,
+    })
+
+    expect(await screen.findByTestId("comment-spinner")).toBeInTheDocument();
   })
 });

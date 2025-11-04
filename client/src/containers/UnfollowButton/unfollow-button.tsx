@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 
 interface UnfollowButtonProps {
   followedAuthorId?: string | null;
+  testId?: string; // so test can easily find this button
 }
 
 const UnfollowButton = (props: UnfollowButtonProps) => {
@@ -89,11 +90,14 @@ const UnfollowButton = (props: UnfollowButtonProps) => {
     if (props.followedAuthorId) unfollowAuthorMutation({variables: { followedAuthorId: props.followedAuthorId }})
   }
 
-  if (error) console.error(error.message)
+  if (error) {
+    console.error(error.message)
+    return <div>{error.message}</div>
+  }
 
 
   if (!loading) {
-    return <UnfollowButtonContainer onClick={handleUnfollow}><FollowIcon />Unfollow</UnfollowButtonContainer>
+    return <UnfollowButtonContainer data-testid={props.testId} onClick={handleUnfollow}><FollowIcon />Unfollow</UnfollowButtonContainer>
   } else return null;
 }
 

@@ -253,5 +253,14 @@ describe("CommentsSection unit test", () => {
     expect(await screen.findAllByText(dateFormatter(date))).toHaveLength(4)
   })
 
-  test.todo("Creates new comment and makes sure it appears in comments section")
+  test("renders CommentsSection loading state", async () => {
+    renderMockProvider({
+      component:
+      <MemoryRouter>
+        <CommentsSection pageSize={5} isLoading={true} />
+      </MemoryRouter>
+    })
+
+    expect(await screen.findAllByTestId("comment-spinner")).toHaveLength(5)
+  })
 });

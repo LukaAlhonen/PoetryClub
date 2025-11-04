@@ -11,6 +11,7 @@ import { useAuth } from "../../context/use-auth";
 
 interface FollowButtonProps {
   followingId?: string;
+  testId?: string; // so test can easily find this button
 }
 
 const FollowButton = (props: FollowButtonProps) => {
@@ -89,10 +90,13 @@ const FollowButton = (props: FollowButtonProps) => {
     if (props.followingId) followAuthorMutation({ variables: { followingId: props.followingId } });
   }
 
-  if (error) console.error(error.message);
+  if (error) {
+    console.error(error.message);
+    return <div>{error.message}</div>
+  }
 
   if (!loading) {
-    return <FollowButtonContainer onClick={handleClick}><FollowIcon />Follow</FollowButtonContainer>
+    return <FollowButtonContainer data-testid={props.testId} onClick={handleClick}><FollowIcon />Follow</FollowButtonContainer>
   } else return null;
 }
 

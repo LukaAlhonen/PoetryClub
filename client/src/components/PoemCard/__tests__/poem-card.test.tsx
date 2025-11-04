@@ -5,8 +5,9 @@ import { renderMockProvider } from "../../../utils/test-utils";
 import PoemCard from "../poem-card";
 import { makeFragmentData } from "../../../__generated__";
 import { POEM_CARD_FRAGMENT } from "../poem-card.graphql";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { dateFormatter } from "../../../utils/formatters";
+import userEvent from "@testing-library/user-event";
 
 describe("PoemCard unit tests", () => {
   const date = new Date()
@@ -64,7 +65,55 @@ describe("PoemCard unit tests", () => {
     expect(screen.getByTestId("commentsCount")).toHaveTextContent("10")
   })
 
-  test.todo("Navigates to Poem page via poem title")
-  test.todo("Navigates to Poem page via 'show full poem' link")
-  test.todo("Navigates to Poem page via comments button")
+  test("Navigates to Poem page via poem title", async () => {
+    renderMockProvider({
+      component:
+      <MemoryRouter>
+        <PoemCard poem={mockPoemCardFragment} />
+        <Routes>
+          <Route element={<div></div>} path={"/"} />
+          <Route element={<div>Poem Page</div>} path={"/poem/:poemId"} />
+        </Routes>
+      </MemoryRouter>
+    })
+
+    await userEvent.click(await screen.findByTestId("poem-title-link-p_01"));
+
+    expect(await screen.findByText("Poem Page")).toBeInTheDocument();
+  })
+
+  test("Navigates to Poem page via 'show full poem' link", async () => {
+    renderMockProvider({
+      component:
+      <MemoryRouter>
+        <PoemCard poem={mockPoemCardFragment} />
+        <Routes>
+          <Route element={<div></div>} path={"/"} />
+          <Route element={<div>Poem Page</div>} path={"/poem/:poemId"} />
+        </Routes>
+      </MemoryRouter>
+    })
+
+    await userEvent.click(await screen.findByTestId("poem-link-p_01"));
+
+    expect(await screen.findByText("Poem Page")).toBeInTheDocument();
+  })
+
+  test("Navigates to Poem page via comments button", async () => {
+
+    renderMockProvider({
+      component:
+      <MemoryRouter>
+        <PoemCard poem={mockPoemCardFragment} />
+        <Routes>
+          <Route element={<div></div>} path={"/"} />
+          <Route element={<div>Author Page</div>} path={"/author/:username"} />
+        </Routes>
+      </MemoryRouter>
+    })
+
+    await userEvent.click(await screen.findByTestId("poem-author-link-a_01"));
+
+    expect(await screen.findByText("Author Page")).toBeInTheDocument();
+  })
 });

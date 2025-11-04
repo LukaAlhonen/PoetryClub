@@ -48,7 +48,7 @@ const PoemCard = (props: PoemCardProps) => {
               Show full poem <Arrow />
             </PoemLink>
           </>
-          : <SpinnerContainer><Spinner /></SpinnerContainer>
+          : <SpinnerContainer><Spinner data-testid={"poem-spinner"} /></SpinnerContainer>
         }
       </TextContainer>
       <PoemFooter>

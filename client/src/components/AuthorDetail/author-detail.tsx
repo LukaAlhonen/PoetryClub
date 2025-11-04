@@ -54,9 +54,9 @@ const AuthorDetail = (props: AuthorDetailProps) => {
         {
           author?.username && user ? user !== author?.username &&
             author?.followedByCurrentUser?.follower?.id === userId ?
-              <UnfollowButton data-testid={`unfollow-button-${author.id}`} followedAuthorId={author.followedByCurrentUser.id} />
+              <UnfollowButton testId={`unfollow-button-${author.id}`} followedAuthorId={author.followedByCurrentUser.id} />
               :
-              user !== author?.username && <FollowButton data-testid={`follow-button-${author.id}`} followingId={author?.id} />
+              user !== author?.username && <FollowButton testId={`follow-button-${author.id}`} followingId={author?.id} />
           : null
         }
       </FooterContainer>

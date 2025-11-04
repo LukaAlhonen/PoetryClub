@@ -128,6 +128,7 @@ const LikeButton = (props: LikeButtonProps) => {
         setIsLiked(true);
         createLikeMutation({ variables: { poemId: props.poemId }})
       } else if (isLiked && props.likedByCurrentUser?.id) {
+        console.log("remove like")
         setIsLiked(false)
         removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
       }
@@ -138,7 +139,7 @@ const LikeButton = (props: LikeButtonProps) => {
   if (removeError) console.error(removeError);
 
   return (
-    <LikeButtonContainer onClick={handleClick} isLiked={isLiked}>
+    <LikeButtonContainer data-testid={`like-button-${props.poemId}`} onClick={handleClick} isLiked={isLiked}>
       {props.children}
     </LikeButtonContainer>
   )

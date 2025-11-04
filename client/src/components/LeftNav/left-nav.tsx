@@ -26,16 +26,16 @@ const LeftNav = () => {
   return (
     <NavContainer>
       <TopNav>
-        <NavLink to="/">
+        <NavLink data-testid={"home-link"} to="/">
           <HomeIcon />
           Home
         </NavLink>
-        <NavLink to="/search">
+        <NavLink data-testid={"search-link"} to="/search">
           <SearchIcon />
           Search
         </NavLink>
         {user ? (
-        <NavLink to="/compose">
+        <NavLink data-testid={"compose-link"} to="/compose">
           <ComposeIcon />
           New Poem
         </NavLink>
@@ -44,19 +44,19 @@ const LeftNav = () => {
       <BottomNav>
         { user ? (
           <>
-            <NavLink to={`/author/${user}`}>
+            <NavLink data-testid={"profile-link"} to={`/author/${user}`}>
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
             </NavLink>
-            <NavLink onClick={handleLogout} to="/">
+            <NavLink data-testid={"logout-link"} onClick={handleLogout} to="/">
               <LogoutIcon/>
               Logout
             </NavLink>
           </>
         ) : (
           <>
-            <NavLink to="/signup"><SignupIcon />Signup</NavLink>
-            <NavLink to="/login"><UserIcon />Login</NavLink>
+            <NavLink data-testid={"signup-link"} to="/signup"><SignupIcon />Signup</NavLink>
+            <NavLink data-testid={"login-link"} to="/login"><UserIcon />Login</NavLink>
           </>
         )
         }
