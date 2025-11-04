@@ -32,25 +32,27 @@ const LikeButton = (props: LikeButtonProps) => {
           },
         })
 
-        if (cachedAuthor && data?.createLike && props.poemId) {
+        if (data?.createLike && props.poemId) {
           const newLike = data.createLike;
           const newNode = { node: newLike, cursor: newLike.id };
           const poemRef = cache.identify({ __typename: "Poem", id: props.poemId });
 
-          cache.writeQuery({
-            query: GET_AUTHOR,
-            variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
-            data: {
-              ...cachedAuthor,
-              authorByUsername: {
-                ...cachedAuthor?.authorByUsername,
-                likedPoems: {
-                  edges: [newNode, ...cachedAuthor.authorByUsername.likedPoems.edges],
-                  pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+          if (cachedAuthor) {
+            cache.writeQuery({
+              query: GET_AUTHOR,
+              variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
+              data: {
+                ...cachedAuthor,
+                authorByUsername: {
+                  ...cachedAuthor?.authorByUsername,
+                  likedPoems: {
+                    edges: [newNode, ...cachedAuthor.authorByUsername.likedPoems.edges],
+                    pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+                  }
                 }
               }
-            }
-          })
+            })
+          };
 
           cache.modify({
             id: poemRef,
@@ -65,6 +67,7 @@ const LikeButton = (props: LikeButtonProps) => {
 
   const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
     update(cache, { data }) {
+      console.log("hello")
       if (user) {
         const cachedAuthor = cache.readQuery({
           query: GET_AUTHOR,
@@ -78,6 +81,7 @@ const LikeButton = (props: LikeButtonProps) => {
           },
         })
         if (cachedAuthor && data?.removeLike && props.poemId) {
+          console.log("hello")
           cache.writeQuery({
             query: GET_AUTHOR,
             variables: {
@@ -101,16 +105,16 @@ const LikeButton = (props: LikeButtonProps) => {
               }
             }
           })
-          cache.modify({
-            id: cache.identify({ __typename: "Poem", id: props.poemId }),
-            fields: {
-              likedByCurrentUser() { return null },
-              likesCount(existingCount = 0) {
-                return existingCount - 1;
-              }
-            }
-          })
         }
+        cache.modify({
+          id: cache.identify({ __typename: "Poem", id: props.poemId }),
+          fields: {
+            likedByCurrentUser() { return null },
+            likesCount(existingCount = 0) {
+              return existingCount - 1;
+            }
+          }
+        })
       }
     },
   })
@@ -127,14 +131,14 @@ const LikeButton = (props: LikeButtonProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleClick = async () => {
+  const handleClick = () => {
     if (props.poemId && !createLoading && !removeLoading && user) {
       if (!isLiked) {
         setIsLiked(true);
-        await createLikeMutation({ variables: { poemId: props.poemId }})
+        createLikeMutation({ variables: { poemId: props.poemId }})
       } else if (isLiked && props.likedByCurrentUser?.id) {
         setIsLiked(false)
-        await removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
+        removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
       }
     }
   }
