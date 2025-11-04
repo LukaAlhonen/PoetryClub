@@ -23,12 +23,12 @@ const Comment = (props: CommentProps) => {
       { props.isLoading
         ?
           <SpinnerContainer>
-            <Spinner />
+            <Spinner data-testid={"comment-spinner"} />
           </SpinnerContainer>
         :
         <>
           <CommentHeader>
-            <AuthorContainer to={comment?.author?.username ? `/author/${comment.author.username}` : "#"}><UserButton />{comment?.author.username}</AuthorContainer>
+            <AuthorContainer data-testid={`author-link-${comment?.id}`} to={comment?.author?.username ? `/author/${comment.author.username}` : "#"}><UserButton />{comment?.author.username}</AuthorContainer>
             {date}
           </CommentHeader>
           <TextContainer>

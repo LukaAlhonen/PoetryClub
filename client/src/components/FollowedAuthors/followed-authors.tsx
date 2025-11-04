@@ -27,14 +27,16 @@ const FollowedAuthors = (props: FollowedAuthorsProps) => {
 
   return (
     <Container>
-      <AuthorLink to={props.username ? `/author/${props.username}` : "#"}><BackIcon />{props.username}</AuthorLink>
+      <AuthorLink data-testid={`author-link-${props.username}`} to={props.username ? `/author/${props.username}` : "#"}><BackIcon />{props.username}</AuthorLink>
       <LinksContainer>
         <LinkContainer
+          data-testid={`followers-link-${props.username}`}
           to={props.username ? `/author/${props.username}/followers` : "#"}
           isActive={props.followers ? true : false}>
             Followers
         </LinkContainer>
         <LinkContainer
+          data-testid={`following-link-${props.username}`}
           to={props.username? `/author/${props.username}/following` : "#"}
           isActive={props.following ? true : false}>
             Following

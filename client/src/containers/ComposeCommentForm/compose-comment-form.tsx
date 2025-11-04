@@ -53,11 +53,11 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
     return (
       <ComposeCommentContainer ref={ref}>
         <FormContainer>
-          <FormTextArea placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} />
-          <FormButton>Post</FormButton>
+          <FormTextArea data-testid={"comment-text-input"} placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} />
+          <FormButton data-testid={"submit-comment-button"}>Post</FormButton>
         </FormContainer>
         <SkeletonContainer>
-          <Comment key={"skeleton_x"} isLoading={loading} noMargin={true} />
+          <Comment data-testid={"comment-skeleton"} key={"skeleton_x"} isLoading={loading} noMargin={true} />
         </SkeletonContainer>
       </ComposeCommentContainer>
     )
@@ -65,9 +65,10 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
 
   if (error) {
     return (
-      <div>{error.message}</div>
+      <div data-testid={"compose-error"}>{error.message}</div>
     )
   }
+
 
   return (
     <ComposeCommentContainer ref={ref}>
@@ -76,10 +77,10 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
         createCommentMutation({ variables: { poemId: props.poemId, text } });
         setText("");
       }}>
-        <FormTextArea placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} onChange={(e) => {
+        <FormTextArea data-testid={"comment-text-input"} placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} onChange={(e) => {
           setText(e.target.value)
         }} />
-        <FormButton type="submit" >Post</FormButton>
+        <FormButton data-testid={"submit-comment-button"} type="submit" >Post</FormButton>
       </FormContainer>
     </ComposeCommentContainer>
   )

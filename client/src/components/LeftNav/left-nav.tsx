@@ -1,16 +1,16 @@
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/use-auth";
+import { useAuth } from "../../context/use-auth";
 
-import HomeSVG from "../assets/icons/home.svg?react";
-import SearchSVG from "../assets/icons/search.svg?react";
-import ComposeSVG from "../assets/icons/plus.svg?react";
-import UserSVG from "../assets/icons/user.svg?react";
-import SignupSVG from "../assets/icons/user-add.svg?react";
-import LogoutSVG from "../assets/icons/exit.svg?react";
-import colors from "../colors";
+import HomeSVG from "../../assets/icons/home.svg?react";
+import SearchSVG from "../../assets/icons/search.svg?react";
+import ComposeSVG from "../../assets/icons/plus.svg?react";
+import UserSVG from "../../assets/icons/user.svg?react";
+import SignupSVG from "../../assets/icons/user-add.svg?react";
+import LogoutSVG from "../../assets/icons/exit.svg?react";
+import colors from "../../colors";
 import { useApolloClient } from "@apollo/client/react";
-import { GET_POEMS } from "../pages/Poems/poems.graphql";
+import { GET_POEMS } from "../../pages/Poems/poems.graphql";
 
 const LeftNav = () => {
   const { user, logout } = useAuth();
@@ -26,16 +26,16 @@ const LeftNav = () => {
   return (
     <NavContainer>
       <TopNav>
-        <NavLink to="/">
+        <NavLink data-testid={"home-link"} to="/">
           <HomeIcon />
           Home
         </NavLink>
-        <NavLink to="/search">
+        <NavLink data-testid={"search-link"} to="/search">
           <SearchIcon />
           Search
         </NavLink>
         {user ? (
-        <NavLink to="/compose">
+        <NavLink data-testid={"compose-link"} to="/compose">
           <ComposeIcon />
           New Poem
         </NavLink>
@@ -44,19 +44,19 @@ const LeftNav = () => {
       <BottomNav>
         { user ? (
           <>
-            <NavLink to={`/author/${user}`}>
+            <NavLink data-testid={"profile-link"} to={`/author/${user}`}>
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
             </NavLink>
-            <NavLink onClick={handleLogout} to="/">
+            <NavLink data-testid={"logout-link"} onClick={handleLogout} to="/">
               <LogoutIcon/>
               Logout
             </NavLink>
           </>
         ) : (
           <>
-            <NavLink to="/signup"><SignupIcon />Signup</NavLink>
-            <NavLink to="/login"><UserIcon />Login</NavLink>
+            <NavLink data-testid={"signup-link"} to="/signup"><SignupIcon />Signup</NavLink>
+            <NavLink data-testid={"login-link"} to="/login"><UserIcon />Login</NavLink>
           </>
         )
         }

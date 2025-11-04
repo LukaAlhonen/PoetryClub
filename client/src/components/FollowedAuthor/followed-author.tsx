@@ -16,7 +16,7 @@ const FollowedAuthor = (props: FollowedAuthorProps) => {
 
   return (
     <FollowedAuthorContainer>
-      <AuthorContainer to={author?.username ? `/author/${author.username}` : "#"}>
+      <AuthorContainer data-testid={`followed-author-link-${author?.id}`} to={author?.username ? `/author/${author.username}` : "#"}>
         <UserIcon />
         {author?.username ? author.username : "loading..."}
       </AuthorContainer>

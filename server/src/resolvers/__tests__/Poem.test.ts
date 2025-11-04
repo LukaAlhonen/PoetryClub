@@ -64,8 +64,6 @@ describe("Graphql Mutation integration tests", () => {
         expect(poem.author.id).toBeDefined();
         // @ts-ignore
         expect(poem.author.password).toBeUndefined();
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -88,8 +86,6 @@ describe("Graphql Mutation integration tests", () => {
         if (errors) console.error(errors);
 
         expect(poem.inCollection).toBeDefined();
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -118,8 +114,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const commentEdge of poem.comments.edges) {
           expect(commentEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -154,8 +148,6 @@ describe("Graphql Mutation integration tests", () => {
         }
 
         cursor = poem.comments.pageInfo.endCursor;
-      } else {
-        throw new Error("invalid response kind");
       }
 
       const secondResponse = await testServer.executeOperation<GetPoemQuery>({
@@ -184,8 +176,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const commentEdge of poem.comments.edges) {
           expect(commentEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -209,8 +199,6 @@ describe("Graphql Mutation integration tests", () => {
 
         expect(poem.commentsCount).toBeDefined();
         expect(poem.commentsCount).toBe(2);
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -239,8 +227,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const likeEdge of poem.likes.edges) {
           expect(likeEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -275,8 +261,6 @@ describe("Graphql Mutation integration tests", () => {
         }
 
         cursor = poem.likes.pageInfo.endCursor;
-      } else {
-        throw new Error("invalid response kind");
       }
 
       const secondResponse = await testServer.executeOperation<GetPoemQuery>({
@@ -305,8 +289,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const likeEdge of poem.likes.edges) {
           expect(likeEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -330,8 +312,6 @@ describe("Graphql Mutation integration tests", () => {
 
         expect(poem.likesCount).toBeDefined();
         expect(poem.likesCount).toBe(1);
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -360,8 +340,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const savedPoemEdge of poem.savedBy.edges) {
           expect(savedPoemEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -396,8 +374,6 @@ describe("Graphql Mutation integration tests", () => {
         }
 
         cursor = poem.savedBy.pageInfo.endCursor;
-      } else {
-        throw new Error("invalid response kind");
       }
 
       const secondResponse = await testServer.executeOperation<GetPoemQuery>({
@@ -426,8 +402,6 @@ describe("Graphql Mutation integration tests", () => {
         for (const savedPoemEdge of poem.savedBy.edges) {
           expect(savedPoemEdge.node.id).toBeDefined();
         }
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
@@ -451,40 +425,10 @@ describe("Graphql Mutation integration tests", () => {
 
         expect(poem.savedByCount).toBeDefined();
         expect(poem.savedByCount).toBe(1);
-      } else {
-        throw new Error("invalid response kind");
       }
     }
   });
 
-  // const testLogin = async ({
-  //   username = "author1",
-  //   password = "password",
-  //   testServer,
-  // }: {
-  //   username?: String;
-  //   password?: String;
-  //   testServer: TestServer;
-  // }) => {
-  //   const response = await testServer.executeOperation<LoginMutation>({
-  //     query: LOGIN,
-  //     variables: {
-  //       username,
-  //       password,
-  //     },
-  //   });
-
-  //   if (response.body.kind === "single") {
-  //     const login = response.body.singleResult.data?.login;
-  //     const errors = response.body.singleResult.errors;
-
-  //     if (errors) console.error(errors);
-
-  //     return login;
-  //   } else {
-  //     throw new Error("Invalid response type");
-  //   }
-  // };
   test("likedByCurentUser", async () => {
     const loginResponse = await testServer.executeOperation<LoginMutation>({
       query: LOGIN,

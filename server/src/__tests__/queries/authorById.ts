@@ -17,8 +17,7 @@ export const GET_AUTHOR_BY_ID = gql(`
         $followingCursor: ID
         $followedByLimit: Int
         $followedByCursor: ID
-    ) {
-        authorById(
+    ) { authorById(
             id: $id
         ) {
             id
@@ -155,6 +154,17 @@ export const GET_AUTHOR_BY_ID = gql(`
                     startCursor
                     endCursor
                     pageSize
+                }
+            }
+            followedByCurrentUser {
+                id
+                follower {
+                    id
+                    username
+                }
+                following {
+                    id
+                    username
                 }
             }
             followedByCount

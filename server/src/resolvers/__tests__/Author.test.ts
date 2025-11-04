@@ -3,6 +3,9 @@ import { seed } from "../../utils/tests/seed-test-db.js";
 import { prisma } from "../../../prisma/index.js";
 import {
   GetAuthorByIdQuery,
+  GetAuthorByIdQueryVariables,
+  LoginMutation,
+  LoginMutationVariables,
 } from "../../__generated__/graphql.js";
 
 import {
@@ -11,6 +14,7 @@ import {
 import { CacheAPI } from "../../cache/cache-api.js";
 import { createServices } from "../../services/index.js";
 import { AuthorWithRelations } from "../../types/extended-types.js";
+import { LOGIN } from "../../__tests__/mutations/login.js";
 
 describe("Graphql Author integration tests", () => {
   // DB seeded with:
@@ -654,4 +658,64 @@ describe("Graphql Author integration tests", () => {
       }
     }
   });
+
+  test("followedByCurrentUser, while logged in", async () => {
+    const follower = authors[0];
+    const following = authors[1];
+
+    const loginResponse = await testServer.executeOperation<LoginMutation, LoginMutationVariables>({
+      query: LOGIN,
+      variables: {
+        username: follower.username,
+        password: "password"
+      }
+    })
+
+    expect(loginResponse.body.kind).toStrictEqual("single")
+
+    if (loginResponse.body.kind === "single") {
+      const login = loginResponse.body.singleResult.data?.login;
+      const errors = loginResponse.body.singleResult.errors;
+
+      expect(errors).toBeUndefined();
+      expect(login.token).toBeDefined();
+      expect(login.author).toBeDefined();
+
+      const response = await testServer.executeOperation<GetAuthorByIdQuery, GetAuthorByIdQueryVariables>({
+        query: GET_AUTHOR_BY_ID,
+        variables: { id: following.id },
+        headers: {
+          authorization: `Bearer ${login.token}`,
+        },
+      })
+
+      expect(response.body.kind).toStrictEqual("single");
+
+      if (response.body.kind === "single") {
+        const author = response.body.singleResult.data?.authorById;
+        const errors = response.body.singleResult.errors
+
+        expect(errors).toBeUndefined();
+
+        expect(author.followedByCurrentUser).toBeDefined();
+        expect(author.followedByCurrentUser.follower.id).toStrictEqual(follower.id);
+        expect(author.followedByCurrentUser.following.id).toStrictEqual(following.id);
+      }
+    }
+  })
+
+  test("followedByCurrentUser, without loggin in", async () => {
+    const response = await testServer.executeOperation<GetAuthorByIdQuery, GetAuthorByIdQueryVariables>({
+      query: GET_AUTHOR_BY_ID,
+      variables: { id: authors[0].id }
+    })
+
+    expect(response.body.kind).toStrictEqual("single");
+
+    if (response.body.kind === "single") {
+      const author = response.body.singleResult.data?.authorById;
+
+      expect(author.followedByCurrentUser).toBeNull();
+    }
+  })
 });

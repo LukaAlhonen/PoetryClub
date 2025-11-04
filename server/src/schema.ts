@@ -77,6 +77,7 @@ export const typeDefs = gql`
     followedBy(first: Int, after: ID): FollowedAuthorsConnection!
     followedByCount: Int!
     dateJoined: Date!
+    followedByCurrentUser: FollowedAuthor
   }
 
   type Poem {

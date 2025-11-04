@@ -118,4 +118,15 @@ export const Author: Resolvers["Author"] = {
       handlePrismaError({err})
     }
   },
+
+  followedByCurrentUser: async ({ id}, _, { user, services}) => {
+    try {
+      if (!user) return null;
+      const followedAuthors = await services.followedAuthorService.getFollowedAuthors({ followerId: user.authorId, followingId: id });
+      if (followedAuthors.length !== 1) return null
+      return followedAuthors[0];
+    } catch (err) {
+      handlePrismaError({ err });
+    }
+  },
 };

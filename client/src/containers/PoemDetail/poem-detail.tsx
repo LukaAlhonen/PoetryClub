@@ -90,13 +90,12 @@ const PoemDetail = (props: PoemDetailProps) => {
                 {poem?.likesCount}
               </span>
             </LikeButton>
-            <CommentsButton open={props.displayCommentForm} onClick={props.onCommentButtonClick}>
+            <CommentsButton data-testid={`comments-button-${poem?.id}`} open={props.displayCommentForm} onClick={props.onCommentButtonClick}>
               <CommentIcon />
               <span data-testid="commentsCount">
                 {poem?.commentsCount}
               </span>
             </CommentsButton>
-            {/*{poem?.commentsCount}*/}
           </StatsContainer>
           <ViewsContainer>
             <ViewsButton />

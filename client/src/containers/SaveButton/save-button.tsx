@@ -138,7 +138,7 @@ const SaveButton = (props: SaveButtonProps) => {
   }
 
   return (
-    <SaveButtonContainer onClick={handleClick} isSaved={isSaved}>
+    <SaveButtonContainer data-testid={`save-button-${props.poemId}`} onClick={handleClick} isSaved={isSaved}>
       {props.children}
     </SaveButtonContainer>
   )

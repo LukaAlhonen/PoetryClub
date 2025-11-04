@@ -34,6 +34,7 @@ export type Author = {
   email: Scalars['String']['output'];
   followedBy: FollowedAuthorsConnection;
   followedByCount: Scalars['Int']['output'];
+  followedByCurrentUser?: Maybe<FollowedAuthor>;
   following: FollowedAuthorsConnection;
   followingCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
@@ -706,6 +707,7 @@ export type AuthorResolvers<ContextType = MyContext, ParentType extends Resolver
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   followedBy?: Resolver<ResolversTypes['FollowedAuthorsConnection'], ParentType, ContextType, Partial<AuthorFollowedByArgs>>;
   followedByCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  followedByCurrentUser?: Resolver<Maybe<ResolversTypes['FollowedAuthor']>, ParentType, ContextType>;
   following?: Resolver<ResolversTypes['FollowedAuthorsConnection'], ParentType, ContextType, Partial<AuthorFollowingArgs>>;
   followingCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
