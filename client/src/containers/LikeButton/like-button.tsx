@@ -20,7 +20,6 @@ const LikeButton = (props: LikeButtonProps) => {
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
     update(cache, { data }) {
       if (user) {
-        console.log("createLike")
         const cachedAuthor = cache.readQuery({
           query: GET_AUTHOR,
           variables: {
@@ -32,7 +31,6 @@ const LikeButton = (props: LikeButtonProps) => {
             followingLimit: 10
           },
         })
-        console.log("hello3")
 
         if (cachedAuthor && data?.createLike && props.poemId) {
           const newLike = data.createLike;
@@ -79,7 +77,6 @@ const LikeButton = (props: LikeButtonProps) => {
             followingLimit: 10
           },
         })
-        console.log(cachedAuthor) // <-- null
         if (cachedAuthor && data?.removeLike && props.poemId) {
           cache.writeQuery({
             query: GET_AUTHOR,
