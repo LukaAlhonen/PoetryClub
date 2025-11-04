@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, test, vi } from "vitest";
 import { screen } from "@testing-library/react";
 // import type { GetPoemsQuery, PoemsConnection } from "../../../__generated__/types";
 import { GET_POEMS } from "../../../pages/Poems/poems.graphql";
@@ -9,8 +9,9 @@ import Poems from "../poems";
 import type { GetPoemsQueryVariables, GetPoemsQuery, PoemsConnection } from "../../../__generated__/graphql";
 
 describe("Poems unit tests", () => {
-  beforeAll(() => {
-    vi.spyOn(console, "error").mockImplementation(() => { })
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
     // dummy intersectionobserver mock
     const mockIntersectionObserver = vi.fn()
     mockIntersectionObserver.mockReturnValue({
@@ -19,7 +20,12 @@ describe("Poems unit tests", () => {
       disconnect: () => null
     });
     window.IntersectionObserver = mockIntersectionObserver;
-  });
+    vi.spyOn(console, "error").mockImplementation(() => { })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  })
 
   const date = new Date()
 

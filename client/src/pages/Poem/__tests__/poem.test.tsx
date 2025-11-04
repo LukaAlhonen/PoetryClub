@@ -1,4 +1,4 @@
-import { expect, describe, beforeEach, afterEach, test, beforeAll, vi } from "vitest";
+import { expect, describe, beforeEach, afterEach, test, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import type { GetPoemQuery, Poem as PoemModel } from "../../../__generated__/types";
 import { GET_POEM } from "../../../pages/Poem/poem.graphql";
@@ -8,19 +8,11 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Poem from "../poem";
 import { INCREMENT_POEM_VIEWS } from "../../../containers/PoemDetail/poem-detail.graphql";
 import type { IncrementPoemViewsMutation } from "../../../__generated__/graphql";
-import * as AuthContext from "../../../context/use-auth";
 
 describe("Poem unit tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetAllMocks();
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  })
-
-  beforeAll(() => {
     vi.spyOn(console, "error").mockImplementation(() => { })
     // dummy intersectionobserver mock
     const mockIntersectionObserver = vi.fn()
@@ -30,7 +22,11 @@ describe("Poem unit tests", () => {
       disconnect: () => null
     });
     window.IntersectionObserver = mockIntersectionObserver;
-  });
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  })
 
   const date = new Date()
 
@@ -106,24 +102,4 @@ describe("Poem unit tests", () => {
     expect(await screen.findByText("poem_01_text")).toBeInTheDocument();
     expect(await screen.findByText("author_01")).toBeInTheDocument();
   })
-
-  // test("checks that ComposeCommentForm appears when logged in", async () => {
-  //   vi.spyOn(AuthContext, "useAuth").mockReturnValue({
-  //    user: "author_01",
-  //    userId: "a_01",
-  //    login: vi.fn(),
-  //    logout: vi.fn(),
-  //   })
-
-  //   renderMockProvider({
-  //     component:
-  //       <MemoryRouter>
-  //         <PoemDetail poem={mockPoemCardFragment} />
-  //       </MemoryRouter>,
-  //     mocks: [mocks]
-  //   });
-  // })
-  // test.todo("checks that ComposeCommentForm does not appear when not logged in")
-  // test.todo("Creates new comment and makes sure it appears in comments section")
-
 });
