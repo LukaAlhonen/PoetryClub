@@ -44,7 +44,6 @@ export const flushAllPromises = async (ticks = 10) => {
     await act(async () => {
       await Promise.resolve();
       await new Promise(res => setTimeout(res, 0));
-      console.log("flushed")
     });
   }
 };
