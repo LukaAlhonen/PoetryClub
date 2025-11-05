@@ -6,6 +6,7 @@ import colors from "../../colors";
 import { useAuth } from "../../context/use-auth";
 import { useEffect, useState } from "react";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
+import { useHandleError } from "../../utils/error-handler";
 
 interface LikeButtonProps {
   children: React.ReactNode;
@@ -16,8 +17,12 @@ interface LikeButtonProps {
 const LikeButton = (props: LikeButtonProps) => {
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
+  const handleError = useHandleError();
 
-  const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
+  const [createLikeMutation, { loading: createLoading }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
+    onError(error) {
+      handleError({ error, shouldNotify: false });
+    },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({
@@ -32,25 +37,27 @@ const LikeButton = (props: LikeButtonProps) => {
           },
         })
 
-        if (cachedAuthor && data?.createLike && props.poemId) {
+        if (data?.createLike && props.poemId) {
           const newLike = data.createLike;
           const newNode = { node: newLike, cursor: newLike.id };
           const poemRef = cache.identify({ __typename: "Poem", id: props.poemId });
 
-          cache.writeQuery({
-            query: GET_AUTHOR,
-            variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
-            data: {
-              ...cachedAuthor,
-              authorByUsername: {
-                ...cachedAuthor?.authorByUsername,
-                likedPoems: {
-                  edges: [newNode, ...cachedAuthor.authorByUsername.likedPoems.edges],
-                  pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+          if (cachedAuthor) {
+            cache.writeQuery({
+              query: GET_AUTHOR,
+              variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
+              data: {
+                ...cachedAuthor,
+                authorByUsername: {
+                  ...cachedAuthor?.authorByUsername,
+                  likedPoems: {
+                    edges: [newNode, ...cachedAuthor.authorByUsername.likedPoems.edges],
+                    pageInfo: cachedAuthor.authorByUsername.likedPoems.pageInfo
+                  }
                 }
               }
-            }
-          })
+            })
+          };
 
           cache.modify({
             id: poemRef,
@@ -63,7 +70,10 @@ const LikeButton = (props: LikeButtonProps) => {
     },
   })
 
-  const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
+  const [removeLikeMutation, { loading: removeLoading }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
+    onError(error){
+      handleError({ error, shouldNotify: false });
+    },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({
@@ -101,16 +111,16 @@ const LikeButton = (props: LikeButtonProps) => {
               }
             }
           })
-          cache.modify({
-            id: cache.identify({ __typename: "Poem", id: props.poemId }),
-            fields: {
-              likedByCurrentUser() { return null },
-              likesCount(existingCount = 0) {
-                return existingCount - 1;
-              }
-            }
-          })
         }
+        cache.modify({
+          id: cache.identify({ __typename: "Poem", id: props.poemId }),
+          fields: {
+            likedByCurrentUser() { return null },
+            likesCount(existingCount = 0) {
+              return existingCount - 1;
+            }
+          }
+        })
       }
     },
   })
@@ -127,21 +137,20 @@ const LikeButton = (props: LikeButtonProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleClick = async () => {
+  const handleClick = () => {
+    if (!user) {
+      handleError({ error: new Error("you must be logged in to like this poem") });
+    }
     if (props.poemId && !createLoading && !removeLoading && user) {
       if (!isLiked) {
         setIsLiked(true);
-        await createLikeMutation({ variables: { poemId: props.poemId }})
+        createLikeMutation({ variables: { poemId: props.poemId }})
       } else if (isLiked && props.likedByCurrentUser?.id) {
         setIsLiked(false)
-        await removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
+        removeLikeMutation({ variables: { likeId: props.likedByCurrentUser.id }})
       }
     }
   }
-
-  if (createError) console.error(createError);
-  if (removeError) console.error(removeError)
-
 
   return (
     <LikeButtonContainer data-testid={`like-button-${props.poemId}`} onClick={handleClick} isLiked={isLiked}>

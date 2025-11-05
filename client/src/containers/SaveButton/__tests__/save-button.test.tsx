@@ -7,6 +7,7 @@ import { renderMockProvider } from "../../../utils/test-utils";
 import SaveButton from "../save-button";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 
 describe("SaveButton unit tests", () => {
   beforeEach(() => {
@@ -85,7 +86,9 @@ describe("SaveButton unit tests", () => {
 
     renderMockProvider({
       component:
-        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>,
+      <MemoryRouter>
+        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>
+      </MemoryRouter>,
       mocks: [savePoemMock]
     });
 
@@ -110,7 +113,9 @@ describe("SaveButton unit tests", () => {
 
     renderMockProvider({
       component:
-        <SaveButton poemId={"p_01"} savedByCurrentUser={mockSavedPoem}>Save</SaveButton>,
+      <MemoryRouter>
+        <SaveButton poemId={"p_01"} savedByCurrentUser={mockSavedPoem}>Save</SaveButton>
+      </MemoryRouter>,
       mocks: [removeSavedPoemMock]
     });
 
@@ -128,7 +133,9 @@ describe("SaveButton unit tests", () => {
   test("Fails to save a saved poem without loggin in", async () => {
     renderMockProvider({
       component:
-        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>,
+      <MemoryRouter>
+        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>
+      </MemoryRouter>,
       mocks: [savePoemMock]
     });
 
@@ -146,7 +153,9 @@ describe("SaveButton unit tests", () => {
   test("Fails to unsave a saved poem without loggin in", async () => {
     renderMockProvider({
       component:
-        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>,
+      <MemoryRouter>
+        <SaveButton poemId={"p_01"} savedByCurrentUser={null}>Save</SaveButton>
+      </MemoryRouter>,
       mocks: [removeSavedPoemMock]
     });
 

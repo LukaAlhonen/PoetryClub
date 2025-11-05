@@ -2,29 +2,30 @@ import { useMutation } from "@apollo/client/react";
 import { Layout } from "../../components"
 import type { SignupMutation, SignupMutationVariables } from "../../__generated__/graphql";
 import { SIGNUP } from "./signup.graphql";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import FullSizeSpinner from "../../components/full-size-spinner";
+import { useHandleError } from "../../utils/error-handler";
+import { notifySuccess } from "../../utils/notify";
 
 const Signup = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [verifyPassword, setVerifyPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [signupMutation, { data, loading, error }] = useMutation<SignupMutation, SignupMutationVariables>(SIGNUP);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (data?.signup) {
+  const handleError = useHandleError();
+  const [signupMutation, { loading }] = useMutation<SignupMutation, SignupMutationVariables>(SIGNUP, {
+    onError(error) {
+      handleError({ error })
+    },
+    onCompleted() {
+      notifySuccess("account created!")
       navigate("/login")
     }
-  }, [data, navigate])
-
-  if (error) {
-    return <div>{error.message}</div>
-  }
+  });
+  const navigate = useNavigate();
 
   if (loading) {
     return (

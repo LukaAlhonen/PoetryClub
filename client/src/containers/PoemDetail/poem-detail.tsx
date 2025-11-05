@@ -13,6 +13,7 @@ import ThumbSVG from "../../assets/icons/thumbs-up.svg?react";
 import ViewsIcon from "../../assets/icons/eye3.svg?react";
 import type { IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables } from "../../__generated__/graphql";
 import { useEffect, useRef } from "react";
+import { useHandleError } from "../../utils/error-handler";
 
 interface PoemDetailProps {
   // the optional null is mainly to silence the lsp, QueryResult in the parent
@@ -25,7 +26,11 @@ interface PoemDetailProps {
 const PoemDetail = (props: PoemDetailProps) => {
   const hasIncremented = useRef(false);
   const poem = useFragment(POEM_DETAIL_FRAGMENT, props.poem);
-  const [incrementPoemViewsMutation, { error }] = useMutation<IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables>(INCREMENT_POEM_VIEWS, {
+  const handleError = useHandleError();
+  const [incrementPoemViewsMutation] = useMutation<IncrementPoemViewsMutation, IncrementPoemViewsMutationVariables>(INCREMENT_POEM_VIEWS, {
+    onError(error) {
+      handleError({ error });
+    },
     update(cache){
       const cachedPoem = cache.identify({ __typename: "Poem", id: poem?.id })
       if (cachedPoem) {
@@ -52,8 +57,6 @@ const PoemDetail = (props: PoemDetailProps) => {
   const date = poem?.datePublished
     ? dateFormatter(poem.datePublished)
     : "loading...";
-
-  if (error) console.error(error)
 
   // TODO: create 404 page to redirect to
   if (!poem) {
@@ -119,7 +122,7 @@ const PoemDetailContainer = styled.div({
   minWidth: "15em",
   alignSelf: "center",
   justifySelf: "center",
-  // margin: "1em"
+  marginTop: "1rem",
 });
 
 const PoemContainer = styled.div({
@@ -190,7 +193,9 @@ const TextContainer = styled.div({
   display: "flex",
   padding: "2em",
   whiteSpace: "pre-wrap",
-  alignSelf: "center"
+  alignSelf: "center",
+  textWrap: "wrap",
+  minHeight: "20em"
 });
 
 const UserButton = styled(UserIcon)({

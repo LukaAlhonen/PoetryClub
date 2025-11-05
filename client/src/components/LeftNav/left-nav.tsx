@@ -10,16 +10,14 @@ import SignupSVG from "../../assets/icons/user-add.svg?react";
 import LogoutSVG from "../../assets/icons/exit.svg?react";
 import colors from "../../colors";
 import { useApolloClient } from "@apollo/client/react";
-import { GET_POEMS } from "../../pages/Poems/poems.graphql";
+import LogoutButton from "../../containers/LogoutButton/logout-button";
+// import { GET_POEMS } from "../../pages/Poems/poems.graphql";
 
 const LeftNav = () => {
   const { user, logout } = useAuth();
   const client = useApolloClient();
   const handleLogout = () => {
     client.clearStore().then(() => {
-      client.refetchQueries({
-        include: [GET_POEMS],
-      })
       logout();
     })
   }
@@ -48,10 +46,12 @@ const LeftNav = () => {
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
             </NavLink>
-            <NavLink data-testid={"logout-link"} onClick={handleLogout} to="/">
+            {/*<NavLink data-testid={"logout-link"} onClick={handleLogout} to="/">*/}
+            <LogoutButton onLogout={handleLogout}>
               <LogoutIcon/>
               Logout
-            </NavLink>
+            </LogoutButton>
+            {/*</NavLink>*/}
           </>
         ) : (
           <>

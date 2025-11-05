@@ -8,6 +8,7 @@ import FollowSVG from "../../assets/icons/following.svg?react";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
+import { useHandleError } from "../../utils/error-handler";
 
 interface FollowButtonProps {
   followingId?: string;
@@ -17,7 +18,11 @@ interface FollowButtonProps {
 const FollowButton = (props: FollowButtonProps) => {
   const { userId, user } = useAuth();
   const { username = "" } = useParams();
-  const [followAuthorMutation, { loading, error }] = useMutation<FollowAuthorMutation, FollowAuthorMutationVariables>(FOLLOW_AUTHOR, {
+  const handleError = useHandleError();
+  const [followAuthorMutation, { loading }] = useMutation<FollowAuthorMutation, FollowAuthorMutationVariables>(FOLLOW_AUTHOR, {
+    onError(error) {
+      handleError({ error });
+    },
     update(cache, { data }) {
 
       if (user) {
@@ -88,11 +93,6 @@ const FollowButton = (props: FollowButtonProps) => {
 
   const handleClick = () => {
     if (props.followingId) followAuthorMutation({ variables: { followingId: props.followingId } });
-  }
-
-  if (error) {
-    console.error(error.message);
-    return <div>{error.message}</div>
   }
 
   if (!loading) {

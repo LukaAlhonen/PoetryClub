@@ -1,40 +1,37 @@
 import colors from "../../colors";
 import styled from "@emotion/styled";
 import { Layout } from "../../components";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { LOGIN } from "./login.graphql";
 import type { LoginMutation, LoginMutationVariables } from "../../__generated__/types";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 import FullSizeSpinner from "../../components/full-size-spinner";
-import { GET_POEMS } from "../Poems/poems.graphql";
+import { notify } from "../../utils/notify";
+import { useHandleError } from "../../utils/error-handler";
 
 const Login = () => {
   const client = useApolloClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginMutation, { data, loading, error }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
+  const handleError = useHandleError();
+  const [loginMutation, { loading }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
     fetchPolicy: "no-cache",
+    onCompleted(data) {
+      login(data.login.token, data.login.author.username, data.login.author.id);
+      console.log(data.login.token)
+      client.clearStore().then(() => {
+        navigate("/")
+        notify(`👋 Welcome ${data.login.author.username}!`)
+      })
+    },
+    onError(error) {
+      handleError({ error })
+    }
   });
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  useEffect(() => {
-    if (data?.login.token) {
-      login(data.login.token, data.login.author.username, data.login.author.id)
-      client.clearStore().then(() => {
-        client.refetchQueries({
-          include: [GET_POEMS],
-        })
-        navigate("/")
-      })
-    }
-  }, [data, login, navigate, client])
-
-  if (error) {
-    return <div>{error.message}</div>
-  }
 
   if (loading) {
     return (

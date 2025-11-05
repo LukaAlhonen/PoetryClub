@@ -17,7 +17,6 @@ type UniqueConstraintError = Prisma.PrismaClientKnownRequestError & {
 };
 
 type RecordNotFoundError = Prisma.PrismaClientKnownRequestError & {
-  code: "P2025",
   meta: {
     modelName: string,
     cause: string
@@ -49,7 +48,10 @@ export const handlePrismaError = ({ err }: { err: PrismaError | GraphQLError }) 
       }
     } else if (err.code === "P2025") {
       const modelName = (err as RecordNotFoundError).meta.modelName;
-      throw new GraphQLError(`${modelName} does not exist`, { extensions: { code: "BAD_USER_INPUT"} })
+      throw new GraphQLError(`${modelName} does not exist`, { extensions: { code: "BAD_USER_INPUT" } })
+    } else if (err.code === "P2023") {
+      const modelName = (err as RecordNotFoundError).meta.modelName;
+      throw new GraphQLError(`${modelName} does not exist`, { extensions: { code: "BAD_USER_INPUT" } })
     } else {
       console.log(err)
       throw new GraphQLError("An unexpected error occured", {

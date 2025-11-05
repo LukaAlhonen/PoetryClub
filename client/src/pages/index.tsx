@@ -6,6 +6,7 @@ import Author from "./Author/author";
 import Search from "./Search/search";
 import Login from "./Login/login";
 import Signup from "./Signup/signup";
+import { ProtectedRoute } from "../components/protected-route";
 
 const Pages = () => {
   return (
@@ -17,8 +18,8 @@ const Pages = () => {
         <Route element={<Author />} path="/author/:username/followers" />
         <Route element={<Author />} path="/author/:username/following" />
         <Route element={<Author />} path="/author/:username/likes" />
-        <Route element={<Author />} path="/author/:username/saved" />
-        <Route element={<ComposePoem />} path="/compose" />
+        <Route element={<ProtectedRoute msg={"you are not allowed to see this"} redirect={"/"} ><Author /></ProtectedRoute>} path="/author/:username/saved" />
+        <Route element={<ProtectedRoute msg={"log in if you want to post a poem"}><ComposePoem /></ProtectedRoute>} path="/compose" />
         <Route element={<Search />} path="/search" />
         <Route element={<Login />} path="/login" />
         <Route element={<Signup />} path="/signup" />

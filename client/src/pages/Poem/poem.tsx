@@ -11,10 +11,12 @@ import type { GetPoemQuery, GetPoemQueryVariables } from "../../__generated__/gr
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/use-auth";
 import { NetworkStatus } from "@apollo/client";
+import { useHandleError } from "../../utils/error-handler";
 
 
 const Poem = () => {
   const { user } = useAuth();
+  const handleError = useHandleError();
   const { poemId = "" } = useParams();
   const [displayCommentForm, setDisplayCommentForm] = useState<boolean>(false);
   const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemQuery, GetPoemQueryVariables>(GET_POEM, {
@@ -37,7 +39,11 @@ const Poem = () => {
   };
 
   const handleDisplayCommentForm = () => {
-    if (user) setDisplayCommentForm(!displayCommentForm);
+    if (user) {
+      setDisplayCommentForm(!displayCommentForm);
+    } else {
+      handleError({ error: new Error("You must be logged in to post a comment") })
+    }
   }
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;

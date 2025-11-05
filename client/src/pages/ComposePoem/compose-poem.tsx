@@ -4,15 +4,28 @@ import colors from "../../colors";
 import { CREATE_POEM } from "./compose-poem.graphql";
 import type { CreatePoemMutation, CreatePoemMutationVariables } from "../../__generated__/types";
 import { useMutation } from "@apollo/client/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GET_POEMS } from "../Poems/poems.graphql";
 import FullSizeSpinner from "../../components/full-size-spinner";
+import { useHandleError } from "../../utils/error-handler";
+import { notifySuccess } from "../../utils/notify";
 
 const ComposePoem = () => {
   const [text, setText] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [createPoemMutation, { data, loading, error }] = useMutation<CreatePoemMutation, CreatePoemMutationVariables>(CREATE_POEM, {
+  const navigate = useNavigate();
+  const handleError = useHandleError();
+  const [createPoemMutation, { loading }] = useMutation<CreatePoemMutation, CreatePoemMutationVariables>(CREATE_POEM, {
+    onCompleted(data) {
+      setText("");
+      setTitle("");
+      notifySuccess("poem created!");
+      navigate(`/poem/${data.createPoem.id}`)
+    },
+    onError(error) {
+      handleError({ error })
+    },
     update(cache, { data }) {
       const cachedPoems = cache.readQuery({ query: GET_POEMS });
       if (cachedPoems && data) {
@@ -29,15 +42,6 @@ const ComposePoem = () => {
       }
     }
   })
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (data?.createPoem.id) {
-      setText("");
-      setTitle("");
-      navigate(`/poem/${data.createPoem.id}`)
-    }
-  }, [data, navigate])
 
   if (loading) {
     return (
@@ -45,10 +49,6 @@ const ComposePoem = () => {
         <FullSizeSpinner/>
       </Layout>
     )
-  }
-
-  if (error) {
-    return <div>{error.message}</div>
   }
 
   return (
