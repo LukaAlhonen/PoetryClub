@@ -28,11 +28,9 @@ const PageContainer = styled.div({
   height: "100%",
   overflowY: "hidden",
   boxSizing: "border-box",
-  // paddingLeft: "1em",
-  paddingRight: "0.3em",
+  padding: "0 0 1rem 1rem",
   maxWidth: "1fr",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  margin: "1em"
 });

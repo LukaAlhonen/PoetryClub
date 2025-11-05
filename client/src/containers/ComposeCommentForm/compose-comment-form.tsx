@@ -7,6 +7,8 @@ import colors from "../../colors";
 import { GET_POEM } from "../../pages/Poem/poem.graphql";
 import { forwardRef } from "react";
 import Comment from "../../components/Comment/comment";
+import { notifySuccess } from "../../utils/notify";
+import { useHandleError } from "../../utils/error-handler";
 
 interface ComposeCommentFormProps {
   poemId: string;
@@ -15,9 +17,17 @@ interface ComposeCommentFormProps {
 // const ComposeCommentForm = (props: ComposeCommentFormProps) => {
 const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((props, ref) => {
   const [text, setText] = useState<string>("")
+  const handleError = useHandleError();
 
-  const [createCommentMutation, { loading, error }] = useMutation<CreateCommentMutation, CreateCommentMutationVariables>(
+  const [createCommentMutation, { loading }] = useMutation<CreateCommentMutation, CreateCommentMutationVariables>(
     CREATE_COMMENT, {
+      onCompleted() {
+        notifySuccess("comment published!")
+      },
+      onError(error) {
+        console.log("hello")
+        handleError({ error });
+      },
       update(cache, { data }) {
         const cachedPoem = cache.readQuery({ query: GET_POEM, variables: { poemId: props.poemId, commentsLimit: 5} });
         if (cachedPoem && data) {
@@ -62,13 +72,6 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
       </ComposeCommentContainer>
     )
   }
-
-  if (error) {
-    return (
-      <div data-testid={"compose-error"}>{error.message}</div>
-    )
-  }
-
 
   return (
     <ComposeCommentContainer ref={ref}>

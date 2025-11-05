@@ -48,4 +48,5 @@ const Container = styled.div({
   flexGrow: 1,
   overflowY: "auto",
   minHeight: 0,
+  paddingRight: "1rem",
 })

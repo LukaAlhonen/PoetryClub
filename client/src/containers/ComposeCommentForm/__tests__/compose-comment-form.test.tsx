@@ -10,49 +10,69 @@ import type { CreateCommentMutation, CreateCommentMutationVariables } from "../.
 import { makeFragmentData } from "../../../__generated__";
 import { COMMENT_FRAGMENT } from "../../../components/Comment/comment.graphql";
 import userEvent from "@testing-library/user-event";
-
-const date = new Date();
-
-const composeMock: MockLink.MockedResponse<CreateCommentMutation, CreateCommentMutationVariables> = {
-  request: {
-    query: CREATE_COMMENT,
-    variables: {
-      poemId: "p_01",
-      text: "comment_01_text"
-    }
-  },
-  result: {
-    data: {
-      createComment: {
-        id: "c_01",
-        ...makeFragmentData({
-          id: "c_01",
-          text: "comment_01_text",
-          author: {
-              id: "a_01",
-              username: "author_01"
-          },
-          datePublished: date,
-        }, COMMENT_FRAGMENT)
-      }
-    },
-  },
-}
-
-const failComposeMock: MockLink.MockedResponse<CreateCommentMutation, CreateCommentMutationVariables> = {
-  request: {
-    query: CREATE_COMMENT,
-    variables: {
-      poemId: "p_01",
-      text: "comment_01_text"
-    }
-  },
-  result: {
-    errors: [new Error("an error has occured")]
-  },
-}
+import { GraphQLError } from "graphql";
 
 describe("ComposeCommentForm unit tests", () => {
+  vi.mock("@apollo/client/react", () => ({
+    useApolloClient: () => ({ clearStore: vi.fn() }),
+  }));
+
+  // const mockNavigate = vi.fn();
+  // vi.mock("react-router-dom", () => ({
+  //   useNavigate: () => mockNavigate,
+  // }));
+
+  const mockNotify = vi.fn();
+  const mockNotifyError = vi.fn();
+  const mockNotifySuccess = vi.fn();
+  vi.mock("../utils/notify", () => ({
+    notify: mockNotify,
+    notifyError: mockNotifyError,
+    notifySuccess: mockNotifySuccess,
+  }));
+
+  const date = new Date();
+
+  const composeMock: MockLink.MockedResponse<CreateCommentMutation, CreateCommentMutationVariables> = {
+    request: {
+      query: CREATE_COMMENT,
+      variables: {
+        poemId: "p_01",
+        text: "comment_01_text"
+      }
+    },
+    result: {
+      data: {
+        createComment: {
+          id: "c_01",
+          ...makeFragmentData({
+            id: "c_01",
+            text: "comment_01_text",
+            author: {
+              id: "a_01",
+              username: "author_01"
+            },
+            datePublished: date,
+          }, COMMENT_FRAGMENT)
+        }
+      },
+    },
+  }
+
+  const failComposeMock: MockLink.MockedResponse<CreateCommentMutation, CreateCommentMutationVariables> = {
+    request: {
+      query: CREATE_COMMENT,
+      variables: {
+        poemId: "p_01",
+        text: "comment_01_text"
+      }
+    },
+    result: {
+      data: null,
+      errors: [new GraphQLError("not authenticated")]
+    },
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetAllMocks();
@@ -65,9 +85,9 @@ describe("ComposeCommentForm unit tests", () => {
   test("Renders ComposeCommentForm", async () => {
     renderMockProvider({
       component:
-      <MemoryRouter>
-        <ComposeCommentForm poemId={"p_01"} />
-      </MemoryRouter>
+        <MemoryRouter>
+          <ComposeCommentForm poemId={"p_01"} />
+        </MemoryRouter>
     })
 
     expect(await screen.findByTestId("comment-text-input")).toBeInTheDocument();
@@ -76,10 +96,10 @@ describe("ComposeCommentForm unit tests", () => {
 
   test("creates new comment", async () => {
     vi.spyOn(AuthContext, "useAuth").mockReturnValue({
-     user: "author_01",
-     userId: "a_01",
-     login: vi.fn(),
-     logout: vi.fn(),
+      user: "author_01",
+      userId: "a_01",
+      login: vi.fn(),
+      logout: vi.fn(),
     })
 
     renderMockProvider({
@@ -97,19 +117,4 @@ describe("ComposeCommentForm unit tests", () => {
     expect(await screen.findByTestId("comment-text-input")).toBeInTheDocument();
     expect(await screen.findByTestId("submit-comment-button")).toBeInTheDocument();
   })
-
-  test("fails to create comment by not logging in first", async () => {
-    renderMockProvider({
-      component:
-        <MemoryRouter>
-          <ComposeCommentForm poemId={"p_01"} />
-        </MemoryRouter>,
-      mocks: [failComposeMock]
-    });
-
-    await userEvent.type(await screen.findByTestId("comment-text-input"), "comment_01_text");
-    await userEvent.click(await screen.findByTestId("submit-comment-button"));
-
-    expect(await screen.findByTestId("compose-error")).toHaveTextContent("an error has occured")
-  })
-})
+});

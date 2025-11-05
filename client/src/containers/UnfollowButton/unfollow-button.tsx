@@ -8,6 +8,7 @@ import { useAuth } from "../../context/use-auth";
 import UnfollowSVG from "../../assets/icons/unfollow.svg?react"
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
 import { useParams } from "react-router-dom";
+import { useHandleError } from "../../utils/error-handler";
 
 interface UnfollowButtonProps {
   followedAuthorId?: string | null;
@@ -17,10 +18,13 @@ interface UnfollowButtonProps {
 const UnfollowButton = (props: UnfollowButtonProps) => {
   const { username = "" } = useParams();
   const { user, userId } = useAuth();
+  const handleError = useHandleError();
 
-  const [unfollowAuthorMutation, { loading, error }] = useMutation<UnfollowAuthorMutation, UnfollowAuthorMutationVariables>(UNFOLLOW_AUTHOR, {
+  const [unfollowAuthorMutation, { loading }] = useMutation<UnfollowAuthorMutation, UnfollowAuthorMutationVariables>(UNFOLLOW_AUTHOR, {
+    onError(error) {
+      handleError({ error });
+    },
     update(cache, { data }) {
-
       if (user) {
         const cachedAuthor = cache.readQuery({ query: GET_AUTHOR, variables: { username, poemsLimit: 5 } });
         if (cachedAuthor && data?.removeFollowedAuthor) {
@@ -89,12 +93,6 @@ const UnfollowButton = (props: UnfollowButtonProps) => {
   const handleUnfollow = () => {
     if (props.followedAuthorId) unfollowAuthorMutation({variables: { followedAuthorId: props.followedAuthorId }})
   }
-
-  if (error) {
-    console.error(error.message)
-    return <div>{error.message}</div>
-  }
-
 
   if (!loading) {
     return <UnfollowButtonContainer data-testid={props.testId} onClick={handleUnfollow}><FollowIcon />Unfollow</UnfollowButtonContainer>

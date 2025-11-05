@@ -6,6 +6,7 @@ import { renderMockProvider } from "../../../utils/test-utils";
 import UnfollowButton from "../unfollow-button";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
 describe("UnfollowButton unit tests", () => {
   const unFollowMock: MockLink.MockedResponse<UnfollowAuthorMutation, UnfollowAuthorMutationVariables> = {
@@ -33,7 +34,9 @@ describe("UnfollowButton unit tests", () => {
   test("Follows an unfollowed author", async () => {
     renderMockProvider({
       component:
-        <UnfollowButton testId={"unfollow-button"} followedAuthorId={"f_01"} />,
+      <MemoryRouter>
+        <UnfollowButton testId={"unfollow-button"} followedAuthorId={"f_01"} />
+      </MemoryRouter>,
       mocks: [unFollowMock]
     });
 

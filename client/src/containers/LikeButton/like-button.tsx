@@ -6,8 +6,7 @@ import colors from "../../colors";
 import { useAuth } from "../../context/use-auth";
 import { useEffect, useState } from "react";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useHandleError } from "../../utils/error-handler";
 
 interface LikeButtonProps {
   children: React.ReactNode;
@@ -18,13 +17,11 @@ interface LikeButtonProps {
 const LikeButton = (props: LikeButtonProps) => {
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
-  const notify = (msg: string) => toast(msg)
+  const handleError = useHandleError();
 
-  const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
-    onError(error){
-      console.error(error);
-      notify(error.message)
-      setIsLiked(false)
+  const [createLikeMutation, { loading: createLoading }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
+    onError(error) {
+      handleError({ error, shouldNotify: false });
     },
     update(cache, { data }) {
       if (user) {
@@ -75,8 +72,7 @@ const LikeButton = (props: LikeButtonProps) => {
 
   const [removeLikeMutation, { loading: removeLoading }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
     onError(error){
-      console.error(error);
-      setIsLiked(true)
+      handleError({ error, shouldNotify: false });
     },
     update(cache, { data }) {
       if (user) {
@@ -142,6 +138,9 @@ const LikeButton = (props: LikeButtonProps) => {
   }, []);
 
   const handleClick = () => {
+    if (!user) {
+      handleError({ error: new Error("you must be logged in to like this poem") });
+    }
     if (props.poemId && !createLoading && !removeLoading && user) {
       if (!isLiked) {
         setIsLiked(true);
@@ -152,10 +151,6 @@ const LikeButton = (props: LikeButtonProps) => {
       }
     }
   }
-
-  // if (createError) console.error(createError);
-  // if (removeError) console.error(removeError)
-
 
   return (
     <LikeButtonContainer data-testid={`like-button-${props.poemId}`} onClick={handleClick} isLiked={isLiked}>

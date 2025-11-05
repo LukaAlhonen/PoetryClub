@@ -12,7 +12,8 @@ const colors = {
   textEggshell: "#dce2dc",
   wineRed: "#911431",
   white2: "#f2f2f2",
-  darkGray: "#4c4c4c"
+  darkGray: "#4c4c4c",
+  successGreen: "#0b3a05"
 };
 
 export default colors;

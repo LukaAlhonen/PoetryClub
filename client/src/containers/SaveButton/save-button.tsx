@@ -7,6 +7,7 @@ import { useAuth } from "../../context/use-auth";
 import { useEffect, useState } from "react";
 import type { RemoveSavedPoemMutation, RemoveSavedPoemMutationVariables } from "../../__generated__/types";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
+import { useHandleError } from "../../utils/error-handler";
 
 interface SaveButtonProps {
   poemId?: string;
@@ -17,7 +18,11 @@ interface SaveButtonProps {
 const SaveButton = (props: SaveButtonProps) => {
   const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(props.savedByCurrentUser ? true : false);
-  const [createSavedPoemMutation, { error: createError, loading: createLoading }] = useMutation<CreateSavedPoemMutation, CreateSavedPoemMutationVariables>(CREATE_SAVED_POEM, {
+  const handleError = useHandleError();
+  const [createSavedPoemMutation, { loading: createLoading }] = useMutation<CreateSavedPoemMutation, CreateSavedPoemMutationVariables>(CREATE_SAVED_POEM, {
+    onError(error) {
+      handleError({ error });
+    },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({
@@ -31,26 +36,28 @@ const SaveButton = (props: SaveButtonProps) => {
             followingLimit: 10
           },
         })
-        if (cachedAuthor && data?.createSavedPoem && props.poemId) {
+        if (data?.createSavedPoem && props.poemId) {
+          const poemRef = cache.identify({ __typename: "Poem", id: props.poemId });
           const newSavedPoem = data.createSavedPoem;
           const newNode = { node: newSavedPoem, cursor: newSavedPoem.id };
-          const poemRef = cache.identify({ __typename: "Poem", id: props.poemId });
+          if (cachedAuthor) {
 
-          cache.writeQuery({
-            query: GET_AUTHOR,
-            variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
-            data: {
-              ...cachedAuthor,
-              authorByUsername: {
-                ...cachedAuthor?.authorByUsername,
-                savedPoems: {
-                  edges: [newNode, ...cachedAuthor.authorByUsername.savedPoems.edges],
-                  pageInfo: cachedAuthor.authorByUsername.savedPoems.pageInfo
+            cache.writeQuery({
+              query: GET_AUTHOR,
+              variables: { username: user, poemsLimit: 5, savedPoemsLimit: 5, likedPoemsLimit: 5, followedByLimit: 10, followingLimit: 10 },
+              data: {
+                ...cachedAuthor,
+                authorByUsername: {
+                  ...cachedAuthor?.authorByUsername,
+                  savedPoems: {
+                    edges: [newNode, ...cachedAuthor.authorByUsername.savedPoems.edges],
+                    pageInfo: cachedAuthor.authorByUsername.savedPoems.pageInfo
+                  }
                 }
               }
-            }
-          })
+            })
 
+          }
           cache.modify({
             id: poemRef,
             fields: {
@@ -62,7 +69,10 @@ const SaveButton = (props: SaveButtonProps) => {
     },
   });
 
-  const [removeSavedPoemMutation, { error: removeError, loading: removeLoading }] = useMutation<RemoveSavedPoemMutation, RemoveSavedPoemMutationVariables>(REMOVE_SAVED_POEM, {
+  const [removeSavedPoemMutation, { loading: removeLoading }] = useMutation<RemoveSavedPoemMutation, RemoveSavedPoemMutationVariables>(REMOVE_SAVED_POEM, {
+    onError(error) {
+      handleError({ error });
+    },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({
@@ -100,16 +110,16 @@ const SaveButton = (props: SaveButtonProps) => {
               }
             }
           })
-          cache.modify({
-            id: cache.identify({ __typename: "Poem", id: props.poemId }),
-            fields: {
-              savedByCurrentUser() { return null },
-              savedByCount(existingCount = 0) {
-                return existingCount - 1;
-              }
-            }
-          })
         }
+        cache.modify({
+          id: cache.identify({ __typename: "Poem", id: props.poemId }),
+          fields: {
+            savedByCurrentUser() { return null },
+            savedByCount(existingCount = 0) {
+              return existingCount - 1;
+            }
+          }
+        })
       }
     },
   })
@@ -121,9 +131,6 @@ const SaveButton = (props: SaveButtonProps) => {
   useEffect(() => {
     setIsSaved(!!props.savedByCurrentUser);
   }, [props.savedByCurrentUser])
-
-  if (createError) console.error(createError);
-  if (removeError) console.error(removeError);
 
   const handleClick = () => {
     if (props.poemId && !createLoading && !removeLoading && user) {

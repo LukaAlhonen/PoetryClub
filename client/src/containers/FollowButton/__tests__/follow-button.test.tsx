@@ -6,6 +6,7 @@ import { FOLLOW_AUTHOR } from "../follow-button.graphql";
 import FollowButton from "../follow-button";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
 
 describe("FolloweButton unit tests", () => {
@@ -34,7 +35,9 @@ describe("FolloweButton unit tests", () => {
   test("follow button click on unfollowed author", async () => {
     renderMockProvider({
       component:
-        <FollowButton testId={"follow-button"} followingId={"a_02"} />,
+      <MemoryRouter>
+        <FollowButton testId={"follow-button"} followingId={"a_02"} />
+      </MemoryRouter>,
       mocks: [followMock]
     });
 

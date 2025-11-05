@@ -4,11 +4,21 @@ import { LOGOUT } from "./logout-button.graphql";
 import colors from "../../colors";
 import styled from "@emotion/styled";
 import { useMutation } from "@apollo/client/react";
+import { notify } from "../../utils/notify";
+import { useHandleError } from "../../utils/error-handler";
 
 const LogoutButton = (props: { children: React.ReactNode;  onLogout: () => void}) => {
   const { user } = useAuth();
+  const handleError = useHandleError();
 
-  const [logoutMutation] = useMutation(LOGOUT)
+  const [logoutMutation] = useMutation(LOGOUT, {
+    onCompleted(){
+      notify("🫶 smell ya' later")
+    },
+    onError(error) {
+      handleError({ error });
+    }
+  })
 
   const handleLogout = () => {
     if (user) {
