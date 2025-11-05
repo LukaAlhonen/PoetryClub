@@ -6,6 +6,8 @@ import colors from "../../colors";
 import { useAuth } from "../../context/use-auth";
 import { useEffect, useState } from "react";
 import { GET_AUTHOR } from "../../pages/Author/author.graphql";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface LikeButtonProps {
   children: React.ReactNode;
@@ -16,8 +18,14 @@ interface LikeButtonProps {
 const LikeButton = (props: LikeButtonProps) => {
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(props.likedByCurrentUser ? true : false);
+  const notify = (msg: string) => toast(msg)
 
   const [createLikeMutation, { loading: createLoading, error: createError }] = useMutation<CreateLikeMutation, CreateLikeMutationVariables>(CREATE_LIKE, {
+    onError(error){
+      console.error(error);
+      notify(error.message)
+      setIsLiked(false)
+    },
     update(cache, { data }) {
       if (user) {
         const cachedAuthor = cache.readQuery({
@@ -65,9 +73,12 @@ const LikeButton = (props: LikeButtonProps) => {
     },
   })
 
-  const [removeLikeMutation, { loading: removeLoading, error: removeError }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
+  const [removeLikeMutation, { loading: removeLoading }] = useMutation<RemoveLikeMutation, RemoveLikeMutationVariables>(REMOVE_LIKE, {
+    onError(error){
+      console.error(error);
+      setIsLiked(true)
+    },
     update(cache, { data }) {
-      console.log("hello")
       if (user) {
         const cachedAuthor = cache.readQuery({
           query: GET_AUTHOR,
@@ -81,7 +92,6 @@ const LikeButton = (props: LikeButtonProps) => {
           },
         })
         if (cachedAuthor && data?.removeLike && props.poemId) {
-          console.log("hello")
           cache.writeQuery({
             query: GET_AUTHOR,
             variables: {
@@ -143,8 +153,8 @@ const LikeButton = (props: LikeButtonProps) => {
     }
   }
 
-  if (createError) console.error(createError);
-  if (removeError) console.error(removeError)
+  // if (createError) console.error(createError);
+  // if (removeError) console.error(removeError)
 
 
   return (

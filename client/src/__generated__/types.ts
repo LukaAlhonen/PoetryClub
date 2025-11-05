@@ -574,6 +574,11 @@ export type RemoveLikeMutationVariables = Exact<{
 
 export type RemoveLikeMutation = { __typename?: 'Mutation', removeLike: { __typename?: 'Like', id: string, poem: { __typename?: 'Poem', id: string }, author: { __typename?: 'Author', id: string, username: string } } };
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
 export type PoemDetailFragmentFragment = { __typename?: 'Poem', id: string, title: string, text: string, datePublished: any, views: number, likesCount: number, commentsCount: number, savedByCount: number, inCollection?: { __typename?: 'Collection', id: string, title: string } | null, author: { __typename?: 'Author', id: string, username: string }, likedByCurrentUser?: { __typename?: 'Like', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string } } | null, savedByCurrentUser?: { __typename?: 'SavedPoem', id: string, author: { __typename?: 'Author', id: string, username: string }, poem: { __typename?: 'Poem', id: string } } | null };
 
 export type IncrementPoemViewsMutationVariables = Exact<{

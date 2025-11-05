@@ -8,7 +8,7 @@ import type { LoginMutation, LoginMutationVariables } from "../../__generated__/
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 import FullSizeSpinner from "../../components/full-size-spinner";
-import { GET_POEMS } from "../Poems/poems.graphql";
+// import { GET_POEMS } from "../Poems/poems.graphql";
 
 const Login = () => {
   const client = useApolloClient();
@@ -24,9 +24,9 @@ const Login = () => {
     if (data?.login.token) {
       login(data.login.token, data.login.author.username, data.login.author.id)
       client.clearStore().then(() => {
-        client.refetchQueries({
-          include: [GET_POEMS],
-        })
+        // client.refetchQueries({
+        //   include: [GET_POEMS],
+        // })
         navigate("/")
       })
     }
