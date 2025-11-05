@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 
 import HomeSVG from "../../assets/icons/home.svg?react";
@@ -24,39 +24,39 @@ const LeftNav = () => {
   return (
     <NavContainer>
       <TopNav>
-        <NavLink data-testid={"home-link"} to="/">
+        <NavButton data-testid={"home-link"} to="/">
           <HomeIcon />
           Home
-        </NavLink>
-        <NavLink data-testid={"search-link"} to="/search">
+        </NavButton>
+        <NavButton data-testid={"search-link"} to="/search">
           <SearchIcon />
           Search
-        </NavLink>
+        </NavButton>
         {user ? (
-        <NavLink data-testid={"compose-link"} to="/compose">
+        <NavButton data-testid={"compose-link"} to="/compose">
           <ComposeIcon />
           New Poem
-        </NavLink>
+        </NavButton>
         ): (<></>)}
       </TopNav>
       <BottomNav>
         { user ? (
           <>
-            <NavLink data-testid={"profile-link"} to={`/author/${user}`}>
+            <NavButton data-testid={"profile-link"} to={`/author/${user}`}>
               <UserIcon />
               <UsernameContainer>{user}</UsernameContainer>
-            </NavLink>
-            {/*<NavLink data-testid={"logout-link"} onClick={handleLogout} to="/">*/}
+            </NavButton>
+            {/*<NavButton data-testid={"logout-link"} onClick={handleLogout} to="/">*/}
             <LogoutButton onLogout={handleLogout}>
               <LogoutIcon/>
               Logout
             </LogoutButton>
-            {/*</NavLink>*/}
+            {/*</NavButton>*/}
           </>
         ) : (
           <>
-            <NavLink data-testid={"signup-link"} to="/signup"><SignupIcon />Signup</NavLink>
-            <NavLink data-testid={"login-link"} to="/login"><UserIcon />Login</NavLink>
+            <NavButton data-testid={"signup-link"} to="/signup"><SignupIcon />Signup</NavButton>
+            <NavButton data-testid={"login-link"} to="/login"><UserIcon />Login</NavButton>
           </>
         )
         }
@@ -92,7 +92,7 @@ const BottomNav = styled.div({
   flexDirection: "column",
 });
 
-const NavLink = styled(Link)({
+const NavButton = styled(NavLink)({
   textDecoration: "none",
   width: "9em",
   color: colors.backgroundBlack,
@@ -110,6 +110,10 @@ const NavLink = styled(Link)({
     color: colors.textEggshell,
     background: colors.wineRed,
   },
+  "&.active": {
+    color: colors.textEggshell,
+    background: colors.wineRed,
+  }
 });
 
 const UsernameContainer = styled.div({
