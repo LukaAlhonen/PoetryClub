@@ -29,10 +29,11 @@ const verifyUser = async ({
     id: user.authorId,
     omitAuthVersion: false,
   });
-  if (!author || author.authVersion !== user.authVersion)
+  if (!author || author.authVersion !== user.authVersion) {
     throw new GraphQLError("not authenticated", {
       extensions: { code: "UNAUTHENITCATED" },
     });
+  }
 };
 
 export const Mutation: Resolvers["Mutation"] = {
@@ -60,25 +61,6 @@ export const Mutation: Resolvers["Mutation"] = {
       });
     } catch (err) {
       handlePrismaError({ err })
-      // if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      //   if (err.code === "P2002") {
-      //     if (err.meta) {
-      //       console.log(err.meta);
-      //     }
-      //     throw new GraphQLError(
-      //       `A Poem with the title ${input.title} already exists`,
-      //       { extensions: { code: "BAD_USER_INPUT" } },
-      //     );
-      //   } else {
-      //     throw new GraphQLError("An unexpected error occured", {
-      //       extensions: { code: "INTERNAL_SERVER_ERROR" },
-      //     });
-      //   }
-      // } else {
-      //   throw new GraphQLError("An unexpected error occured", {
-      //     extensions: { code: "INTERNAL_SERVER_ERROR" },
-      //   });
-      // }
     }
   },
 

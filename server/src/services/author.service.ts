@@ -110,7 +110,7 @@ export class AuthorService {
     if (author) {
       await this.cache.set({ key: cacheKey, value: copy });
       await this.cache.sAdd({
-        setKey: `author:${author.id}:queries}`,
+        setKey: `author:${author.id}:queries`,
         cacheKey,
       });
     }
@@ -430,6 +430,7 @@ export class AuthorService {
 
     if (author) {
       const cacheKey = `author:id:${author.id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
+      const usernameCacheKey = `author:username:${username}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`
 
       await this.cache.removeRelations({ id: author.id, name: "author" });
       await this.cache.set({ key: cacheKey, value: author });
@@ -437,6 +438,10 @@ export class AuthorService {
         setKey: `author:${author.id}:queries`,
         cacheKey,
       });
+      await this.cache.sAdd({
+        setKey: `author:${author.id}:queries`,
+        cacheKey: usernameCacheKey,
+      })
       await this.cache.delByPattern({ pattern: "authors:first:*" });
 
       for (const poem of author.poems) {
