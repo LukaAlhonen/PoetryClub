@@ -1,16 +1,8 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
     "lib": [
       "es2020"
     ],
-    "baseUrl": ".",
-    "paths": {
-      "@prisma/*": [
-        "prisma/*"
-      ] // alias for everything under prisma/
-    },
     "target": "es2020",
     "module": "NodeNext",
     "moduleResolution": "nodenext",
@@ -24,6 +16,7 @@
   },
   "include": [
     "src",
-    "global.d.ts"
+    "global.d.ts",
+    "prisma"
   ]
 }
