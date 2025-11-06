@@ -55,6 +55,9 @@ const HeaderContainer = styled.div({
   color: colors.textEggshell,
   // borderBottom: "0.15rem solid gray",
   boxSizing: "border-box",
+  "@media (max-width: 769px)": {
+    display: "none"
+  }
 });
 
 const TitleContainer = styled(Link)({

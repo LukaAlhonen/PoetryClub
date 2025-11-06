@@ -5,11 +5,11 @@ import BurgerNav from "./burger-nav";
 import colors from "../colors";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 500);
+  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 769);
 
   useEffect(() => {
     const handleResize = () => {
-      setSmallScreen(window.innerWidth < 500)
+      setSmallScreen(window.innerWidth < 769)
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -46,7 +46,7 @@ const PageContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  // "@media (max-width: 500px)": {
-  //   marginTop: "3rem"
-  // }
+  "@media (max-width: 769px)": {
+    marginTop: "3rem"
+  }
 });

@@ -9,7 +9,8 @@ export const notify = (msg: string) => toast(msg, {
     borderRadius: "0.5rem",
     // fontWeight: "bold",
     minWidth: "25rem"
-  }
+  },
+  position: window.innerWidth < 769 ? "bottom-center" : "top-center"
 });
 
 export const notifyError = (msg: string) => toast.error(msg, {
@@ -22,10 +23,7 @@ export const notifyError = (msg: string) => toast.error(msg, {
     minWidth: "25rem"
   },
   icon: '❌',
-  // iconTheme: {
-  //   primary: colors.textEggshell,
-  //   secondary: colors.backgroundBlack
-  // }
+  position: window.innerWidth < 769 ? "bottom-center" : "top-center"
 })
 
 export const notifySuccess = (msg: string) => toast.success(msg, {
@@ -37,5 +35,6 @@ export const notifySuccess = (msg: string) => toast.success(msg, {
     fontWeight: "bold",
     minWidth: "25rem"
   },
-  icon: '🍾'
+  icon: '🍾',
+  position: window.innerWidth < 769 ? "bottom-center" : "top-center"
 })
