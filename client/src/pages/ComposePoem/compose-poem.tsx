@@ -4,7 +4,7 @@ import colors from "../../colors";
 import { CREATE_POEM } from "./compose-poem.graphql";
 import type { CreatePoemMutation, CreatePoemMutationVariables } from "../../__generated__/types";
 import { useMutation } from "@apollo/client/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GET_POEMS } from "../Poems/poems.graphql";
 import FullSizeSpinner from "../../components/full-size-spinner";
@@ -14,6 +14,7 @@ import { notifySuccess } from "../../utils/notify";
 const ComposePoem = () => {
   const [text, setText] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const [isFilled, setIsFilled] = useState(text.trim() !== "" && title.trim() !== "");
   const navigate = useNavigate();
   const handleError = useHandleError();
   const [createPoemMutation, { loading }] = useMutation<CreatePoemMutation, CreatePoemMutationVariables>(CREATE_POEM, {
@@ -43,6 +44,10 @@ const ComposePoem = () => {
     }
   })
 
+  useEffect(() => {
+    setIsFilled(text.trim() !== "" && title.trim() !== "");
+  }, [text, title])
+
   if (loading) {
     return (
       <Layout>
@@ -70,7 +75,7 @@ const ComposePoem = () => {
           <FormTextArea placeholder={"write your poem here"} rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
             setText(e.target.value)
           }} />
-          <ComposeButton type="submit">Post</ComposeButton>
+          <ComposeButton disabled={!isFilled} isFilled={isFilled} type="submit">Post</ComposeButton>
         </FormContainer>
       </ComposePoemContainer>
     </Layout>
@@ -146,11 +151,11 @@ const FormInput = styled.input({
   },
 })
 
-const ComposeButton = styled.button({
+const ComposeButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: colors.backgroundBlack,
+  background: isFilled ? colors.wineRed : colors.backgroundBlack,
   color: colors.textEggshell,
   border: `0.15rem solid gray`,
   boxSizing: "border-box",
@@ -160,10 +165,9 @@ const ComposeButton = styled.button({
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {
-    background: colors.wineRed,
-    cursor: "pointer"
+    cursor: isFilled ? "pointer" : "default"
   }
-})
+}))
 
 const FormTextArea = styled.textarea({
   resize: "none",
