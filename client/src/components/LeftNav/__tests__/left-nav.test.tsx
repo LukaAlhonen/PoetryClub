@@ -7,12 +7,20 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { MockLink } from "@apollo/client/testing";
 import { GET_POEMS } from "../../../pages/Poems/poems.graphql";
+import { LOGOUT } from "../../../containers/LogoutButton/logout-button.graphql";
 
 const getPoemsMock: MockLink.MockedResponse = {
   request: {
     query: GET_POEMS,
   },
   result: {}
+}
+
+const logoutMock: MockLink.MockedResponse = {
+  request: {
+    query: LOGOUT
+  },
+  result: { data: { } }
 }
 
 describe("LeftNav unit tests", () => {
@@ -158,7 +166,7 @@ describe("LeftNav unit tests", () => {
           <Route element={<div>Home Page</div>} path={"/"} />
         </Routes>
       </MemoryRouter>,
-      mocks: [getPoemsMock]
+      mocks: [getPoemsMock, logoutMock]
     })
 
     await userEvent.click(await screen.findByTestId("logout-link"))

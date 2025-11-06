@@ -196,6 +196,7 @@ describe("FollowedAuthors unit tests", () => {
       <MemoryRouter>
           <FollowedAuthors username={"author_07"} />
         <Routes>
+          <Route path="/" element={<div></div>}/>
           <Route path={"/author/:username"} element={<div>Author Page</div>} />
         </Routes>
       </MemoryRouter>
