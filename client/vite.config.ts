@@ -16,6 +16,16 @@ export default defineConfig({
       "src/**/__tests__/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          apollo: ['@apollo/client']
+        }
+      }
+    }
+  },
   server: {
     allowedHosts: ["ubuntubox.local"],
   },
