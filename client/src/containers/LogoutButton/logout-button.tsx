@@ -38,7 +38,8 @@ export default LogoutButton;
 
 const LogoutButtonContainer = styled(Link)({
   textDecoration: "none",
-  width: "9em",
+  // width: "9em",
+  width: "100%",
   color: colors.backgroundBlack,
   background: colors.textEggshell,
   marginBottom: "1em",

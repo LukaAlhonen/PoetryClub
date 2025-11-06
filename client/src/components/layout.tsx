@@ -20,7 +20,7 @@ const LayoutContainer = styled.div({
   height: "100vh",
   overflow: "hidden",
   background: colors.backgroundBlack,
-  boxSizing: "border-box"
+  boxSizing: "border-box",
 })
 
 const PageContainer = styled.div({
