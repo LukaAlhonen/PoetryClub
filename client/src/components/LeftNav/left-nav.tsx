@@ -32,11 +32,11 @@ const LeftNav = () => {
       return !prev;
     })
   }
+
   return (
     <NavContainer collapsed={collapsed}>
       <CollapseContainer>
         <CollapseButton onClick={handleCollapse}>
-          {/*{collapsed ? <CollapsedIcon /> : <ExpandedIcon />}*/}
           <CollapsedIcon />
         </CollapseButton>
       </CollapseContainer>
@@ -63,12 +63,10 @@ const LeftNav = () => {
               <UserIcon />
               {!collapsed && <UsernameContainer>{user}</UsernameContainer>}
             </NavButton>
-            {/*<NavButton data-testid={"logout-link"} onClick={handleLogout} to="/">*/}
             <LogoutButton onLogout={handleLogout}>
               <LogoutIcon/>
               {!collapsed && "Logout"}
             </LogoutButton>
-            {/*</NavButton>*/}
           </>
         ) : (
           <>
