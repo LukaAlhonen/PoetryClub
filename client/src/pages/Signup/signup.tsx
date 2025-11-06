@@ -105,6 +105,10 @@ const SignupContainer = styled.div({
   justifySelf: "center",
   alignSelf: "center",
   width: "100%",
+  marginRight: "1rem",
+  "@media (max-width: 769px)": {
+    padding: "1em"
+  }
 })
 
 const SignupTitle = styled.div({

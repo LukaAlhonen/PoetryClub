@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import LeftNav from "./LeftNav/left-nav";
+import BurgerNav from "./burger-nav";
 import colors from "../colors";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 769);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSmallScreen(window.innerWidth < 769)
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [])
   return (
     <LayoutContainer>
-      <LeftNav></LeftNav>
+      {smallScreen ? <BurgerNav></BurgerNav> : <LeftNav></LeftNav>}
+      {/*<LeftNav></LeftNav>*/}
       <PageContainer>{children}</PageContainer>
     </LayoutContainer>
   );
@@ -21,6 +33,7 @@ const LayoutContainer = styled.div({
   overflow: "hidden",
   background: colors.backgroundBlack,
   boxSizing: "border-box",
+  position: "relative"
 })
 
 const PageContainer = styled.div({
@@ -33,4 +46,7 @@ const PageContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  "@media (max-width: 769px)": {
+    marginTop: "3rem"
+  }
 });

@@ -43,7 +43,7 @@ const Search = () => {
       <ScrollContainer onIntersect={handleIntersect}>
         <SearchBar>
           <SearchButton />
-          <SearchInput value={filter} onChange={(e) => {
+          <SearchInput placeholder="search" value={filter} onChange={(e) => {
             setFilter(e.target.value)
           }} />
         </SearchBar>
@@ -65,7 +65,8 @@ const SearchBar = styled.div({
   boxSizing: "border-box",
   border: "0.15em solid gray",
   padding: "0.5em",
-  margin: "1em",
+  // margin: "1em",
+  marginTop: "1rem",
   background: colors.textEggshell
 })
 

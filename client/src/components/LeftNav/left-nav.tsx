@@ -2,7 +2,6 @@ import styled from "@emotion/styled";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 import colors from "../../colors";
-import { useApolloClient } from "@apollo/client/react";
 import { useState } from "react";
 import LogoutButton from "../../containers/LogoutButton/logout-button";
 
@@ -19,24 +18,18 @@ const LeftNav = () => {
     // idiotic hack to persist collapsed state accross page reloads (i do not like this)
     return localStorage.getItem("collapsed") === "true"
   });
-  const { user, logout } = useAuth();
-  const client = useApolloClient();
-  const handleLogout = () => {
-    client.clearStore().then(() => {
-      logout();
-    })
-  }
+  const { user } = useAuth();
   const handleCollapse = () => {
     setCollapsed(prev => {
       localStorage.setItem("collapsed", String(!prev));
       return !prev;
     })
   }
+
   return (
     <NavContainer collapsed={collapsed}>
       <CollapseContainer>
         <CollapseButton onClick={handleCollapse}>
-          {/*{collapsed ? <CollapsedIcon /> : <ExpandedIcon />}*/}
           <CollapsedIcon />
         </CollapseButton>
       </CollapseContainer>
@@ -63,12 +56,10 @@ const LeftNav = () => {
               <UserIcon />
               {!collapsed && <UsernameContainer>{user}</UsernameContainer>}
             </NavButton>
-            {/*<NavButton data-testid={"logout-link"} onClick={handleLogout} to="/">*/}
-            <LogoutButton onLogout={handleLogout}>
+            <LogoutButton>
               <LogoutIcon/>
               {!collapsed && "Logout"}
             </LogoutButton>
-            {/*</NavButton>*/}
           </>
         ) : (
           <>

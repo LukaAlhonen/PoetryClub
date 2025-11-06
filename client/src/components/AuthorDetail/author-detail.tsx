@@ -51,6 +51,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
             }
           </StatContainer>
         </StatsContainer>
+        <FollowButtonContainer>
         {
           author?.username && user ? user !== author?.username &&
             author?.followedByCurrentUser?.follower?.id === userId ?
@@ -59,6 +60,7 @@ const AuthorDetail = (props: AuthorDetailProps) => {
               user !== author?.username && <FollowButton testId={`follow-button-${author.id}`} followingId={author?.id} />
           : null
         }
+        </FollowButtonContainer>
       </FooterContainer>
     </AuthorDetailContainer>
   )
@@ -128,15 +130,27 @@ const FooterContainer = styled.div({
   display: "flex",
   width: "100%",
   justifyContent: "space-between",
-  alignItems: "end"
+  alignItems: "flex-end",
+  flexWrap: "wrap",
+  boxSizing: "border-box",
+  gap: "1rem"
+})
+
+const FollowButtonContainer = styled.div({
+  flexShrink: 0,
+  minWidth: 0
 })
 
 const StatsContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   marginTop: "5em",
-  width: "100%",
-  alignItems: "center"
+  // width: "100%",
+  alignItems: "center",
+  flexGrow: 1,
+  minWidth: 0,
+  flexWrap: "wrap",
+  gap: "1rem"
 })
 
 const StatContainer = styled(Link)({
