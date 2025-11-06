@@ -4,6 +4,7 @@ dotenv.config();
 
 interface ENV {
   DATABASE_URL: string | undefined;
+  TEST_DATABASE_URL: string | undefined;
   REDIS_URL: string | undefined;
   JWT_SECRET: string | undefined;
   JWT_REFRESH_SECRET: string | undefined;
@@ -12,6 +13,7 @@ interface ENV {
 
 interface Config {
   DATABASE_URL: string;
+  TEST_DATABASE_URL: string;
   REDIS_URL: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
@@ -21,6 +23,7 @@ interface Config {
 const getConfig = (): ENV => {
   return {
     DATABASE_URL: process.env.DATABASE_URL,
+    TEST_DATABASE_URL: process.env.TEST_DATABASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,

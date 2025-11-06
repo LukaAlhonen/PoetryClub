@@ -6,7 +6,7 @@ import { beforeEach, afterEach } from "vitest";
 import { URL } from "url";
 
 const generateDatabaseURL = (schema: string) => {
-  const url = new URL(config.DATABASE_URL);
+  const url = new URL(config.TEST_DATABASE_URL);
   url.searchParams.append("schema", schema);
   return url.toString();
 };

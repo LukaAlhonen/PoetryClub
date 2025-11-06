@@ -19,10 +19,33 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       REDIS_URL: ${{ secrets.REDIS_URL }}
+      TEST_REDIS_URL: ${{ secrets.TEST_REDIS_URL }}
       APOLLO_SERVER_PORT: ${{ vars.APOLLO_SERVER_PORT }}
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timout 5s
+          --health-retries 5
+
+      redis:
+        image: redis
+        ports:
+          - 6380:6379
+        options: >-
+          --requirepass test
 
     steps:
       - uses: actions/checkout@v4
@@ -31,20 +54,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Create .env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> server/.env
-          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> server/.env
-          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> server/.env
-          echo "APOLLO_SERVER_PORT=${{ vars.APOLLO_SERVER_PORT }}" >> server/.env
-      - name: Debug env vars
-        run: |
-          echo "DATABASE_URL length: ${#DATABASE_URL}"
-          echo "JWT_SECRET length: ${#JWT_SECRET}"
-          echo "REDIS_URL length: ${#REDIS_URL}"
-          echo "APOLLO_SERVER_PORT: $APOLLO_SERVER_PORT"
-        shell: bash
       - run: rm -rf package-lock.json node_modules
       - run: npm install
       - name: Generate prisma client
