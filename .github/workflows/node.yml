@@ -40,7 +40,7 @@ jobs:
         ports:
           - 6380:6379
         options: >-
-          --requirepass test
+          redis-server --requirepass test
 
     steps:
       - uses: actions/checkout@v4
