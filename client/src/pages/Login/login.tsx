@@ -1,7 +1,7 @@
 import colors from "../../colors";
 import styled from "@emotion/styled";
 import { Layout } from "../../components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { LOGIN } from "./login.graphql";
 import type { LoginMutation, LoginMutationVariables } from "../../__generated__/types";
@@ -15,6 +15,7 @@ const Login = () => {
   const client = useApolloClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isFilled, setIsFilled] = useState(username.trim() !== "" && password.trim() !== "");
   const handleError = useHandleError();
   const [loginMutation, { loading }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
     fetchPolicy: "no-cache",
@@ -32,6 +33,10 @@ const Login = () => {
   });
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  useEffect(() => {
+    setIsFilled(username.trim() !== "" && password.trim() !== "")
+  }, [username, password])
 
   if (loading) {
     return (
@@ -66,7 +71,7 @@ const Login = () => {
             }}/>
           </InputContainer>
           <InputContainer>
-            <LoginButton type="submit">Login</LoginButton>
+            <LoginButton disabled={!isFilled} isFilled={isFilled} type="submit">Login</LoginButton>
           </InputContainer>
         </LoginForm>
       </LoginContainer>
@@ -137,11 +142,11 @@ const LoginInput = styled.input({
   }
 })
 
-const LoginButton = styled.button({
+const LoginButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: colors.backgroundBlack,
+  background: isFilled ? colors.wineRed : colors.backgroundBlack,
   color: colors.textEggshell,
   border: `0.15rem solid gray`,
   boxSizing: "border-box",
@@ -151,7 +156,6 @@ const LoginButton = styled.button({
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {
-    background: colors.wineRed,
-    cursor: "pointer"
+    cursor: isFilled ? "pointer" : "default"
   }
-})
+}))

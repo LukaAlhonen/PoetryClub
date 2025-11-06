@@ -2,19 +2,20 @@ import { useMutation } from "@apollo/client/react";
 import { Layout } from "../../components"
 import type { SignupMutation, SignupMutationVariables } from "../../__generated__/graphql";
 import { SIGNUP } from "./signup.graphql";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import FullSizeSpinner from "../../components/full-size-spinner";
 import { useHandleError } from "../../utils/error-handler";
-import { notifySuccess } from "../../utils/notify";
+import { notifyError, notifySuccess } from "../../utils/notify";
 
 const Signup = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [verifyPassword, setVerifyPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [isFilled, setIsFilled] = useState(username.trim() !== "" && password.trim() !== "" && verifyPassword.trim() !== "" && email.trim() !== "");
   const handleError = useHandleError();
   const [signupMutation, { loading }] = useMutation<SignupMutation, SignupMutationVariables>(SIGNUP, {
     onError(error) {
@@ -27,6 +28,10 @@ const Signup = () => {
   });
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setIsFilled(username.trim() !== "" && password.trim() !== "" && verifyPassword.trim() !== "" && email.trim() !== "")
+  }, [username, password, verifyPassword, email])
+
   if (loading) {
     return (
       <Layout>
@@ -38,8 +43,12 @@ const Signup = () => {
   const handleSubmit = ({ username, email, password, verifyPassword }: { username: string; email: string; password: string; verifyPassword: string; }) => {
     if (password === verifyPassword) {
       signupMutation({ variables: { input: { username, email, password } } });
+      setUsername("");
+      setPassword("");
+      setVerifyPassword("")
+      setEmail("");
     } else {
-      console.error("passwords do not match")
+      notifyError("passwords do not match")
     }
   }
 
@@ -52,10 +61,10 @@ const Signup = () => {
         <SignupForm onSubmit={(e) => {
           e.preventDefault();
           handleSubmit({username, password, email, verifyPassword})
-          setUsername("");
-          setPassword("");
-          setVerifyPassword("")
-          setEmail("");
+          // setUsername("");
+          // setPassword("");
+          // setVerifyPassword("")
+          // setEmail("");
         }}>
           <InputContainer>
             <h4>Username</h4>
@@ -82,7 +91,7 @@ const Signup = () => {
             }}/>
           </InputContainer>
           <InputContainer>
-            <SignupButton type="submit">Signup</SignupButton>
+            <SignupButton disabled={!isFilled} isFilled={isFilled} type="submit">Signup</SignupButton>
           </InputContainer>
         </SignupForm>
       </SignupContainer>
@@ -153,11 +162,11 @@ const SignupInput = styled.input({
   }
 })
 
-const SignupButton = styled.button({
+const SignupButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: colors.backgroundBlack,
+  background: isFilled ? colors.wineRed : colors.backgroundBlack,
   color: colors.textEggshell,
   border: `0.15rem solid gray`,
   boxSizing: "border-box",
@@ -167,7 +176,7 @@ const SignupButton = styled.button({
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {
-    background: colors.wineRed,
-    cursor: "pointer"
+    // background: colors.wineRed,
+    cursor: isFilled ? "pointer" : "default",
   }
-})
+}))

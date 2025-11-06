@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client/react/compiled";
 import { CREATE_COMMENT } from "./compose-comment-form.graphql";
 import type { CreateCommentMutation, CreateCommentMutationVariables } from "../../__generated__/graphql";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import colors from "../../colors";
 import { GET_POEM } from "../../pages/Poem/poem.graphql";
@@ -17,7 +17,9 @@ interface ComposeCommentFormProps {
 // const ComposeCommentForm = (props: ComposeCommentFormProps) => {
 const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((props, ref) => {
   const [text, setText] = useState<string>("")
+  const [isFilled, setIsFilled] = useState(text.trim() !== "");
   const handleError = useHandleError();
+
 
   const [createCommentMutation, { loading }] = useMutation<CreateCommentMutation, CreateCommentMutationVariables>(
     CREATE_COMMENT, {
@@ -25,7 +27,6 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
         notifySuccess("comment published!")
       },
       onError(error) {
-        console.log("hello")
         handleError({ error });
       },
       update(cache, { data }) {
@@ -59,12 +60,16 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
     }
   );
 
+  useEffect(() => {
+    setIsFilled(text.trim() !== "")
+  }, [text])
+
   if (loading) {
     return (
       <ComposeCommentContainer ref={ref}>
         <FormContainer>
           <FormTextArea data-testid={"comment-text-input"} placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} />
-          <FormButton data-testid={"submit-comment-button"}>Post</FormButton>
+          <FormButton data-testid={"submit-comment-button"} disabled={!isFilled} isFilled={isFilled}>Post</FormButton>
         </FormContainer>
         <SkeletonContainer>
           <Comment data-testid={"comment-skeleton"} key={"skeleton_x"} isLoading={loading} noMargin={true} />
@@ -83,7 +88,7 @@ const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((
         <FormTextArea data-testid={"comment-text-input"} placeholder="Post a comment" rows={10} maxLength={1000} required={true} value={text} onChange={(e) => {
           setText(e.target.value)
         }} />
-        <FormButton data-testid={"submit-comment-button"} type="submit" >Post</FormButton>
+        <FormButton data-testid={"submit-comment-button"} disabled={!isFilled} isFilled={isFilled} type="submit" >Post</FormButton>
       </FormContainer>
     </ComposeCommentContainer>
   )
@@ -129,7 +134,7 @@ const FormTextArea = styled.textarea({
   }
 })
 
-const FormButton = styled.button({
+const FormButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   padding: "0.5rem",
   fontSize: "1.1em",
   width: "50%",
@@ -138,14 +143,14 @@ const FormButton = styled.button({
   textDecoration: "none",
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
-  background: colors.backgroundBlack,
+  background: isFilled ? colors.wineRed : colors.backgroundBlack,
   color: colors.textEggshell,
   transition: "background 0.1s ease-in-out",
   "&:hover": {
-    background: colors.wineRed,
-    cursor: "pointer"
+    // background: colors.wineRed,
+    cursor: isFilled ? "pointer" : "default"
   }
-})
+}));
 
 const SkeletonContainer = styled.div({
   display: "flex",
