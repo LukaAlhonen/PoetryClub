@@ -10,17 +10,11 @@ import type { CreateCommentMutation, CreateCommentMutationVariables } from "../.
 import { makeFragmentData } from "../../../__generated__";
 import { COMMENT_FRAGMENT } from "../../../components/Comment/comment.graphql";
 import userEvent from "@testing-library/user-event";
-import { GraphQLError } from "graphql";
 
 describe("ComposeCommentForm unit tests", () => {
   vi.mock("@apollo/client/react", () => ({
     useApolloClient: () => ({ clearStore: vi.fn() }),
   }));
-
-  // const mockNavigate = vi.fn();
-  // vi.mock("react-router-dom", () => ({
-  //   useNavigate: () => mockNavigate,
-  // }));
 
   const mockNotify = vi.fn();
   const mockNotifyError = vi.fn();
@@ -56,20 +50,6 @@ describe("ComposeCommentForm unit tests", () => {
           }, COMMENT_FRAGMENT)
         }
       },
-    },
-  }
-
-  const failComposeMock: MockLink.MockedResponse<CreateCommentMutation, CreateCommentMutationVariables> = {
-    request: {
-      query: CREATE_COMMENT,
-      variables: {
-        poemId: "p_01",
-        text: "comment_01_text"
-      }
-    },
-    result: {
-      data: null,
-      errors: [new GraphQLError("not authenticated")]
     },
   }
 

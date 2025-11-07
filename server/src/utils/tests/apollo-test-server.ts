@@ -1,7 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { typeDefs } from "../../schema.js";
 import { resolvers } from "../../resolvers/index.js";
-import { PoemAPI } from "../../datasources/poem-api.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { MyContext } from "../../types/context.js";
 import config from "../../config.js";

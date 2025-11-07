@@ -1,5 +1,5 @@
 import type { ErrorLike } from "@apollo/client"
-import { notify, notifyError } from "./notify"
+import { notifyError } from "./notify"
 import { useApolloClient } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/use-auth";
