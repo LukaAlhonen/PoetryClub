@@ -5,10 +5,18 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POStgRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
   redis:
     image: redis
     restart: always
@@ -18,17 +26,34 @@ services:
     volumes:
       - redis-cache:/data
       - ./redis-full.conf:/usr/local/etc/redis/redis-full.conf
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
   server:
     build:
       context: ../server
       dockerfile: Dockerfile
     expose:
       - "4000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - APOLLO_SERVER_PORT=${APOLLO_SERVER_PORT}
     depends_on:
-      - db
-      - redis
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     networks:
       - app-network
+    env_file:
+      - ../server/.env
   nxginx-proxy:
     image: nginx:alpine
     restart: "always"

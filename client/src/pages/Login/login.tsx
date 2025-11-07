@@ -4,7 +4,10 @@ import { Layout } from "../../components";
 import { useEffect, useState } from "react";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import { LOGIN } from "./login.graphql";
-import type { LoginMutation, LoginMutationVariables } from "../../__generated__/types";
+import type {
+  LoginMutation,
+  LoginMutationVariables,
+} from "../../__generated__/types";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/use-auth";
 import FullSizeSpinner from "../../components/full-size-spinner";
@@ -15,35 +18,39 @@ const Login = () => {
   const client = useApolloClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isFilled, setIsFilled] = useState(username.trim() !== "" && password.trim() !== "");
+  const [isFilled, setIsFilled] = useState(
+    username.trim() !== "" && password.trim() !== "",
+  );
   const handleError = useHandleError();
-  const [loginMutation, { loading }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
+  const [loginMutation, { loading }] = useMutation<
+    LoginMutation,
+    LoginMutationVariables
+  >(LOGIN, {
     fetchPolicy: "no-cache",
     onCompleted(data) {
       login(data.login.token, data.login.author.username, data.login.author.id);
-      console.log(data.login.token)
       client.clearStore().then(() => {
-        navigate("/")
-        notify(`👋 Welcome ${data.login.author.username}!`)
-      })
+        navigate("/");
+        notify(`👋 Welcome ${data.login.author.username}!`);
+      });
     },
     onError(error) {
-      handleError({ error })
-    }
+      handleError({ error });
+    },
   });
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
-    setIsFilled(username.trim() !== "" && password.trim() !== "")
-  }, [username, password])
+    setIsFilled(username.trim() !== "" && password.trim() !== "");
+  }, [username, password]);
 
   if (loading) {
     return (
       <Layout>
         <FullSizeSpinner />
       </Layout>
-    )
+    );
   }
 
   return (
@@ -52,26 +59,37 @@ const Login = () => {
         <LoginTitle>
           <h3>Login</h3>
         </LoginTitle>
-        <LoginForm onSubmit={(e) => {
+        <LoginForm
+          onSubmit={(e) => {
             e.preventDefault();
             loginMutation({ variables: { username, password } });
             setUsername("");
             setPassword("");
-        }}>
+          }}
+        >
           <InputContainer>
             <h4>Username</h4>
-            <LoginInput value={username} onChange={(e) => {
-              setUsername(e.target.value)
-            }}/>
+            <LoginInput
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
           </InputContainer>
           <InputContainer>
             <h4>Password</h4>
-            <LoginInput type="password" value={password} onChange={(e) => {
-              setPassword(e.target.value)
-            }}/>
+            <LoginInput
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
           </InputContainer>
           <InputContainer>
-            <LoginButton disabled={!isFilled} isFilled={isFilled} type="submit">Login</LoginButton>
+            <LoginButton disabled={!isFilled} isFilled={isFilled} type="submit">
+              Login
+            </LoginButton>
           </InputContainer>
         </LoginForm>
       </LoginContainer>
@@ -96,20 +114,20 @@ const LoginContainer = styled.div({
   width: "100%",
   marginRight: "1rem",
   "@media (max-width: 769px)": {
-    padding: "1em"
-  }
-})
+    padding: "1em",
+  },
+});
 
 const LoginTitle = styled.div({
   fontSize: "1.7em",
-  color: colors.backgroundBlack
-})
+  color: colors.backgroundBlack,
+});
 
 const LoginForm = styled.form({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-})
+});
 
 const InputContainer = styled.div({
   color: colors.backgroundBlack,
@@ -121,7 +139,7 @@ const InputContainer = styled.div({
   },
   marginBottom: "1em",
   alignItems: "stretch",
-})
+});
 
 const LoginInput = styled.input({
   display: "flex",
@@ -135,14 +153,14 @@ const LoginInput = styled.input({
   transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`
+    border: `0.15rem solid ${colors.wineRed}`,
   },
   "&:hover": {
     border: `0.15rem solid ${colors.wineRed}`,
-  }
-})
+  },
+});
 
-const LoginButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
+const LoginButton = styled.button<{ isFilled?: boolean }>(({ isFilled }) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
@@ -156,6 +174,6 @@ const LoginButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {
-    cursor: isFilled ? "pointer" : "default"
-  }
-}))
+    cursor: isFilled ? "pointer" : "default",
+  },
+}));
