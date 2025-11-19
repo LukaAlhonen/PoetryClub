@@ -95,7 +95,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./server
-          file: Dockerfile
+          file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.REGISTRY }}/${{ steps.downcaserepo.outputs.lowercase }}-server:${{ steps.tags.outputs.tag }}
 
@@ -105,7 +105,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./client
-          file: Dockerfile
+          file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.REGISTRY }}/${{ steps.downcaserepo.outputs.lowercase }}-client:${{ steps.tags.outputs.tag }}
 
