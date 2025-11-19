@@ -83,7 +83,7 @@ jobs:
             echo "tag=${VERSION}" >> $GITHUB_OUTPUT
             echo "is_release=true"
           else
-            echo "pr-${{ github.run_id }}" >> $GITHUB_OUTPUT
+            echo "tag=pr-${{ github.run_id }}" >> $GITHUB_OUTPUT
           fi
 
       # Build and push Docker images with Buildx (don't push on PR)
