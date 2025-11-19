@@ -44,9 +44,6 @@ export class CacheAPI {
     valueArray: Array<unknown>;
     ttlSeconds?: number;
   }) {
-    // for (let i = 0; i < valueArray.length; ++i) {
-    //   await this.hSet({ key, field: String(i), value: valueArray[i] });
-    // }
     const pipeline = this.redisClient.pipeline();
 
     valueArray.forEach((value, i) => {
@@ -92,16 +89,6 @@ export class CacheAPI {
     if (!rawData || Object.keys(rawData).length === 0) {
       return null;
     }
-
-    // // Parse each value
-    // const data = Object.fromEntries(
-    //   Object.entries(rawData).map(([key, value]) => [
-    //     key,
-    //     JSON.parse(value, this.dateReviver),
-    //   ]),
-    // ) as T;
-
-    // return Object.values(data);
 
     const values = Object.entries(rawData)
       .sort(([a], [b]) => Number(a) - Number(b))
