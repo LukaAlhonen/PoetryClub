@@ -9,3 +9,5 @@ RUN npm run build
 FROM nginx:alpine
 
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
