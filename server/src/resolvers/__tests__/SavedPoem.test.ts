@@ -1,0 +1,88 @@
+import { createTestServer } from "../../utils/tests/apollo-test-server.js";
+import { seed } from "../../utils/tests/seed-test-db.js";
+import { prisma } from "../../../prisma/index.js";
+import {
+  GetSavedPoemQuery,
+} from "../../__generated__/graphql.js";
+
+import {
+  GET_SAVED_POEM,
+} from "../../__tests__/queries/index.js";
+import { CacheAPI } from "../../cache/cache-api.js";
+import { createServices } from "../../services/index.js";
+import { SavedPoemWithRelations } from "../../types/extended-types.js";
+
+describe("Graphql SavedPoem integration tests", () => {
+  // DB seeded with:
+  // 4 authors
+  // 8 poems (2 per author)
+  // 4 collections (1 per author 2 poems per collection)
+  // 16 comments (2 per poem and author)
+  // 3 followed authors
+  // 4 likes
+  // 4 savedPoems
+  const cache = new CacheAPI({ prefix: "SavedPoem" });
+  const services = createServices({ prisma, cache });
+  let testServer: Awaited<ReturnType<typeof createTestServer> | null> = null;
+
+  let savedPoems: SavedPoemWithRelations[] = [];
+
+  beforeEach(async () => {
+    await cache.delByPattern({ pattern: "*" });
+    testServer = await createTestServer({ services });
+    const result = await seed({ prisma });
+    savedPoems = result.savedPoems;
+  });
+  afterAll(async () => {
+    await testServer.cleanup();
+    await cache.delByPattern({ pattern: "*" });
+  });
+
+  test("author", async () => {
+    for (const savedPoem of savedPoems) {
+      const response = await testServer.executeOperation<GetSavedPoemQuery>({
+        query: GET_SAVED_POEM,
+        variables: {
+          id: savedPoem.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const savedPoem = response.body.singleResult.data?.savedPoem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(savedPoem.author).toBeDefined();
+        expect(savedPoem.author.id).toBeDefined();
+        // @ts-ignore
+        expect(savedPoem.author.password).toBeUndefined();
+      }
+    }
+  });
+
+  test("poem", async () => {
+    for (const savedPoem of savedPoems) {
+      const response = await testServer.executeOperation<GetSavedPoemQuery>({
+        query: GET_SAVED_POEM,
+        variables: {
+          id: savedPoem.id,
+        },
+      });
+
+      expect(response.body.kind).toStrictEqual("single")
+
+      if (response.body.kind === "single") {
+        const savedPoem = response.body.singleResult.data?.savedPoem;
+        const errors = response.body.singleResult.errors;
+
+        if (errors) console.error(errors);
+
+        expect(savedPoem.poem).toBeDefined();
+        expect(savedPoem.poem.id).toBeDefined();
+      }
+    }
+  });
+});

@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POStgRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis-full.conf --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-cache:/data
+      - ./redis-full.conf:/usr/local/etc/redis/redis-full.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-cache:

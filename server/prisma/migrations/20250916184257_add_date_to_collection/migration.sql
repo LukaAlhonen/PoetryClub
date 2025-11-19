@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "public"."Collection" ADD COLUMN     "dateCreated" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "public"."User" ADD COLUMN     "dateJoined" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;

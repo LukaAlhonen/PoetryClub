@@ -5,27 +5,67 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
-  build:
+  npm-test:
+    runs-on: ubuntu-latest
 
-    runs-on: self-hosted
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      APOLLO_SERVER_PORT: ${{ vars.APOLLO_SERVER_PORT }}
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x, 24.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci --workspaces
-    - run: npm run build --if-present --workspaces
-    - run: npm test --workspaces
+      - uses: actions/checkout@v4
+      - name: Run Tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: rm -rf package-lock.json node_modules
+      - run: npm install
+      - name: Generate prisma client
+        run: npx prisma generate
+        working-directory: ./server
+      - name: Generate graphql types for server
+        run: npm run generate
+        working-directory: ./server
+      - run: npm test --workspaces
+
+  npm-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build client and server
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: rm -rf package-lock.json node_modules
+      - run: npm install
+      - name: Generate prisma client
+        run: npx prisma generate
+        working-directory: ./server
+      - name: Generate graphql types for server
+        run: npm run generate
+        working-directory: ./server
+      - run: npm run build --workspaces
