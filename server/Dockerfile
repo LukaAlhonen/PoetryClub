@@ -5,13 +5,10 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-RUN npm run compile
-
-# COPY docker-entrypoint.sh /usr/src/app/docker-entrypoint.sh
-# RUN chmod +x /usr/src/app/docker-entrypoint.sh
+RUN npx prisma generate
+RUN npm run generate
+RUN npm run build
 
 EXPOSE 4000
 
-# ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
-# CMD [ "node", "./dist/index.js" ]
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run test && node ./dist/index.js"]
