@@ -76,16 +76,14 @@ jobs:
         run: |
           if [[ "${GITHUB_REF}"  == refs/heads/main ]]; then
             echo "tag=latest" >> $GITHUB_OUTPUT
-          fi
-
-          if [[ "${GITHUB_REF}"  == refs/heads/dev ]]; then
+          elif [[ "${GITHUB_REF}"  == refs/heads/dev ]]; then
             echo "tag=beta" >> $GITHUB_OUTPUT
-          fi
-
-          if [[ "${GITHUB_REF}"  == refs/tags/v* ]]; then
+          elif [[ "${GITHUB_REF}"  == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF#refs/tags/v}"
             echo "tag=${VERSION}" >> $GITHUB_OUTPUT
             echo "is_release=true"
+          else
+            echo "pr-${{ github.run_id }}" >> $GITHUB_OUTPUT
           fi
 
       # Build and push Docker images with Buildx (don't push on PR)
