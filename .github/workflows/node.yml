@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -45,20 +45,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Create .env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> server/.env
-          echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> server/.env
-          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> server/.env
-          echo "APOLLO_SERVER_PORT=${{ vars.APOLLO_SERVER_PORT }}" >> server/.env
-      - name: Debug env vars
-        run: |
-          echo "DATABASE_URL length: ${#DATABASE_URL}"
-          echo "JWT_SECRET length: ${#JWT_SECRET}"
-          echo "REDIS_URL length: ${#REDIS_URL}"
-          echo "APOLLO_SERVER_PORT: $APOLLO_SERVER_PORT"
-        shell: bash
+      # - name: Create .env file
+      #   run: |
+      #     echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
+      #     echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> server/.env
+      #     echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> server/.env
+      #     echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> server/.env
+      #     echo "APOLLO_SERVER_PORT=${{ vars.APOLLO_SERVER_PORT }}" >> server/.env
+      # - name: Debug env vars
+      #   run: |
+      #     echo "DATABASE_URL length: ${#DATABASE_URL}"
+      #     echo "JWT_SECRET length: ${#JWT_SECRET}"
+      #     echo "REDIS_URL length: ${#REDIS_URL}"
+      #     echo "APOLLO_SERVER_PORT: $APOLLO_SERVER_PORT"
+      #   shell: bash
       - run: rm -rf package-lock.json node_modules
       - run: npm install
       - name: Generate prisma client
