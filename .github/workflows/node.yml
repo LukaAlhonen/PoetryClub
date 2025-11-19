@@ -10,13 +10,9 @@ on:
     branches: ["main", "dev"]
 
 jobs:
-  build:
+  npm-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [22.x, 24.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
@@ -40,25 +36,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Run Tests
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 24.x
           cache: "npm"
-      # - name: Create .env file
-      #   run: |
-      #     echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
-      #     echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> server/.env
-      #     echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> server/.env
-      #     echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> server/.env
-      #     echo "APOLLO_SERVER_PORT=${{ vars.APOLLO_SERVER_PORT }}" >> server/.env
-      # - name: Debug env vars
-      #   run: |
-      #     echo "DATABASE_URL length: ${#DATABASE_URL}"
-      #     echo "JWT_SECRET length: ${#JWT_SECRET}"
-      #     echo "REDIS_URL length: ${#REDIS_URL}"
-      #     echo "APOLLO_SERVER_PORT: $APOLLO_SERVER_PORT"
-      #   shell: bash
       - run: rm -rf package-lock.json node_modules
       - run: npm install
       - name: Generate prisma client
@@ -68,3 +50,22 @@ jobs:
         run: npm run generate
         working-directory: ./server
       - run: npm test --workspaces
+
+  npm-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build client and server
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: rm -rf package-lock.json node_modules
+      - run: npm install
+      - name: Generate prisma client
+        run: npx prisma generate
+        working-directory: ./server
+      - name: Generate graphql types for server
+        run: npm run generate
+        working-directory: ./server
+      - run: npm build --workspaces
