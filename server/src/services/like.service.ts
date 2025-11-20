@@ -101,6 +101,13 @@ export class LikeService {
     return likes;
   }
 
+  /**
+   * Checks if the previous page exists
+   * @param before - id of first Like in page
+   * @param authorId - filter
+   * @param poemId - filter
+   * @returns true if the previous page exists, false if not
+   **/
   async hasPreviousPage({before, authorId, poemId}: {before: string, authorId?: string, poemId?: string}) {
     const firstLike = await this.prisma.like.findUnique({ where: { id: before } });
     if (!firstLike) return false;
@@ -130,6 +137,13 @@ export class LikeService {
     return Boolean(hasPrev)
   }
 
+  /**
+   * Get a page of authors using relay-style pagination
+   * @param first
+   * @param after
+   * @param authorId - filter
+   * @param poemId - filter
+  **/
   async getLikesConnection({ first, after, authorId, poemId }: { first?: number, after?: string, authorId?: string, poemId?: string } = {}) {
     const likes = await this.getLikes({ first: first ? first + 1 : undefined, after, authorId, poemId });
 

@@ -123,6 +123,13 @@ export class CommentService {
     return comments;
   }
 
+  /**
+   * Checks if the previous page exists for a given paginated query
+   * @param before - ID of the first comment in the query
+   * @param authorId - filter
+   * @param poemId - filter
+   * @returns - true if the previous page exists, false if not
+  **/
   async hasPreviousPage ({before, authorId, poemId}: { before: string, authorId?: string, poemId?: string}): Promise<boolean> {
     const firstComment = await this.prisma.comment.findUnique({ where: { id: before } });
     if (!firstComment) return false;
@@ -149,6 +156,13 @@ export class CommentService {
     return Boolean(hasPrev)
   }
 
+  /**
+   * Get a page of collections using relay-style pagination
+   * @param first
+   * @param after
+   * @param authorId - filter
+   * @param poemId - filter
+  **/
   async getCommentsConnection({ first, after, authorId, poemId }: { first?: number, after?: string, authorId?: string, poemId?: string } = {}) {
     // fetch one extra to check if there are more comments available
     const comments = await this.getComments({first: first ? first + 1 : undefined, after, authorId, poemId})
