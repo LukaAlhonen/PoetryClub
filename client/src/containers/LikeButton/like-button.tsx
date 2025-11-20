@@ -129,9 +129,6 @@ const LikeButton = (props: LikeButtonProps) => {
     if (!user) setIsLiked(false);
   }, [user])
 
-  // useEffect(() => {
-  //   setIsLiked(!!props.likedByCurrentUser);
-  // }, [props.likedByCurrentUser])
   useEffect(() => {
     setIsLiked(!!props.likedByCurrentUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,14 +167,14 @@ const LikeButtonContainer = styled.div<{
   height: "2.1rem",
   minWidth: "3.2rem",
   border: "0.15rem solid gray",
-  background: isLiked ? colors.wineRed : colors.textEggshell,
-  color: isLiked ? colors.textEggshell : colors.backgroundBlack,
+  background: isLiked ? colors.wineRed : colors.eggShellWhite,
+  color: isLiked ? colors.eggShellWhite : colors.leatherBlack,
   borderRadius: "0.5rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
   alignItems: "center",
   "&:hover": {
     background: colors.wineRed,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     cursor: "pointer"
   }
 }))

@@ -9,6 +9,7 @@ interface ScrollContainerProps {
   rootMargin?: string;
 }
 
+// reusable scrollable container for infinite scroll refetching
 const ScrollContainer = ({onIntersect, children, threshold = 0.1, rootMargin = "0% 0% 20%"}: ScrollContainerProps) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);

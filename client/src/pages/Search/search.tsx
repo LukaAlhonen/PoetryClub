@@ -65,9 +65,8 @@ const SearchBar = styled.div({
   boxSizing: "border-box",
   border: "0.15em solid gray",
   padding: "0.5em",
-  // margin: "1em",
   marginTop: "1rem",
-  background: colors.textEggshell
+  background: colors.eggShellWhite
 })
 
 const SearchButton = styled(SearchIcon)({
@@ -76,7 +75,7 @@ const SearchButton = styled(SearchIcon)({
   marginRight: "0.5em",
   marginLeft: "0.5em",
   "& path": {
-    fill: colors.backgroundBlack,
+    fill: colors.leatherBlack,
     transition: "fill 0.15s ease",
   },
 })
@@ -85,7 +84,7 @@ const SearchInput = styled.input({
   width: "100%",
   height: "2.4em",
   border: `0.15em solid gray`,
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",

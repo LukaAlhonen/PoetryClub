@@ -13,8 +13,6 @@ import { useHandleError } from "../../utils/error-handler";
 interface ComposeCommentFormProps {
   poemId: string;
 }
-// forwardRef<HTMLDivElement, CommentsSectionProps>((props, ref)
-// const ComposeCommentForm = (props: ComposeCommentFormProps) => {
 const ComposeCommentForm = forwardRef<HTMLDivElement, ComposeCommentFormProps>((props, ref) => {
   const [text, setText] = useState<string>("")
   const [isFilled, setIsFilled] = useState(text.trim() !== "");
@@ -102,7 +100,6 @@ const ComposeCommentContainer = styled.div({
   justifySelf: "center",
   width: "100%",
   maxWidth: "60em",
-  // marginBottom: "1em"
 })
 
 const FormContainer = styled.form({
@@ -111,7 +108,7 @@ const FormContainer = styled.form({
   boxSizing: "border-box",
   borderRadius: "0.5em",
   border: "0.15em solid gray",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   width: "60%",
   padding: "0.5em",
 })
@@ -120,7 +117,7 @@ const FormTextArea = styled.textarea({
   padding: "0.5em",
   resize: "none",
   border: `0.15rem solid gray`,
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   marginBottom: "1em",
   boxSizing: "border-box",
   fontSize: "1.1em",
@@ -143,11 +140,10 @@ const FormButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   textDecoration: "none",
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
-  background: isFilled ? colors.wineRed : colors.backgroundBlack,
-  color: colors.textEggshell,
+  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  color: colors.eggShellWhite,
   transition: "background 0.1s ease-in-out",
   "&:hover": {
-    // background: colors.wineRed,
     cursor: isFilled ? "pointer" : "default"
   }
 }));

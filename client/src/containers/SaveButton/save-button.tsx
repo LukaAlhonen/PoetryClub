@@ -162,14 +162,14 @@ const SaveButtonContainer = styled.div<{
   height: "2.1rem",
   minWidth: "3.2rem",
   border: "0.15rem solid gray",
-  background: isSaved ? colors.wineRed : colors.textEggshell,
-  color: isSaved ? colors.textEggshell : colors.backgroundBlack,
+  background: isSaved ? colors.wineRed : colors.eggShellWhite,
+  color: isSaved ? colors.eggShellWhite : colors.leatherBlack,
   borderRadius: "0.5rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
   alignItems: "center",
   "&:hover": {
     background: colors.wineRed,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     cursor: "pointer"
   }
 }))

@@ -61,7 +61,7 @@ const Container = styled.div({
   marginTop: "2rem",
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
 
 })
 
@@ -69,11 +69,10 @@ const FollowedAuthorsContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   padding: "1rem",
-  // boxSizing: "border-box",
   borderBottomLeftRadius: "0.5rem",
   borderBottomRightRadius: "0.5rem",
   marginTop: "0",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   borderTop: "0.15rem solid gray",
   justifySelf: "center",
 })
@@ -85,7 +84,7 @@ const AuthorLink = styled(Link)({
   textDecoration: "none",
   justifyContent: "left",
   alignContent: "center",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   fontWeight: "bold",
   padding: "1rem",
   transition: "color 0.1s ease-in-out",
@@ -109,14 +108,13 @@ const LinksContainer = styled.div({
   flexDirection: "row",
   justifyContent: "space-evenly",
   paddingTop: "1em",
-  // marginBottom: "-0.15rem",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
 })
 
 const LinkContainer = styled(Link, { shouldForwardProp: (prop) => prop !== "isActive"})<{isActive: boolean}>(
   ({isActive}) => ({
-    background: isActive ? colors.textEggshell : colors.darkGray,
-    color: colors.backgroundBlack,
+    background: isActive ? colors.eggShellWhite : colors.darkGray,
+    color: colors.leatherBlack,
     padding: "1rem",
     border: "0.15rem solid gray",
     borderBottom: "none",
@@ -129,8 +127,8 @@ const LinkContainer = styled(Link, { shouldForwardProp: (prop) => prop !== "isAc
     textDecoration: "none",
     transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
     "&:hover": {
-      color: isActive ? colors.backgroundBlack : colors.textEggshell,
-      background: isActive ? colors.textEggshell : colors.wineRed,
+      color: isActive ? colors.leatherBlack : colors.eggShellWhite,
+      background: isActive ? colors.eggShellWhite : colors.wineRed,
     },
   })
 )

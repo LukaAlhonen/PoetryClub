@@ -20,7 +20,7 @@ const BurgerNav = () => {
   return (
     <NavContainer>
       <HeaderContainer>
-        <Hamburger toggled={isOpen} toggle={setIsOpen} size={30} color={colors.textEggshell} />
+        <Hamburger toggled={isOpen} toggle={setIsOpen} size={30} color={colors.eggShellWhite} />
         <TitleContainer to={"/"}>PoetryClub</TitleContainer>
         {user && <UserButton to={`/author/${user}`}><UserIcon /></UserButton>}
       </HeaderContainer>
@@ -37,7 +37,7 @@ const BurgerNav = () => {
             <LogoutButton
               style={
                   {
-                    color: colors.textEggshell,
+                    color: colors.eggShellWhite,
                     textDecoration: "none",
                     padding: "0.5rem",
                     border: "0.15rem solid gray",
@@ -70,7 +70,7 @@ const NavContainer = styled.div({
   flexDirection: "column",
   zIndex: 10,
   position: "fixed",
-  background: colors.backgroundBlack,
+  background: colors.leatherBlack,
   width: "100%",
   borderBottom: "0.15rem solid gray",
   boxSizing: "border-box",
@@ -88,7 +88,7 @@ const LinksContainer = styled.div<{isOpen: boolean}>(({isOpen}) => ({
   display: isOpen ? "flex" : "none",
   flexDirection: "column",
   padding: "0.5rem",
-  background: colors.backgroundBlack,
+  background: colors.leatherBlack,
   position: "fixed",
   top: "3rem",
   width: "100%",
@@ -112,13 +112,13 @@ const BottomLinks = styled.div({
 })
 
 const NavButton = styled(NavLink)({
-  color: colors.textEggshell,
+  color: colors.eggShellWhite,
   textDecoration: "none",
   padding: "0.5rem",
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
   "&.active": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed
   },
   alignItems: "center",
@@ -127,7 +127,7 @@ const NavButton = styled(NavLink)({
 })
 
 const TitleContainer = styled(Link)({
-  color: colors.textEggshell,
+  color: colors.eggShellWhite,
   textDecoration: "none",
   position: "absolute",   // allow it to be centered
   left: "50%",
@@ -171,7 +171,7 @@ const ComposeIcon = styled(ComposeSVG)({
 const UserButton = styled(NavLink)({
   border: "none",
   textDecoration: "none",
-  color: colors.textEggshell,
+  color: colors.eggShellWhite,
   "&.active": {
     color: colors.wineRed
   }

@@ -107,13 +107,13 @@ const UnfollowButtonContainer = styled.button({
   borderRadius: "0.5rem",
   height: "3em",
   padding: "1rem",
-  background: colors.textEggshell,
-  color: colors.backgroundBlack,
+  background: colors.eggShellWhite,
+  color: colors.leatherBlack,
   alignItems: "center",
   fontWeight: "bold",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed,
     cursor: "pointer"
   }
