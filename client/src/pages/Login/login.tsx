@@ -102,7 +102,7 @@ export default Login;
 const LoginContainer = styled.div({
   display: "flex",
   flexDirection: "column",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
   border: "0.15rem solid gray",
@@ -120,7 +120,7 @@ const LoginContainer = styled.div({
 
 const LoginTitle = styled.div({
   fontSize: "1.7em",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
 });
 
 const LoginForm = styled.form({
@@ -130,7 +130,7 @@ const LoginForm = styled.form({
 });
 
 const InputContainer = styled.div({
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   display: "flex",
   flexDirection: "column",
   "& h4": {
@@ -144,7 +144,7 @@ const InputContainer = styled.div({
 const LoginInput = styled.input({
   display: "flex",
   border: `0.15rem solid gray`,
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
@@ -164,8 +164,8 @@ const LoginButton = styled.button<{ isFilled?: boolean }>(({ isFilled }) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: isFilled ? colors.wineRed : colors.backgroundBlack,
-  color: colors.textEggshell,
+  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  color: colors.eggShellWhite,
   border: `0.15rem solid gray`,
   boxSizing: "border-box",
   margin: "0.5em",

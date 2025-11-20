@@ -51,9 +51,8 @@ const HeaderContainer = styled.div({
   alignItems: "center",
   fontSize: "3em",
   fontWeight: "bold",
-  background: colors.backgroundBlack,
-  color: colors.textEggshell,
-  // borderBottom: "0.15rem solid gray",
+  background: colors.leatherBlack,
+  color: colors.eggShellWhite,
   boxSizing: "border-box",
   "@media (max-width: 769px)": {
     display: "none"
@@ -62,7 +61,7 @@ const HeaderContainer = styled.div({
 
 const TitleContainer = styled(Link)({
   textDecoration: "none",
-  color: colors.textEggshell,
+  color: colors.eggShellWhite,
   position: "relative",
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",

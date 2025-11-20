@@ -58,7 +58,6 @@ const PoemDetail = (props: PoemDetailProps) => {
     ? dateFormatter(poem.datePublished)
     : "loading...";
 
-  // TODO: create 404 page to redirect to
   if (!poem) {
     return (
       <PoemDetailContainer>
@@ -131,8 +130,8 @@ const PoemContainer = styled.div({
   border: "0.15em solid gray",
   display: "flex",
   flexDirection: "column",
-  background: colors.textEggshell,
-  color: colors.backgroundBlack,
+  background: colors.eggShellWhite,
+  color: colors.leatherBlack,
 })
 
 const PoemHeader = styled.div({
@@ -151,7 +150,7 @@ const PoemHeader = styled.div({
 const PoemTitle = styled.div({
   textDecoration: "underline",
   // alignSelf: "center",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   marginBottom: "2em"
 });
 
@@ -172,8 +171,8 @@ const AuthorContainer = styled(Link)({
   boxSizing: "border-box",
   padding: "0.2em",
   borderRadius: "0.5em",
-  color: colors.backgroundBlack,
-  background: colors.textEggshell,
+  color: colors.leatherBlack,
+  background: colors.eggShellWhite,
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "auto",
   fontWeight: "bold",
@@ -181,11 +180,11 @@ const AuthorContainer = styled(Link)({
   display: "flex",
   border: `0.15em solid gray`,
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed
   },
   "&:hover path": {
-    fill: colors.textEggshell
+    fill: colors.eggShellWhite
   },
 });
 
@@ -204,7 +203,7 @@ const UserButton = styled(UserIcon)({
   transition: "fill 0.1s ease",
   margin: "0 0.5em 0 0",
   "& path": {
-    fill: colors.backgroundBlack,
+    fill: colors.leatherBlack,
     transition: "fill 0.1s ease"
   }
 });
@@ -220,7 +219,7 @@ const PoemFooter = styled.div({
   "& h5": {
     margin: 0,
   },
-  color: colors.backgroundBlack
+  color: colors.leatherBlack
 });
 
 const ViewsContainer = styled.div({
@@ -250,8 +249,8 @@ const CommentsButton = styled.button<{ open?: boolean }>(({open}) => ({
   display: "flex",
   height: "2.1rem",
   minWidth: "3.2rem",
-  color: open ? colors.textEggshell : colors.backgroundBlack,
-  background: open ? colors.wineRed : colors.textEggshell,
+  color: open ? colors.eggShellWhite : colors.leatherBlack,
+  background: open ? colors.wineRed : colors.eggShellWhite,
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
@@ -263,7 +262,7 @@ const CommentsButton = styled.button<{ open?: boolean }>(({open}) => ({
   fontWeight: "inherit",
   "&:hover": {
     background: colors.wineRed,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     cursor: "pointer"
   }
 }))
@@ -289,6 +288,6 @@ const LikeIcon = styled(ThumbSVG)({
 const ViewsButton = styled(ViewsIcon) ({
   ...svgButtonStyles,
   "& path": {
-    fill: colors.backgroundBlack
+    fill: colors.leatherBlack
   }
 });

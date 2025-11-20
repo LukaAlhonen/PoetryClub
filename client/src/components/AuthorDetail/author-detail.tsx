@@ -78,8 +78,8 @@ const AuthorDetailContainer = styled.div({
   padding: "2.5em",
   marginTop: "1rem",
   marginBottom: "1em",
-  background: colors.textEggshell,
-  color: colors.backgroundBlack
+  background: colors.eggShellWhite,
+  color: colors.leatherBlack
 })
 
 const HeaderContainer = styled.div({
@@ -107,7 +107,7 @@ const UserIcon = styled(UserSVG)({
   height: "1.5em",
   marginRight: "0.2em",
   "& path": {
-    fill: colors.backgroundBlack
+    fill: colors.leatherBlack
   }
 })
 
@@ -145,7 +145,6 @@ const StatsContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   marginTop: "5em",
-  // width: "100%",
   alignItems: "center",
   flexGrow: 1,
   minWidth: 0,
@@ -159,7 +158,7 @@ const StatContainer = styled(Link)({
   flexDirection: "row",
   marginRight: "3em",
   fontWeight: "bold",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   transition: "color 0.1s ease-in-out",
   "&:hover": {
     color: colors.wineRed,
@@ -168,7 +167,7 @@ const StatContainer = styled(Link)({
 })
 
 const StatLinkContainer = styled.div({
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   marginLeft: "0.2em",
   transition: "color 0.1s ease-in-out",
   "&:hover": {

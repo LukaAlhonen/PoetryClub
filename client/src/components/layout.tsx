@@ -18,7 +18,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <LayoutContainer>
       {smallScreen ? <BurgerNav></BurgerNav> : <LeftNav></LeftNav>}
-      {/*<LeftNav></LeftNav>*/}
       <PageContainer>{children}</PageContainer>
     </LayoutContainer>
   );
@@ -31,7 +30,7 @@ const LayoutContainer = styled.div({
   flexDirection: "row",
   height: "100vh",
   overflow: "hidden",
-  background: colors.backgroundBlack,
+  background: colors.leatherBlack,
   boxSizing: "border-box",
   position: "relative"
 })

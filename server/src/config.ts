@@ -6,7 +6,6 @@ interface ENV {
   DATABASE_URL: string | undefined;
   REDIS_URL: string | undefined;
   JWT_SECRET: string | undefined;
-  JWT_REFRESH_SECRET: string | undefined;
   APOLLO_SERVER_PORT: number | undefined;
 }
 
@@ -14,7 +13,6 @@ interface Config {
   DATABASE_URL: string;
   REDIS_URL: string;
   JWT_SECRET: string;
-  JWT_REFRESH_SECRET: string;
   APOLLO_SERVER_PORT: number;
 }
 
@@ -23,7 +21,6 @@ const getConfig = (): ENV => {
     DATABASE_URL: process.env.DATABASE_URL,
     REDIS_URL: process.env.REDIS_URL,
     JWT_SECRET: process.env.JWT_SECRET,
-    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     APOLLO_SERVER_PORT: Number.parseInt(process.env.APOLLO_SERVER_PORT),
   };
 };

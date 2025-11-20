@@ -100,8 +100,8 @@ const PoemContainer = styled.div({
   border: "0.15em solid gray",
   wordWrap: "break-word",
   overflowWrap: "break-word",
-  background: colors.textEggshell,
-  color: colors.backgroundBlack,
+  background: colors.eggShellWhite,
+  color: colors.leatherBlack,
   borderRadius: "0.6em"
 });
 
@@ -110,17 +110,16 @@ const PoemHeader = styled.div({
     margin: "0 0 5px 0px",
     fontSize: "25px",
   },
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   padding: "1em 1em 0 1em",
-  color: colors.backgroundBlack,
-  // width: "100%",
+  color: colors.leatherBlack,
   boxSizing: "border-box",
   borderBottom: "0.15em solid gray"
 });
 
 const PoemTitle = styled(Link)({
   textDecoration: "none",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   position: "relative",
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",
@@ -140,7 +139,6 @@ const PoemTitle = styled(Link)({
 });
 
 const PoemSubHeader = styled.div({
-  // width: "100%",
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
@@ -156,8 +154,8 @@ const UsernameContainer = styled(Link)({
   boxSizing: "border-box",
   padding: "0.3em",
   borderRadius: "0.5em",
-  color: colors.backgroundBlack,
-  background: colors.textEggshell,
+  color: colors.leatherBlack,
+  background: colors.eggShellWhite,
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "auto",
   fontWeight: "bold",
@@ -165,12 +163,11 @@ const UsernameContainer = styled(Link)({
   display: "flex",
   border: `0.15em solid gray`,
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed,
-    // border: `0.15em solid ${colors.wineRed}`
   },
   "&:hover path": {
-    fill: colors.textEggshell
+    fill: colors.eggShellWhite
   },
 });
 
@@ -243,8 +240,8 @@ const PoemFooter = styled.div({
   "& h5": {
     margin: 0,
   },
-  background: colors.textEggshell,
-  color: colors.backgroundBlack
+  background: colors.eggShellWhite,
+  color: colors.leatherBlack
 });
 
 const TagsContainer = styled.div({
@@ -274,8 +271,8 @@ const CommentsButton = styled(Link)({
   display: "flex",
   height: "2.1rem",
   minWidth: "3.2rem",
-  color: colors.backgroundBlack,
-  background: colors.textEggshell,
+  color: colors.leatherBlack,
+  background: colors.eggShellWhite,
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
@@ -288,7 +285,7 @@ const CommentsButton = styled(Link)({
   fontWeight: "inherit",
   "&:hover": {
     background: colors.wineRed,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     cursor: "pointer"
   }
 })
@@ -323,7 +320,7 @@ const SavedIcon = styled(SavedSVG)({
 const ViewsButton = styled(ViewsIcon)({
   ...svgButtonStyles,
   "& path": {
-    fill: colors.backgroundBlack
+    fill: colors.leatherBlack
   }
 });
 
@@ -333,7 +330,7 @@ const UserButton = styled(UserIcon)({
   transition: "fill 0.1s ease",
   margin: "0 0.2em 0 0",
   "& path": {
-    fill: colors.backgroundBlack,
+    fill: colors.leatherBlack,
     transition: "fill 0.1s ease"
   }
 })
@@ -365,7 +362,7 @@ const dots = keyframes`
 
 const LoadingText = styled.span({
   position: "relative",
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   fontSize: "1.2em",
   fontWeight: 500,
 

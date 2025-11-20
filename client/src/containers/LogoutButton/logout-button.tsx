@@ -44,10 +44,9 @@ export default LogoutButton;
 const LogoutButtonContainer = styled(Link)<{buttonStyle?: CSSProperties}>(({buttonStyle}) => ({
   ...(buttonStyle ? buttonStyle : {
     textDecoration: "none",
-    // width: "9em",
     width: "100%",
-    color: colors.backgroundBlack,
-    background: colors.textEggshell,
+    color: colors.leatherBlack,
+    background: colors.eggShellWhite,
     marginBottom: "1em",
     padding: "0.5em",
     display: "flex",
@@ -58,7 +57,7 @@ const LogoutButtonContainer = styled(Link)<{buttonStyle?: CSSProperties}>(({butt
     borderRadius: "0.5em",
     transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
     "&:hover": {
-      color: colors.textEggshell,
+      color: colors.eggShellWhite,
       background: colors.wineRed,
     },
   })

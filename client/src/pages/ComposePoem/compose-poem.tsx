@@ -88,7 +88,7 @@ export default ComposePoem;
 const ComposePoemContainer = styled.div({
   display: "flex",
   flexDirection: "column",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
   border: "0.15rem solid gray",
@@ -111,7 +111,7 @@ const TitleContainer = styled.div({
   "& h3": {
     margin: "0.5rem"
   },
-  color: colors.backgroundBlack
+  color: colors.leatherBlack
 })
 
 const FormContainer = styled.form({
@@ -121,7 +121,7 @@ const FormContainer = styled.form({
 })
 
 const TitleInputContainer = styled.div({
-  color: colors.backgroundBlack,
+  color: colors.leatherBlack,
   display: "flex",
   flexDirection: "column",
   "& h4": {
@@ -135,7 +135,7 @@ const TitleInputContainer = styled.div({
 const FormInput = styled.input({
   display: "flex",
   border: `0.15rem solid gray`,
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
@@ -155,8 +155,8 @@ const ComposeButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: isFilled ? colors.wineRed : colors.backgroundBlack,
-  color: colors.textEggshell,
+  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  color: colors.eggShellWhite,
   border: `0.15rem solid gray`,
   boxSizing: "border-box",
   margin: "0.5em",
@@ -173,7 +173,7 @@ const FormTextArea = styled.textarea({
   resize: "none",
   display: "flex",
   border: `0.15rem solid gray`,
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
@@ -188,105 +188,3 @@ const FormTextArea = styled.textarea({
     border: `0.15rem solid ${colors.wineRed}`,
   }
 })
-
-// const ComposePoemContainer = styled.div({
-//   justifySelf: "center",
-//   alignSelf: "center",
-//   display: "flex",
-//   flexDirection: "column",
-//   maxWidth: "50em",
-//   minWidth: "10em",
-//   width: "100%",
-//   alignItems: "stretch",
-//   background: colors.textEggshell,
-//   padding: "1em",
-//   borderRadius: "0.5em",
-//   border: "0.15rem solid gray",
-//   boxSizing: "border-box",
-//   color: colors.backgroundBlack
-// })
-
-// const ComposeTitle = styled.div({
-//   fontSize: "1.7em",
-//   color: colors.backgroundBlack,
-//   alignSelf: "center",
-//   marginBottom: "2em"
-// })
-
-// const ComposeForm = styled.form({
-//   display: "flex",
-//   flexDirection: "column",
-// })
-
-// const FormInput = styled.input({
-//   display: "flex",
-//   maxWidth: "20em",
-//   border: `0.15rem solid gray`,
-//   background: colors.textEggshell,
-//   margin: "0.5em",
-//   padding: "0.3em",
-//   boxSizing: "border-box",
-//   fontSize: "1.1em",
-//   borderRadius: "0.5em",
-//   transition: "border 0.1s ease-in-out",
-//   "&:focus": {
-//     outline: "none",
-//     border: `0.15rem solid ${colors.wineRed}`
-//   },
-//   "&:hover": {
-//     border: `0.15rem solid ${colors.wineRed}`,
-//   }
-// })
-
-// const FormTextArea = styled.textarea({
-//   resize: "none",
-//   border: `0.15rem solid gray`,
-//   background: colors.textEggshell,
-//   margin: "0.5em",
-//   padding: "0.5em",
-//   boxSizing: "border-box",
-//   fontSize: "1.1em",
-//   borderRadius: "0.5em",
-//   transition: "border 0.1s ease-in-out",
-//   "&:focus": {
-//     outline: "none",
-//     border: `0.15rem solid ${colors.wineRed}`
-//   },
-//   "&:hover": {
-//     border: `0.15rem solid ${colors.wineRed}`,
-//   }
-// })
-
-// const InputContainer = styled.div({
-//   color: colors.backgroundBlack,
-//   display: "flex",
-//   flexDirection: "column",
-//   "& h4": {
-//     textDecoration: "bold",
-//     margin: "0 0 0 0.7em",
-//   },
-//   marginBottom: "1em",
-//   alignItems: "stretch",
-// })
-
-// const ComposeButton = styled.button({
-//   display: "flex",
-//   justifyContent: "center",
-//   alignSelf: "center",
-//   textDecoration: "none",
-//   background: colors.backgroundBlack,
-//   border: "0.15rem solid gray",
-//   color: colors.textEggshell,
-//   boxSizing: "border-box",
-//   margin: "0.5em",
-//   padding: "0.75em",
-//   maxWidth: "20em",
-//   minWidth: "15em",
-//   borderRadius: "0.5em",
-//   fontSize: "1.1em",
-//   transition: "background 0.1s ease-in-out",
-//   "&:hover": {
-//     background: colors.wineRed,
-//     cursor: "pointer"
-//   }
-// })

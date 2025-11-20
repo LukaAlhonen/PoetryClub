@@ -31,6 +31,10 @@ const isUniqueConstraintError = (e: PrismaError): e is UniqueConstraintError => 
   );
 };
 
+/**
+ * Maps a prisma error to a graphql error and throws it
+ * @params err - prisma error
+**/
 export const handlePrismaError = ({ err }: { err: PrismaError | GraphQLError }) => {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {

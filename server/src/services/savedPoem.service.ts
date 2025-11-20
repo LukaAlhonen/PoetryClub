@@ -110,6 +110,13 @@ export class SavedPoemService {
     return savedPoems;
   }
 
+  /**
+   * Checks if the previous page exists
+   * @param before - id of first author in page
+   * @param authorId - filter
+   * @param poemId - filter
+   * @returns true if the previous page exists, false if not
+   **/
   async hasPreviousPage ({before, authorId, poemId}: { before: string, authorId?: string, poemId?: string}): Promise<boolean> {
     const firstSavedPoem = await this.prisma.savedPoem.findUnique({ where: { id: before } });
     if (!firstSavedPoem) return false;
@@ -136,6 +143,13 @@ export class SavedPoemService {
     return Boolean(hasPrev)
   }
 
+  /**
+   * Get a page of authors using relay-style pagination
+   * @param first
+   * @param after
+   * @param authorId - filter
+   * @param poemId - filter
+  **/
   async getSavedPoemsConnection({ after, first, authorId, poemId }: { after?: string, first?: number, authorId?: string, poemId?: string } = {}) {
     const savedPoems = await this.getSavedPoems({after, first: first ? first + 1 : undefined, poemId, authorId});
 
