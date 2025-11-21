@@ -7,19 +7,25 @@ import QueryResult from "../../components/query-result";
 import ScrollContainer from "../../components/ScrollContainer/scroll-container";
 import CommentsSection from "../../components/CommentsSection/comments-section";
 import ComposeCommentForm from "../../containers/ComposeCommentForm/compose-comment-form";
-import type { GetPoemQuery, GetPoemQueryVariables } from "../../__generated__/graphql";
+import type {
+  GetPoemQuery,
+  GetPoemQueryVariables,
+} from "../../__generated__/graphql";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/use-auth";
 import { NetworkStatus } from "@apollo/client";
 import { useHandleError } from "../../utils/error-handler";
-
+import styled from "@emotion/styled";
 
 const Poem = () => {
   const { user } = useAuth();
   const handleError = useHandleError();
   const { poemId = "" } = useParams();
   const [displayCommentForm, setDisplayCommentForm] = useState<boolean>(false);
-  const { loading, error, data, fetchMore, networkStatus } = useQuery<GetPoemQuery, GetPoemQueryVariables>(GET_POEM, {
+  const { loading, error, data, fetchMore, networkStatus } = useQuery<
+    GetPoemQuery,
+    GetPoemQueryVariables
+  >(GET_POEM, {
     variables: { poemId, commentsLimit: 5 },
   });
 
@@ -27,14 +33,26 @@ const Poem = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.hash === "#composeComment" && composeCommentRef.current && !loading) {
-      composeCommentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (
+      location.hash === "#composeComment" &&
+      composeCommentRef.current &&
+      !loading
+    ) {
+      composeCommentRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
-  }, [location, loading])
+  }, [location, loading]);
 
   const handleIntersect = () => {
     if (data?.poem?.comments?.pageInfo?.hasNextPage) {
-      fetchMore({ variables: { commentsLimit: data.poem.comments.pageInfo.pageSize, commentsCursor: data.poem.comments.pageInfo.endCursor}})
+      fetchMore({
+        variables: {
+          commentsLimit: data.poem.comments.pageInfo.pageSize,
+          commentsCursor: data.poem.comments.pageInfo.endCursor,
+        },
+      });
     }
   };
 
@@ -42,9 +60,11 @@ const Poem = () => {
     if (user) {
       setDisplayCommentForm(!displayCommentForm);
     } else {
-      handleError({ error: new Error("You must be logged in to post a comment") })
+      handleError({
+        error: new Error("You must be logged in to post a comment"),
+      });
     }
-  }
+  };
 
   const isLoading = networkStatus === NetworkStatus.fetchMore;
 
@@ -52,9 +72,21 @@ const Poem = () => {
     <Layout>
       <ScrollContainer onIntersect={handleIntersect}>
         <QueryResult loading={loading} error={error} data={data}>
-          <PoemDetail poem={data?.poem} onCommentButtonClick={handleDisplayCommentForm} displayCommentForm={displayCommentForm} />
-          {user && displayCommentForm && poemId ? <ComposeCommentForm ref={composeCommentRef} poemId={poemId} /> : null}
-          <CommentsSection comments={data?.poem?.comments} isLoading={isLoading} pageSize={data?.poem?.comments?.pageInfo?.pageSize} />
+          <PoemContainer>
+            <PoemDetail
+              poem={data?.poem}
+              onCommentButtonClick={handleDisplayCommentForm}
+              displayCommentForm={displayCommentForm}
+            />
+            {user && displayCommentForm && poemId ? (
+              <ComposeCommentForm ref={composeCommentRef} poemId={poemId} />
+            ) : null}
+            <CommentsSection
+              comments={data?.poem?.comments}
+              isLoading={isLoading}
+              pageSize={data?.poem?.comments?.pageInfo?.pageSize}
+            />
+          </PoemContainer>
         </QueryResult>
       </ScrollContainer>
     </Layout>
@@ -62,3 +94,10 @@ const Poem = () => {
 };
 
 export default Poem;
+
+const PoemContainer = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  width: "100%",
+});
