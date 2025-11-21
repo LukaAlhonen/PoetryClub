@@ -20,7 +20,10 @@ The app is composed of a typescript graphql server with a postgresql database an
 
 I also implemented a "pretty much" full CI pipeline with github actions to test and build the code + build and publish the server and client containers to ghcr.
 
-<summary>Run the app</summary>
+</details>
+
+<details>
+  <summary>Run the app</summary>
 If you whish to try out this app you need to have git and docker installed.
 
 Then just pull the repo, add a .env file (or modify the compose.yaml file) and add the following env vars:
@@ -55,5 +58,4 @@ docker run \
 -e GRAPHQL_URL="http://<server_address>:4000/graphql" \
 ghcr.io/lukaalhonen/poetryclub-client:latest
 ```
-
 </details>
