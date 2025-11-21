@@ -14,8 +14,7 @@ import { CombinedGraphQLErrors } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
 
 const link = new HttpLink({
-  // uri: "/graphql",
-  uri: "http://localhost:4000/graphql",
+  uri: "/graphql",
   credentials: "include",
 });
 
