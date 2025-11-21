@@ -12,7 +12,7 @@ import { Prisma } from "../../generated/prisma/index.js";
 /**
  * Verifies user is logged in and auth token is valid
  * @param user - context
- * @param poemAPI - PoemAPI instance
+ * @param authorService - AuthorService instance
  **/
 const verifyUser = async ({
   user,

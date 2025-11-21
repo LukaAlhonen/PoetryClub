@@ -108,6 +108,13 @@ export class FollowedAuthorService {
     return followedAuthors;
   }
 
+  /**
+   * Checks if the previous page exists for a given paginated query
+   * @param before - ID of the first FollowedAuthor in the query
+   * @param followerId - filter
+   * @param followingId - filter
+   * @returns - true if the previous page exists, false if not
+  **/
   async hasPreviousPage({before, followerId, followingId }: {before: string, followerId?: string, followingId?: string }) {
     const firstFollowedAuthor = await this.prisma.followedAuthor.findUnique({ where: { id: before } });
     if (!firstFollowedAuthor) return false;
@@ -134,6 +141,13 @@ export class FollowedAuthorService {
     return Boolean(hasPrev);
   }
 
+  /**
+   * Get a page of collections using relay-style pagination
+   * @param first
+   * @param after
+   * @param followerId - filter
+   * @param followingId - filter
+  **/
   async getFollowedAuthorsConnection({ first, after, followerId, followingId }: { first?: number, after?: string, followerId?: string, followingId?: string } = {}){
     const followedAuthors = await this.getFollowedAuthors({ first: first ? first + 1 : undefined, after, followerId, followingId });
 

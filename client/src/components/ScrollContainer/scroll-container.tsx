@@ -9,7 +9,13 @@ interface ScrollContainerProps {
   rootMargin?: string;
 }
 
-const ScrollContainer = ({onIntersect, children, threshold = 0.1, rootMargin = "0% 0% 20%"}: ScrollContainerProps) => {
+// reusable scrollable container for infinite scroll refetching
+const ScrollContainer = ({
+  onIntersect,
+  children,
+  threshold = 0.1,
+  rootMargin = "0% 0% 20%",
+}: ScrollContainerProps) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -23,24 +29,23 @@ const ScrollContainer = ({onIntersect, children, threshold = 0.1, rootMargin = "
       {
         root: scrollRef.current,
         threshold,
-        rootMargin
-      }
-    )
+        rootMargin,
+      },
+    );
     if (bottomRef.current) {
-      observer.observe(bottomRef.current)
+      observer.observe(bottomRef.current);
     }
 
     return () => observer.disconnect();
-  },[onIntersect, threshold, rootMargin])
+  }, [onIntersect, threshold, rootMargin]);
 
   return (
     <Container ref={scrollRef} data-scroll-container>
       {children}
       <div ref={bottomRef} style={{ height: "1px" }} />
     </Container>
-
-  )
-}
+  );
+};
 
 export default ScrollContainer;
 
@@ -49,4 +54,4 @@ const Container = styled.div({
   overflowY: "auto",
   minHeight: 0,
   paddingRight: "1rem",
-})
+});

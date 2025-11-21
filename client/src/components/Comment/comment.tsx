@@ -49,8 +49,8 @@ const CommentContainer = styled.div<{ noMargin?: boolean}>(
     marginBottom: noMargin ? "0" : "1em",
     width: "100%",
     maxWidth: "60%",
-    background: colors.textEggshell,
-    color: colors.backgroundBlack,
+    background: colors.eggShellWhite,
+    color: colors.leatherBlack,
     borderRadius: "0.5em",
     boxSizing: "border-box",
     border: "0.15em solid gray",
@@ -74,8 +74,8 @@ const AuthorContainer = styled(Link)({
   boxSizing: "border-box",
   padding: "0.5em",
   borderRadius: "0.5em",
-  color: colors.backgroundBlack,
-  background: colors.textEggshell,
+  color: colors.leatherBlack,
+  background: colors.eggShellWhite,
   justifyContent: "space-between",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "1em",
@@ -84,11 +84,11 @@ const AuthorContainer = styled(Link)({
   display: "flex",
   border: `0.15em solid gray`,
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed
   },
   "&:hover path": {
-    fill: colors.textEggshell
+    fill: colors.eggShellWhite
   },
 });
 
@@ -98,7 +98,7 @@ const UserButton = styled(UserIcon)({
   transition: "fill 0.1s ease-in-out",
   margin: "0 0.2em 0 0",
   "& path": {
-    fill: colors.backgroundBlack,
+    fill: colors.leatherBlack,
     transition: "fill 0.1s ease-in-out"
   }
 });

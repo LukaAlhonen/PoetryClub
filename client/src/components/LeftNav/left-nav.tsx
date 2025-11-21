@@ -117,7 +117,7 @@ const CollapseContainer = styled.div({
 
 const CollapseButton = styled.button({
   textDecoration: "none",
-  color: colors.textEggshell,
+  color: colors.eggShellWhite,
   border: "none",
   background: "none",
   alignItems: "center",
@@ -134,24 +134,23 @@ const NavButton = styled(NavLink)({
   textWrap: "nowrap",
   overflow: "hidden",
   width: "100%",
-  color: colors.backgroundBlack,
-  background: colors.textEggshell,
+  color: colors.leatherBlack,
+  background: colors.eggShellWhite,
   marginBottom: "1em",
   padding: "0.5em",
   display: "flex",
   alignItems: "center",
-  // justifyContent: "center",
   gap: "1em",
   boxSizing: "border-box",
   border: "0.15em solid gray",
   borderRadius: "0.5em",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed,
   },
   "&.active": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed,
   }
 });

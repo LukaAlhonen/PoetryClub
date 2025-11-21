@@ -128,6 +128,12 @@ export class CollectionService {
     return collections;
   }
 
+  /**
+   * Checks if the previous page exists for a given paginated query
+   * @param before - ID of the first collection in the query
+   * @param fitler - filter used in the query
+   * @returns - true if the previous page exists, false if not
+  **/
   async hasPreviousPage({ before, filter }: {before: string, filter?: GetCollectionsFilter}) {
     const firstCollection = await this.prisma.collection.findUnique({ where: { id: before } });
     if (!firstCollection) {
@@ -153,6 +159,13 @@ export class CollectionService {
     return Boolean(hasPrev)
   }
 
+
+  /**
+   * Get a page of collections using relay-style pagination
+   * @param first
+   * @param after
+   * @param filter
+  **/
   async getCollectionsConnection({ first, after, filter }: { first?: number, after?: string, filter?: GetCollectionsFilter } = {}) {
     const collections = await this.getCollections({ first: first ? first + 1 : undefined, after, filter });
 

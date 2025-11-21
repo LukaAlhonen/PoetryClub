@@ -1,7 +1,5 @@
 import { Global } from "@emotion/react";
-// import colors from "./colors";
 
-// TODO: add global styles lol
 const GlobalStyles = () => {
   return (
     <Global

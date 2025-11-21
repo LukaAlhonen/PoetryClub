@@ -52,10 +52,12 @@ export class AuthorService {
       },
     });
 
+    // remove passsword and authVersion
     const copy = { ...author };
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
 
+    // cache author
     if (author) {
       await this.cache.set({ key: cacheKey, value: copy });
       await this.cache.sAdd({ setKey: `author:${id}:queries`, cacheKey });
@@ -103,10 +105,12 @@ export class AuthorService {
       },
     });
 
+    // remove password and authversion
     const copy = { ...author };
     if (omitPassword) delete copy.password;
     if (omitAuthVersion) delete copy.authVersion;
 
+    // cache author
     if (author) {
       await this.cache.set({ key: cacheKey, value: copy });
       await this.cache.sAdd({
@@ -148,6 +152,7 @@ export class AuthorService {
     const cached = await this.cache.getAll<SafeAuthor>({
       key: cacheKey,
     });
+    // return cached authors
     if (cached) {
       return cached;
     }
@@ -208,6 +213,12 @@ export class AuthorService {
     return safeAuthors;
   }
 
+  /**
+   * Checks if the previous page exists
+   * @param before - id of first author in page
+   * @param usernameContains - filter used in query
+   * @returns true if the previous page exists, false if not
+   **/
   async hasPreviousPage({before, usernameContains}: {before: string, usernameContains?: string}) {
     const firstAuthor = await this.prisma.author.findUnique({ where: { id: before } });
     if (!firstAuthor) return false;
@@ -234,6 +245,12 @@ export class AuthorService {
     return Boolean(hasPrev)
   }
 
+  /**
+   * Get a page of authors using relay-style pagination
+   * @param first
+   * @param after
+   * @param usernameContains
+  **/
   async getAuthorsConnection({ first, after, usernameContains }: { first?: number, after?: string, usernameContains?: string } = {}) {
     const authors = await this.getAuthors({ first: first ? first + 1 : undefined, after, usernameContains });
 
@@ -428,6 +445,7 @@ export class AuthorService {
       },
     });
 
+    // delete ALL cached queries that include the author
     if (author) {
       const cacheKey = `author:id:${author.id}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`;
       const usernameCacheKey = `author:username:${username}:omitPassword:${omitPassword}:omitAuthVersion:${omitAuthVersion}`
@@ -504,6 +522,7 @@ export class AuthorService {
       omit: { password: true },
     });
 
+    // nuke all cached queries that contain the author
     if (author) {
       await this.cache.removeRelations({ id: author.id, name: "author" });
       for (const poem of author.poems) {

@@ -42,6 +42,7 @@ const Author = () => {
 
   const poemsToDisplay = location.pathname.endsWith("/likes") ? likedPoems : location.pathname.endsWith("/saved") ? savedPoems : poems;
 
+  // can only view saved poems on your own profile page
   useEffect(() => {
     if (location.pathname.endsWith("/saved") && (!user || user !== username)) navigate("/")
   })
@@ -117,7 +118,7 @@ const LinksContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "1rem",
-  background: colors.textEggshell,
+  background: colors.eggShellWhite,
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
   justifyContent: "space-evenly",
@@ -127,15 +128,15 @@ const LinkContainer = styled(Link, {shouldForwardProp: (prop) => prop !== "isAct
   display: "flex",
   alignItems: "center",
   textDecoration: "none",
-  background: isActive ? colors.wineRed : colors.textEggshell,
-  color: isActive ? colors.textEggshell : colors.backgroundBlack,
+  background: isActive ? colors.wineRed : colors.eggShellWhite,
+  color: isActive ? colors.eggShellWhite : colors.leatherBlack,
   padding: "1rem",
   border: "0.15rem solid gray",
   borderRadius: "0.5rem",
   fontWeight: "bold",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     background: colors.wineRed,
     cursor: "pointer"
   }

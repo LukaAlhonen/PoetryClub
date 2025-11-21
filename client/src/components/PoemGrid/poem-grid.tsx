@@ -4,7 +4,6 @@ import PoemCard from "../PoemCard/poem-card";
 import type { PoemCardFragmentFragment } from "../../__generated__/graphql";
 
 interface PoemGridProps {
-  // poems?: GetPoemsQuery["poems"] | GetAuthorQuery["authorByUsername"]["poems"];
   isLoading?: boolean;
   poems?: ({ __typename?: "Poem", id: string } & { ' $fragmentRefs'?: { "PoemCardFragmentFragment": PoemCardFragmentFragment } | undefined } | undefined | null)[];
   pageSize?: number | null;
@@ -13,13 +12,6 @@ interface PoemGridProps {
 const PoemGrid = (props: PoemGridProps) => {
   return (
     <PoemsContainer>
-      {/*{props.poems?.edges?.map((edge) => {
-        const isLiked = !!(edge?.node?.likes?.edges?.[0]?.node?.author?.id === userId);
-        const likeId = edge?.node?.likes?.edges?.[0]?.node && edge.node.likes.edges[0].node.id;
-        return (
-          edge?.node ? (<PoemCard key={edge.node.id} poem={edge.node} likeId={likeId} isLiked={isLiked} />) : null
-        )
-      })}*/}
       { props.poems?.map((poem) => (
         poem?.id && <PoemCard key={poem.id} poem={poem} />
       ))}
@@ -33,7 +25,7 @@ const PoemGrid = (props: PoemGridProps) => {
 }
 
 const PoemsContainer = styled.div({
-  background: colors.backgroundBlack,
+  background: colors.leatherBlack,
   overflowX: "hidden",
   display: "grid",
   gap: "1em",

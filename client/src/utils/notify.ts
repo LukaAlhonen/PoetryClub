@@ -3,8 +3,8 @@ import colors from "../colors";
 
 export const notify = (msg: string) => toast(msg, {
   style: {
-    background: colors.textEggshell,
-    color: colors.backgroundBlack,
+    background: colors.eggShellWhite,
+    color: colors.leatherBlack,
     border: "0.15rem solid gray",
     borderRadius: "0.5rem",
     // fontWeight: "bold",
@@ -16,7 +16,7 @@ export const notify = (msg: string) => toast(msg, {
 export const notifyError = (msg: string) => toast.error(msg, {
   style: {
     background: colors.wineRed,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     border: "0.15rem solid gray",
     borderRadius: "0.5rem",
     fontWeight: "bold",
@@ -29,7 +29,7 @@ export const notifyError = (msg: string) => toast.error(msg, {
 export const notifySuccess = (msg: string) => toast.success(msg, {
   style: {
     background: colors.successGreen,
-    color: colors.textEggshell,
+    color: colors.eggShellWhite,
     border: "0.15rem solid gray",
     borderRadius: "0.5rem",
     fontWeight: "bold",

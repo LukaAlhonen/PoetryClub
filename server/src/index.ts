@@ -35,7 +35,6 @@ async function startApolloServer() {
     credentials: true,
     preflightContinue: false,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    // methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   };
 

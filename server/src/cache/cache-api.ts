@@ -4,6 +4,7 @@ import config from "../config.js";
 /**
  * Exposes an API to communicate with a redis instance
  * @param redisClient - a redis client
+ * @param prefix - mainly for testing, adds prefix to each cache key
  **/
 export class CacheAPI {
   private redisClient: Redis;
