@@ -3,10 +3,10 @@ import colors from "../colors";
 
 export const notify = (msg: string) => toast(msg, {
   style: {
-    background: colors.eggShellWhite,
-    color: colors.leatherBlack,
-    border: "0.15rem solid gray",
-    borderRadius: "0.5rem",
+    background: colors.bg2,
+    color: colors.eggShellWhite,
+    border: `0.10rem solid ${colors.darkGray}`,
+    borderRadius: "0.3rem",
     // fontWeight: "bold",
     minWidth: "25rem"
   },
@@ -17,8 +17,8 @@ export const notifyError = (msg: string) => toast.error(msg, {
   style: {
     background: colors.wineRed,
     color: colors.eggShellWhite,
-    border: "0.15rem solid gray",
-    borderRadius: "0.5rem",
+    border: `0.10rem solid ${colors.darkGray}`,
+    borderRadius: "0.3rem",
     fontWeight: "bold",
     minWidth: "25rem"
   },
@@ -30,8 +30,8 @@ export const notifySuccess = (msg: string) => toast.success(msg, {
   style: {
     background: colors.successGreen,
     color: colors.eggShellWhite,
-    border: "0.15rem solid gray",
-    borderRadius: "0.5rem",
+    border: `0.10rem solid ${colors.darkGray}`,
+    borderRadius: "0.3rem",
     fontWeight: "bold",
     minWidth: "25rem"
   },

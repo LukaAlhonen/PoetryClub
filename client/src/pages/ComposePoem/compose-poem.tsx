@@ -59,24 +59,26 @@ const ComposePoem = () => {
   return (
     <Layout>
       <ComposePoemContainer>
-        <TitleContainer>
-          <h3>Compose New Poem</h3>
-        </TitleContainer>
-        <FormContainer onSubmit={(e) => {
-          e.preventDefault();
-          createPoemMutation({variables: {input: {title, text}}})
-        }}>
-          <TitleInputContainer>
-            <h4>Title</h4>
-            <FormInput required={true} value={title} onChange={(e) => {
-              setTitle(e.target.value)
-            }}/>
-          </TitleInputContainer>
-          <FormTextArea placeholder={"write your poem here"} rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
-            setText(e.target.value)
-          }} />
-          <ComposeButton disabled={!isFilled} isFilled={isFilled} type="submit">Post</ComposeButton>
-        </FormContainer>
+        <ComposePoemInner>
+          <TitleContainer>
+            <h3>Compose New Poem</h3>
+          </TitleContainer>
+          <FormContainer onSubmit={(e) => {
+            e.preventDefault();
+            createPoemMutation({variables: {input: {title, text}}})
+          }}>
+            <TitleInputContainer>
+              <h4>Title</h4>
+              <FormInput required={true} value={title} onChange={(e) => {
+                setTitle(e.target.value)
+              }}/>
+            </TitleInputContainer>
+            <FormTextArea placeholder={"write your poem here"} rows={20} maxLength={2000} required={true} value={text} onChange={(e) => {
+              setText(e.target.value)
+            }} />
+            <ComposeButton disabled={!isFilled} isFilled={isFilled} type="submit">Post</ComposeButton>
+          </FormContainer>
+        </ComposePoemInner>
       </ComposePoemContainer>
     </Layout>
   )
@@ -84,23 +86,33 @@ const ComposePoem = () => {
 
 export default ComposePoem;
 
-
 const ComposePoemContainer = styled.div({
+  width: "100%",
+  maxWidth: "100%",
+  flexShrink: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  display: "flex",
+  justifyContent: "center",
+})
+
+const ComposePoemInner = styled.div({
   display: "flex",
   flexDirection: "column",
-  background: colors.eggShellWhite,
-  padding: "1em 5em 1em 5em",
+  background: colors.bg2,
+  color: colors.eggShellWhite,
+  minWidth: 0,
+  padding: "1em",
   borderRadius: "0.5em",
-  border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   alignItems: "center",
-  maxWidth: "50em",
   justifySelf: "center",
   alignSelf: "center",
   marginRight: "1rem",
-  width: "100%",
+  width: "min(50rem, 100%)",
   "@media (max-width: 769px)": {
-    padding: "1em",
+    height: "100%",
   }
 })
 
@@ -111,7 +123,6 @@ const TitleContainer = styled.div({
   "& h3": {
     margin: "0.5rem"
   },
-  color: colors.leatherBlack
 })
 
 const FormContainer = styled.form({
@@ -121,7 +132,6 @@ const FormContainer = styled.form({
 })
 
 const TitleInputContainer = styled.div({
-  color: colors.leatherBlack,
   display: "flex",
   flexDirection: "column",
   "& h4": {
@@ -134,20 +144,21 @@ const TitleInputContainer = styled.div({
 
 const FormInput = styled.input({
   display: "flex",
-  border: `0.15rem solid gray`,
-  background: colors.eggShellWhite,
+  border: `0.10rem solid ${colors.darkGray}`,
+  background: colors.test,
+  color: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`
+    border: `0.10rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   },
 })
 
@@ -155,13 +166,13 @@ const ComposeButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  background: isFilled ? colors.wineRed : colors.bg3,
   color: colors.eggShellWhite,
-  border: `0.15rem solid gray`,
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {
@@ -172,19 +183,20 @@ const ComposeButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
 const FormTextArea = styled.textarea({
   resize: "none",
   display: "flex",
-  border: `0.15rem solid gray`,
-  background: colors.eggShellWhite,
+  border: `0.10rem solid ${colors.darkGray}`,
+  color: colors.eggShellWhite,
+  background: colors.test,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`
+    border: `0.10rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   }
 })

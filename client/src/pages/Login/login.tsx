@@ -56,6 +56,7 @@ const Login = () => {
   return (
     <Layout>
       <LoginContainer>
+        <LoginInner>
         <LoginTitle>
           <h3>Login</h3>
         </LoginTitle>
@@ -92,6 +93,7 @@ const Login = () => {
             </LoginButton>
           </InputContainer>
         </LoginForm>
+        </LoginInner>
       </LoginContainer>
     </Layout>
   );
@@ -100,18 +102,28 @@ const Login = () => {
 export default Login;
 
 const LoginContainer = styled.div({
+  width: "100%",
+  maxWidth: "100%",
+  flexShrink: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  display: "flex",
+  justifyContent: "center",
+})
+
+const LoginInner = styled.div({
   display: "flex",
   flexDirection: "column",
-  background: colors.eggShellWhite,
+  background: colors.bg2,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
-  border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   alignItems: "center",
-  maxWidth: "30em",
   justifySelf: "center",
   alignSelf: "center",
-  width: "100%",
+  width: "min(30rem, 100%)",
+  minWidth: 0,
   marginRight: "1rem",
   "@media (max-width: 769px)": {
     padding: "1em",
@@ -120,7 +132,7 @@ const LoginContainer = styled.div({
 
 const LoginTitle = styled.div({
   fontSize: "1.7em",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
 });
 
 const LoginForm = styled.form({
@@ -130,7 +142,7 @@ const LoginForm = styled.form({
 });
 
 const InputContainer = styled.div({
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   display: "flex",
   flexDirection: "column",
   "& h4": {
@@ -143,20 +155,21 @@ const InputContainer = styled.div({
 
 const LoginInput = styled.input({
   display: "flex",
-  border: `0.15rem solid gray`,
-  background: colors.eggShellWhite,
+  border: `0.10rem solid ${colors.darkGray}`,
+  background: colors.test,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "border 0.1s ease-in-out",
+  color: colors.eggShellWhite,
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   },
   "&:hover": {
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   },
 });
 
@@ -164,13 +177,13 @@ const LoginButton = styled.button<{ isFilled?: boolean }>(({ isFilled }) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  background: isFilled ? colors.wineRed : colors.bg3,
   color: colors.eggShellWhite,
-  border: `0.15rem solid gray`,
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {

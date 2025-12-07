@@ -30,22 +30,27 @@ const LayoutContainer = styled.div({
   flexDirection: "row",
   height: "100vh",
   overflow: "hidden",
-  background: colors.leatherBlack,
+  background: colors.bg3,
   boxSizing: "border-box",
-  position: "relative"
+  position: "relative",
 })
 
 const PageContainer = styled.div({
   width: "100%",
-  height: "100%",
-  overflowY: "hidden",
+  overflow: "hidden",
   boxSizing: "border-box",
-  padding: "0 0 1rem 1rem",
+  padding: "0.5rem 0 0.5rem 0.5rem",
+  border: `0.10rem solid ${colors.darkGray}`,
+  margin: "0.5rem 0.5rem 0.5rem 0",
   maxWidth: "1fr",
   display: "flex",
+  borderRadius: "0.5rem",
+  background: colors.bg4,
   flexDirection: "column",
   justifyContent: "center",
   "@media (max-width: 769px)": {
-    marginTop: "3rem"
+    margin: "3rem 0 0 0",
+    borderRadius: 0,
+    border: "none"
   }
 });

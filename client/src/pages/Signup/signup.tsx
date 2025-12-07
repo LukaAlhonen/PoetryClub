@@ -55,6 +55,7 @@ const Signup = () => {
   return (
     <Layout>
       <SignupContainer>
+        <SignupInner>
         <SignupTitle>
           <h3>Signup</h3>
         </SignupTitle>
@@ -70,7 +71,7 @@ const Signup = () => {
           </InputContainer>
           <InputContainer>
             <h4>Email</h4>
-            <SignupInput required={true} value={email} onChange={(e) => {
+            <SignupInput required={true} type="email" value={email} onChange={(e) => {
               setEmail(e.target.value)
             }}/>
           </InputContainer>
@@ -90,6 +91,7 @@ const Signup = () => {
             <SignupButton disabled={!isFilled} isFilled={isFilled} type="submit">Signup</SignupButton>
           </InputContainer>
         </SignupForm>
+        </SignupInner>
       </SignupContainer>
     </Layout>
   )
@@ -98,19 +100,31 @@ const Signup = () => {
 export default Signup;
 
 const SignupContainer = styled.div({
+  width: "100%",
+  maxWidth: "100%",
+  flexShrink: 1,
+  minWidth: 0,
+  overflow: "hidden",
+  display: "flex",
+  justifyContent: "center",
+})
+
+const SignupInner = styled.div({
   display: "flex",
   flexDirection: "column",
-  background: colors.eggShellWhite,
+  background: colors.bg2,
   padding: "1em 5em 1em 5em",
   borderRadius: "0.5em",
-  border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   alignItems: "center",
   maxWidth: "30em",
   justifySelf: "center",
   alignSelf: "center",
-  width: "100%",
+  minWidth: 0,
+  width: "min(30rem, 100%)",
   marginRight: "1rem",
+  color: colors.eggShellWhite,
   "@media (max-width: 769px)": {
     padding: "1em"
   }
@@ -118,7 +132,6 @@ const SignupContainer = styled.div({
 
 const SignupTitle = styled.div({
   fontSize: "1.7em",
-  color: colors.leatherBlack
 })
 
 const SignupForm = styled.form({
@@ -128,7 +141,6 @@ const SignupForm = styled.form({
 })
 
 const InputContainer = styled.div({
-  color: colors.leatherBlack,
   display: "flex",
   flexDirection: "column",
   "& h4": {
@@ -141,20 +153,21 @@ const InputContainer = styled.div({
 
 const SignupInput = styled.input({
   display: "flex",
-  border: `0.15rem solid gray`,
-  background: colors.eggShellWhite,
+  border: `0.10rem solid ${colors.darkGray}`,
+  background: colors.test,
+  color: colors.eggShellWhite,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3rem",
   transition: "border 0.1s ease-in-out",
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`
+    border: `0.10rem solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   }
 })
 
@@ -162,13 +175,13 @@ const SignupButton = styled.button<{isFilled?: boolean}>(({isFilled}) => ({
   display: "flex",
   justifyContent: "center",
   textDecoration: "none",
-  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  background: isFilled ? colors.wineRed : colors.bg3,
   color: colors.eggShellWhite,
-  border: `0.15rem solid gray`,
+  border: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   margin: "0.5em",
   padding: "0.75em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3rem",
   transition: "background 0.1s ease-in-out",
   fontWeight: "bold",
   "&:hover": {

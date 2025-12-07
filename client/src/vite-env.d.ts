@@ -2,7 +2,7 @@
 /// <reference types="vite-plugin-svgr/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_GRAPHQL_SERVER_URL: string;
+  readonly VITE_GRAPHQL_SERVER_URL: string | undefined;
 }
 
 interface ImportMeta {

@@ -20,5 +20,5 @@ const SpinnerContainer = styled.div({
   flexGrow: 1,
   minHeight: "100vh",
   boxSizing: "border-box",
-  background: colors.leatherBlack,
+  background: colors.eggShellWhite,
 });

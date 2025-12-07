@@ -74,12 +74,12 @@ const AuthorDetailContainer = styled.div({
   alignItems: "center",
   borderRadius: "0.5em",
   boxSizing: "border-box",
-  border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
   padding: "2.5em",
-  marginTop: "1rem",
+  // marginTop: "1rem",
   marginBottom: "1em",
-  background: colors.eggShellWhite,
-  color: colors.leatherBlack
+  background: colors.bg2,
+  color: colors.eggShellWhite
 })
 
 const HeaderContainer = styled.div({
@@ -107,7 +107,7 @@ const UserIcon = styled(UserSVG)({
   height: "1.5em",
   marginRight: "0.2em",
   "& path": {
-    fill: colors.leatherBlack
+    fill: "currentcolor"
   }
 })
 
@@ -158,7 +158,7 @@ const StatContainer = styled(Link)({
   flexDirection: "row",
   marginRight: "3em",
   fontWeight: "bold",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   transition: "color 0.1s ease-in-out",
   "&:hover": {
     color: colors.wineRed,
@@ -167,7 +167,7 @@ const StatContainer = styled(Link)({
 })
 
 const StatLinkContainer = styled.div({
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   marginLeft: "0.2em",
   transition: "color 0.1s ease-in-out",
   "&:hover": {

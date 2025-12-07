@@ -36,16 +36,16 @@ const LeftNav = () => {
       <TopNav>
         <NavButton data-testid={"home-link"} to="/">
           <HomeIcon />
-          {!collapsed && "Home"}
+          {"Home"}
         </NavButton>
         <NavButton data-testid={"search-link"} to="/search">
           <SearchIcon />
-          {!collapsed && "Search"}
+          {"Search"}
         </NavButton>
         {user ? (
         <NavButton data-testid={"compose-link"} to="/compose">
           <ComposeIcon />
-            {!collapsed && "New Poem"}
+            {"New Poem"}
         </NavButton>
         ): (<></>)}
       </TopNav>
@@ -54,17 +54,17 @@ const LeftNav = () => {
           <>
             <NavButton data-testid={"profile-link"} to={`/author/${user}`}>
               <UserIcon />
-              {!collapsed && <UsernameContainer>{user}</UsernameContainer>}
+              {<UsernameContainer>{user}</UsernameContainer>}
             </NavButton>
             <LogoutButton>
               <LogoutIcon/>
-              {!collapsed && "Logout"}
+              {"Logout"}
             </LogoutButton>
           </>
         ) : (
           <>
-              <NavButton data-testid={"signup-link"} to="/signup"><SignupIcon />{!collapsed && "Signup"}</NavButton>
-              <NavButton data-testid={"login-link"} to="/login"><UserIcon />{!collapsed && "Login"}</NavButton>
+              <NavButton data-testid={"signup-link"} to="/signup"><SignupIcon />{"Signup"}</NavButton>
+              <NavButton data-testid={"login-link"} to="/login"><UserIcon />{"Login"}</NavButton>
           </>
         )
         }
@@ -80,13 +80,12 @@ const NavContainer = styled.div<{ collapsed: boolean }>(({ collapsed }) => ({
   flexDirection: "column",
   top: 0,
   alignSelf: "stretch",
+  justifyItems: "center",
   zIndex: 10,
   flexGrow: 1,
-  width: collapsed ? "4.5rem" : "12rem",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
-  margin: "0.7rem 0 0.7rem 0.7rem",
+  width: collapsed ? "3.5rem" : "12rem",
   transition: "width 0.2s ease-in-out",
+  padding: "1rem",
 }));
 
 const TopNav = styled.div({
@@ -94,7 +93,6 @@ const TopNav = styled.div({
   flexDirection: "column",
   width: "100%",
   alignItems: "center",
-  padding: "0.7em 0.7em 0 0.7em",
 });
 
 const BottomNav = styled.div({
@@ -103,15 +101,14 @@ const BottomNav = styled.div({
   flexDirection: "column",
   width: "100%",
   alignItems: "center",
-  padding: "0.7em 0.7em 0 0.7em",
 });
 
 const CollapseContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  borderBottom: "0.15rem solid gray",
-  padding: "0.5em 0.5em 0.5rem 0.5em",
+  marginBottom: "1rem",
+  // marginTop: "0.5rem",
   alignItems: "left"
 })
 
@@ -121,8 +118,9 @@ const CollapseButton = styled.button({
   border: "none",
   background: "none",
   alignItems: "center",
+  margin: 0,
+  padding: 0,
   display: "flex",
-  marginLeft: "0.33rem",
   "&:hover": {
     cursor: "pointer",
     color: colors.wineRed
@@ -134,24 +132,18 @@ const NavButton = styled(NavLink)({
   textWrap: "nowrap",
   overflow: "hidden",
   width: "100%",
-  color: colors.leatherBlack,
-  background: colors.eggShellWhite,
-  marginBottom: "1em",
-  padding: "0.5em",
+  color: colors.eggShellWhite,
+  marginTop: "1em",
   display: "flex",
-  alignItems: "center",
+  alignItems: "end",
   gap: "1em",
   boxSizing: "border-box",
-  border: "0.15em solid gray",
-  borderRadius: "0.5em",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: colors.eggShellWhite,
-    background: colors.wineRed,
+    color: colors.wineRed,
   },
   "&.active": {
-    color: colors.eggShellWhite,
-    background: colors.wineRed,
+    color: colors.wineRed,
   }
 });
 
@@ -173,8 +165,8 @@ const navImg = {
 };
 
 const CollapsedIcon = styled(CollapsedSVG)({
-  width: "2em",
-  height: "2em",
+  width: "1.8em",
+  height: "1.8em",
   fill: "currentcolor",
   flexShrink: 0,
 })
@@ -193,11 +185,16 @@ const ComposeIcon = styled(ComposeSVG)({
 });
 
 const UserIcon = styled(UserSVG)({
-  ...navImg,
+  width: "1.5em",
+  height: "1.5em",
+  fill: "currentcolor",
+  transition: "fill 0.15s ease",
+  flexShrink: 0,
+  // ...navImg,
 });
 
 const SignupIcon = styled(SignupSVG)({
-  ...navImg
+  ...navImg,
 })
 
 const LogoutIcon = styled(LogoutSVG)({
