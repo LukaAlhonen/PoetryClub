@@ -49,11 +49,11 @@ const CommentContainer = styled.div<{ noMargin?: boolean}>(
     marginBottom: noMargin ? "0" : "1em",
     width: "100%",
     maxWidth: "60%",
-    background: colors.eggShellWhite,
-    color: colors.leatherBlack,
+    background: colors.bg2,
+    color: colors.eggShellWhite,
     borderRadius: "0.5em",
     boxSizing: "border-box",
-    border: "0.15em solid gray",
+    border: `0.10em solid ${colors.darkGray}`,
     justifySelf: "left",
     whiteSpace: "pre-wrap",
   })
@@ -63,7 +63,7 @@ const CommentHeader = styled.div({
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
-  borderBottom: "0.15em solid gray",
+  borderBottom: `0.15em solid ${colors.darkGray}`,
   padding: "0.5em",
   alignItems: "center",
   fontSize: "0.9em"
@@ -73,22 +73,18 @@ const AuthorContainer = styled(Link)({
   textDecoration: "none",
   boxSizing: "border-box",
   padding: "0.5em",
-  borderRadius: "0.5em",
-  color: colors.leatherBlack,
-  background: colors.eggShellWhite,
+  borderRadius: "0.3em",
+  color: colors.eggShellWhite,
+  background: colors.test,
   justifyContent: "space-between",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "1em",
   fontWeight: "bold",
   alignItems: "center",
   display: "flex",
-  border: `0.15em solid gray`,
+  border: `0.10em solid ${colors.darkGray}`,
   "&:hover": {
-    color: colors.eggShellWhite,
     background: colors.wineRed
-  },
-  "&:hover path": {
-    fill: colors.eggShellWhite
   },
 });
 
@@ -98,7 +94,7 @@ const UserButton = styled(UserIcon)({
   transition: "fill 0.1s ease-in-out",
   margin: "0 0.2em 0 0",
   "& path": {
-    fill: colors.leatherBlack,
+    fill: "currentcolor",
     transition: "fill 0.1s ease-in-out"
   }
 });

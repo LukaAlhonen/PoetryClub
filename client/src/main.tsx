@@ -14,7 +14,7 @@ import { CombinedGraphQLErrors } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
 
 const link = new HttpLink({
-  uri: "/graphql",
+  uri: import.meta.env.VITE_GRAPHQL_SERVER_URL ?? "/graphql",
   credentials: "include",
 });
 

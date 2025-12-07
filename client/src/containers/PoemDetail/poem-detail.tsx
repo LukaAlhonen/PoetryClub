@@ -138,18 +138,18 @@ const PoemContainer = styled.div({
   maxWidth: "60em",
   width: "100%",
   borderRadius: "0.5em",
-  border: "0.15em solid gray",
+  border: `0.10em solid ${colors.darkGray}`,
   display: "flex",
   flexDirection: "column",
-  background: colors.eggShellWhite,
-  color: colors.leatherBlack,
+  background: colors.bg2,
+  color: colors.eggShellWhite,
 });
 
 const PoemHeader = styled.div({
   display: "flex",
   flexDirection: "column",
   boxSizing: "border-box",
-  borderBottom: "0.15em solid gray",
+  borderBottom: `0.15em solid ${colors.darkGray}`,
   width: "100%",
   padding: "2em",
   "& h3": {
@@ -161,7 +161,7 @@ const PoemHeader = styled.div({
 const PoemTitle = styled.div({
   textDecoration: "underline",
   // alignSelf: "center",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   marginBottom: "2em",
 });
 
@@ -180,16 +180,17 @@ const AuthorContainer = styled(Link)({
   },
   textDecoration: "none",
   boxSizing: "border-box",
-  padding: "0.2em",
-  borderRadius: "0.5em",
-  color: colors.leatherBlack,
-  background: colors.eggShellWhite,
+  // padding: "0.2em",
+  padding: "0.3em 0.5rem 0.3rem 0.3rem",
+  borderRadius: "0.3em",
+  color: colors.eggShellWhite,
+  background: colors.test,
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "auto",
   fontWeight: "bold",
   alignItems: "center",
   display: "flex",
-  border: `0.15em solid gray`,
+  border: `0.10em solid ${colors.darkGray}`,
   "&:hover": {
     color: colors.eggShellWhite,
     background: colors.wineRed,
@@ -226,11 +227,11 @@ const PoemFooter = styled.div({
   flexDirection: "row",
   justifyContent: "space-evenly",
   alignItems: "center",
-  borderTop: `0.15em solid gray`,
+  borderTop: `0.15em solid ${colors.darkGray}`,
   "& h5": {
     margin: 0,
   },
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
 });
 
 const ViewsContainer = styled.div({
@@ -260,10 +261,11 @@ const CommentsButton = styled.button<{ open?: boolean }>(({ open }) => ({
   display: "flex",
   height: "2.1rem",
   minWidth: "3.2rem",
-  color: open ? colors.eggShellWhite : colors.leatherBlack,
-  background: open ? colors.wineRed : colors.eggShellWhite,
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  // color: open ? colors.eggShellWhite : colors.leatherBlack,
+  color: colors.eggShellWhite,
+  background: open ? colors.wineRed : colors.test,
+  border: `0.10rem solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
   alignItems: "center",
   marginLeft: "0.5rem",
@@ -299,6 +301,6 @@ const LikeIcon = styled(ThumbSVG)({
 const ViewsButton = styled(ViewsIcon)({
   ...svgButtonStyles,
   "& path": {
-    fill: colors.leatherBlack,
+    fill: colors.eggShellWhite,
   },
 });

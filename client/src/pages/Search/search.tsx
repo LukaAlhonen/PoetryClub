@@ -63,10 +63,9 @@ const SearchBar = styled.div({
   alignItems: "center",
   borderRadius: "0.5em",
   boxSizing: "border-box",
-  border: "0.15em solid gray",
+  border: `0.10em solid ${colors.darkGray}`,
   padding: "0.5em",
-  marginTop: "1rem",
-  background: colors.eggShellWhite
+  background: colors.bg2
 })
 
 const SearchButton = styled(SearchIcon)({
@@ -75,7 +74,7 @@ const SearchButton = styled(SearchIcon)({
   marginRight: "0.5em",
   marginLeft: "0.5em",
   "& path": {
-    fill: colors.leatherBlack,
+    fill: colors.eggShellWhite,
     transition: "fill 0.15s ease",
   },
 })
@@ -83,19 +82,21 @@ const SearchButton = styled(SearchIcon)({
 const SearchInput = styled.input({
   width: "100%",
   height: "2.4em",
-  border: `0.15em solid gray`,
-  background: colors.eggShellWhite,
+  // border: `0.15em solid gray`,
+  border: `0.10em solid ${colors.darkGray}`,
+  background: colors.test,
   margin: "0.5em",
   padding: "0.3em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
   transition: "border 0.1s ease-in-out",
+  color: colors.eggShellWhite,
   "&:focus": {
     outline: "none",
-    border: `0.15em solid ${colors.wineRed}`
+    border: `0.10em solid ${colors.wineRed}`
   },
   "&:hover": {
-    border: `0.15em solid ${colors.wineRed}`,
+    border: `0.10em solid ${colors.wineRed}`,
   }
 })
