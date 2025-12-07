@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import colors from "../../colors";
 import PoemCard from "../PoemCard/poem-card";
 import type { PoemCardFragmentFragment } from "../../__generated__/graphql";
 
@@ -25,7 +24,6 @@ const PoemGrid = (props: PoemGridProps) => {
 }
 
 const PoemsContainer = styled.div({
-  background: colors.leatherBlack,
   overflowX: "hidden",
   display: "grid",
   gap: "1em",

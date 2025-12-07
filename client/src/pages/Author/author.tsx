@@ -118,27 +118,34 @@ const LinksContainer = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "1rem",
-  background: colors.eggShellWhite,
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  // background: colors.eggShellWhite,
+  // border: "0.15rem solid gray",
+  // borderRadius: "0.5rem",
   justifyContent: "space-evenly",
 })
 
 const LinkContainer = styled(Link, {shouldForwardProp: (prop) => prop !== "isActive"})<{ isActive?: boolean }>(({ isActive }) => ({
   display: "flex",
-  alignItems: "center",
+  alignItems: "end",
   textDecoration: "none",
-  background: isActive ? colors.wineRed : colors.eggShellWhite,
-  color: isActive ? colors.eggShellWhite : colors.leatherBlack,
-  padding: "1rem",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  // background: isActive ? colors.wineRed : colors.test,
+  color: isActive ? colors.wineRed : colors.eggShellWhite,
+  // padding: "1rem",
+  // border: "0.15rem solid gray",
+  // borderRadius: "0.5rem",
   fontWeight: "bold",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
+  position: "relative",
+  backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
+  backgroundPosition: "0 100%",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: isActive ? "100% 0.2em" : "0% 0.2em",
+  paddingBottom: "0.3rem",
   "&:hover": {
-    color: colors.eggShellWhite,
-    background: colors.wineRed,
-    cursor: "pointer"
+    color: colors.wineRed,
+    cursor: "pointer",
+    transition: "color 0.1s ease, background-size 0.1s ease",
+    backgroundSize: "100% 0.2em",
   }
 }))
 

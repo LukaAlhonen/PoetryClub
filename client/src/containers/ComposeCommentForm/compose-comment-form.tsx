@@ -156,8 +156,8 @@ const FormContainer = styled.form({
   flexDirection: "column",
   boxSizing: "border-box",
   borderRadius: "0.5em",
-  border: "0.15em solid gray",
-  background: colors.eggShellWhite,
+  border: `0.10em solid ${colors.darkGray}`,
+  background: colors.bg2,
   width: "100%",
   maxWidth: "60em",
   padding: "0.5em",
@@ -166,18 +166,19 @@ const FormContainer = styled.form({
 const FormTextArea = styled.textarea({
   padding: "0.5em",
   resize: "none",
-  border: `0.15rem solid gray`,
-  background: colors.eggShellWhite,
+  border: `0.10rem solid ${colors.darkGray}`,
+  background: colors.test,
   marginBottom: "1em",
   boxSizing: "border-box",
   fontSize: "1.1em",
-  borderRadius: "0.5em",
+  borderRadius: "0.3em",
+  color: colors.eggShellWhite,
   "&:focus": {
     outline: "none",
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   },
   "&:hover": {
-    border: `0.15rem solid ${colors.wineRed}`,
+    border: `0.10rem solid ${colors.wineRed}`,
   },
 });
 
@@ -189,9 +190,9 @@ const FormButton = styled.button<{ isFilled?: boolean }>(({ isFilled }) => ({
   fontWeight: "bold",
   textDecoration: "none",
   alignSelf: "center",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
-  background: isFilled ? colors.wineRed : colors.leatherBlack,
+  border: `0.10rem solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
+  background: isFilled ? colors.wineRed : colors.bg3,
   color: colors.eggShellWhite,
   transition: "background 0.1s ease-in-out",
   "&:hover": {

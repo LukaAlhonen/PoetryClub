@@ -51,7 +51,7 @@ const HeaderContainer = styled.div({
   alignItems: "center",
   fontSize: "3em",
   fontWeight: "bold",
-  background: colors.leatherBlack,
+  // background: colors.leatherBlack,
   color: colors.eggShellWhite,
   boxSizing: "border-box",
   "@media (max-width: 769px)": {

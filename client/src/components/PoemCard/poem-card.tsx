@@ -35,7 +35,7 @@ const PoemCard = (props: PoemCardProps) => {
         <PoemSubHeader>
           <UsernameContainer data-testid={`poem-author-link-${poem?.author?.id}`} to={poem?.author?.username ? `/author/${poem.author.username}` : "#"}>
             <UserButton></UserButton>
-            {poem?.author?.username ?? null}
+            <UsernameTextContainer>{poem?.author?.username ?? null}</UsernameTextContainer>
           </UsernameContainer>
           <h5>{date}</h5>
         </PoemSubHeader>
@@ -97,10 +97,11 @@ const PoemContainer = styled.div({
   maxHeight: "30em",
   height: "30em",
   boxSizing: "border-box",
-  border: "0.15em solid gray",
+  // border: "0.15em solid gray",
+  border: `0.10em solid ${colors.darkGray}`,
   wordWrap: "break-word",
   overflowWrap: "break-word",
-  background: colors.eggShellWhite,
+  background: colors.bg2,
   color: colors.leatherBlack,
   borderRadius: "0.6em"
 });
@@ -110,16 +111,16 @@ const PoemHeader = styled.div({
     margin: "0 0 5px 0px",
     fontSize: "25px",
   },
-  background: colors.eggShellWhite,
+  background: colors.bg2,
   padding: "1em 1em 0 1em",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   boxSizing: "border-box",
-  borderBottom: "0.15em solid gray"
+  borderBottom: `0.15em solid ${colors.darkGray}`
 });
 
 const PoemTitle = styled(Link)({
   textDecoration: "none",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   position: "relative",
   backgroundImage: `linear-gradient(${colors.wineRed}, ${colors.wineRed})`,
   backgroundPosition: "0 100%",
@@ -152,16 +153,16 @@ const UsernameContainer = styled(Link)({
   },
   textDecoration: "none",
   boxSizing: "border-box",
-  padding: "0.3em",
-  borderRadius: "0.5em",
-  color: colors.leatherBlack,
-  background: colors.eggShellWhite,
+  padding: "0.3em 0.5rem 0.3rem 0.3rem",
+  borderRadius: "0.3em",
+  color: colors.eggShellWhite,
+  background: colors.test,
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   marginRight: "auto",
   fontWeight: "bold",
   alignItems: "center",
   display: "flex",
-  border: `0.15em solid gray`,
+  border: `0.10em solid ${colors.darkGray}`,
   "&:hover": {
     color: colors.eggShellWhite,
     background: colors.wineRed,
@@ -169,12 +170,20 @@ const UsernameContainer = styled(Link)({
   "&:hover path": {
     fill: colors.eggShellWhite
   },
+  maxWidth: "12rem"
 });
+
+const UsernameTextContainer = styled.div({
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+})
 
 const TextContainer = styled.div({
   flexGrow: 1,
   minHeight: 0,
   overflow: "hidden",
+  color: colors.eggShellWhite,
   display: "flex",
   alignSelf: "center",
   whiteSpace: "pre-wrap",
@@ -193,8 +202,8 @@ const TextContainer = styled.div({
     height: "10em",
     background: `linear-gradient(
       to bottom,
-      rgba(220, 226, 220, 0) 0%,
-      rgba(220, 226, 220, 1.0) 100%
+      rgba(21, 26, 28, 0) 0%,
+      rgba(21, 26, 28, 1.0) 100%
     )`,
     pointerEvents: "none",
   },
@@ -226,7 +235,7 @@ const PoemLink = styled(Link)({
   justifyContent: "center",
   gap: "4px",
   textDecoration: "none",
-  color: colors.foregroundBlack,
+  color: colors.eggShellWhite,
 });
 
 const PoemFooter = styled.div({
@@ -236,12 +245,12 @@ const PoemFooter = styled.div({
   flexDirection: "row",
   justifyContent: "space-evenly",
   alignItems: "center",
-  borderTop: `0.15em solid gray`,
+  borderTop: `0.15em solid ${colors.darkGray}`,
   "& h5": {
     margin: 0,
   },
-  background: colors.eggShellWhite,
-  color: colors.leatherBlack
+  background: colors.bg2,
+  color: colors.eggShellWhite
 });
 
 const TagsContainer = styled.div({
@@ -271,10 +280,11 @@ const CommentsButton = styled(Link)({
   display: "flex",
   height: "2.1rem",
   minWidth: "3.2rem",
-  color: colors.leatherBlack,
-  background: colors.eggShellWhite,
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  color: colors.eggShellWhite,
+  background: colors.test,
+  // border: "0.15rem solid gray",
+  border: `0.10em solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
   padding: "0.2rem 0.3rem 0.2rem 0.3rem",
   alignItems: "center",
   marginLeft: "0.5rem",
@@ -285,7 +295,6 @@ const CommentsButton = styled(Link)({
   fontWeight: "inherit",
   "&:hover": {
     background: colors.wineRed,
-    color: colors.eggShellWhite,
     cursor: "pointer"
   }
 })
@@ -320,7 +329,7 @@ const SavedIcon = styled(SavedSVG)({
 const ViewsButton = styled(ViewsIcon)({
   ...svgButtonStyles,
   "& path": {
-    fill: colors.leatherBlack
+    fill: colors.eggShellWhite
   }
 });
 
@@ -330,7 +339,7 @@ const UserButton = styled(UserIcon)({
   transition: "fill 0.1s ease",
   margin: "0 0.2em 0 0",
   "& path": {
-    fill: colors.leatherBlack,
+    fill: "currentcolor",
     transition: "fill 0.1s ease"
   }
 })

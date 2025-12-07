@@ -40,8 +40,9 @@ const BurgerNav = () => {
                     color: colors.eggShellWhite,
                     textDecoration: "none",
                     padding: "0.5rem",
-                    border: "0.15rem solid gray",
-                    borderRadius: "0.5rem",
+                    border: `0.10rem solid ${colors.darkGray}`,
+                    background: colors.test,
+                    borderRadius: "0.3rem",
                     alignItems: "center",
                     display: "flex",
                     gap: "0.5rem"
@@ -70,9 +71,9 @@ const NavContainer = styled.div({
   flexDirection: "column",
   zIndex: 10,
   position: "fixed",
-  background: colors.leatherBlack,
+  background: colors.bg3,
   width: "100%",
-  borderBottom: "0.15rem solid gray",
+  borderBottom: `0.10rem solid ${colors.darkGray}`,
   boxSizing: "border-box",
   height: "3rem"
 })
@@ -88,7 +89,7 @@ const LinksContainer = styled.div<{isOpen: boolean}>(({isOpen}) => ({
   display: isOpen ? "flex" : "none",
   flexDirection: "column",
   padding: "0.5rem",
-  background: colors.leatherBlack,
+  background: colors.bg3,
   position: "fixed",
   top: "3rem",
   width: "100%",
@@ -113,10 +114,11 @@ const BottomLinks = styled.div({
 
 const NavButton = styled(NavLink)({
   color: colors.eggShellWhite,
+  background: colors.test,
   textDecoration: "none",
   padding: "0.5rem",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  border: `0.10rem solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
   "&.active": {
     color: colors.eggShellWhite,
     background: colors.wineRed
