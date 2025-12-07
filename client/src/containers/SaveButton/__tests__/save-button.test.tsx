@@ -93,8 +93,8 @@ describe("SaveButton unit tests", () => {
     });
 
     const saveButton = await screen.findByTestId("save-button-p_01");
-    expect(window.getComputedStyle(saveButton).background).toBe("rgb(220, 226, 220)")
-    expect(window.getComputedStyle(saveButton).color).toBe("rgb(24, 28, 24)")
+    expect(window.getComputedStyle(saveButton).background).toBe("rgb(38, 45, 48)")
+    expect(window.getComputedStyle(saveButton).color).toBe("rgb(220, 226, 220)")
 
     await userEvent.click(saveButton);
     vi.waitFor(() => {
@@ -140,13 +140,13 @@ describe("SaveButton unit tests", () => {
     });
 
     const saveButton = await screen.findByTestId("save-button-p_01");
-    expect(window.getComputedStyle(saveButton).background).toBe("rgb(220, 226, 220)")
-    expect(window.getComputedStyle(saveButton).color).toBe("rgb(24, 28, 24)")
+    expect(window.getComputedStyle(saveButton).background).toBe("rgb(38, 45, 48)")
+    expect(window.getComputedStyle(saveButton).color).toBe("rgb(220, 226, 220)")
 
     await userEvent.click(saveButton);
     vi.waitFor(() => {
-      expect(window.getComputedStyle(saveButton).background).toBe("rgb(220, 226, 220)")
-      expect(window.getComputedStyle(saveButton).color).toBe("rgb(24, 28, 24)")
+      expect(window.getComputedStyle(saveButton).background).toBe("rgb(38, 45, 48)")
+      expect(window.getComputedStyle(saveButton).color).toBe("rgb(220, 226, 220)")
     })
   })
 
@@ -160,13 +160,13 @@ describe("SaveButton unit tests", () => {
     });
 
     const saveButton = await screen.findByTestId("save-button-p_01");
-    expect(window.getComputedStyle(saveButton).background).toBe("rgb(220, 226, 220)")
-    expect(window.getComputedStyle(saveButton).color).toBe("rgb(24, 28, 24)")
+    expect(window.getComputedStyle(saveButton).background).toBe("rgb(38, 45, 48)")
+    expect(window.getComputedStyle(saveButton).color).toBe("rgb(220, 226, 220)")
 
     await userEvent.click(saveButton);
     vi.waitFor(() => {
-      expect(window.getComputedStyle(saveButton).background).toBe("rgb(220, 226, 220)")
-      expect(window.getComputedStyle(saveButton).color).toBe("rgb(24, 28, 24)")
+      expect(window.getComputedStyle(saveButton).background).toBe("rgb(38, 45, 48)")
+      expect(window.getComputedStyle(saveButton).color).toBe("rgb(220, 226, 220)")
     })
   })
 })
