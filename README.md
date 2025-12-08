@@ -43,7 +43,7 @@ docker compose up
 The server can be started with this command:
 ```bash
 docker run \
---network=host \
+-p 4000:4000 \
 -e DATABASE_URL="postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@<db_address>:5432/<POSTGRES_DB>?schema=public"\
 -e REDIS_URL="redis://default:<REDIS_PASSWORD>@<redis_address>:6379" \
 -e JWT_SECRET="JWT_SECRET" \
@@ -54,7 +54,7 @@ ghcr.io/lukaalhonen/poetryclub-server:latest
 And the client:
 ```bash
 docker run \
---network=host \
+-p 80:80 \
 -e GRAPHQL_URL="http://<server_address>:4000/graphql" \
 ghcr.io/lukaalhonen/poetryclub-client:latest
 ```
