@@ -103,17 +103,16 @@ export default UnfollowButton;
 
 const UnfollowButtonContainer = styled.button({
   display: "flex",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  border: `0.10rem solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
   height: "3em",
   padding: "1rem",
-  background: colors.eggShellWhite,
-  color: colors.leatherBlack,
+  background: colors.test,
+  color: colors.eggShellWhite,
   alignItems: "center",
   fontWeight: "bold",
   transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
   "&:hover": {
-    color: colors.eggShellWhite,
     background: colors.wineRed,
     cursor: "pointer"
   }
