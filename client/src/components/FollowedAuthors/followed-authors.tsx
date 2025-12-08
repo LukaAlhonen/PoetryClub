@@ -59,9 +59,9 @@ const Container = styled.div({
   width: "100%",
   justifySelf: "center",
   marginTop: "2rem",
-  border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
   borderRadius: "0.5rem",
-  background: colors.eggShellWhite,
+  background: colors.bg2,
 
 })
 
@@ -72,8 +72,8 @@ const FollowedAuthorsContainer = styled.div({
   borderBottomLeftRadius: "0.5rem",
   borderBottomRightRadius: "0.5rem",
   marginTop: "0",
-  background: colors.eggShellWhite,
-  borderTop: "0.15rem solid gray",
+  background: colors.bg4,
+  borderTop: `0.10rem solid ${colors.darkGray}`,
   justifySelf: "center",
 })
 
@@ -84,7 +84,7 @@ const AuthorLink = styled(Link)({
   textDecoration: "none",
   justifyContent: "left",
   alignContent: "center",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   fontWeight: "bold",
   padding: "1rem",
   transition: "color 0.1s ease-in-out",
@@ -108,27 +108,27 @@ const LinksContainer = styled.div({
   flexDirection: "row",
   justifyContent: "space-evenly",
   paddingTop: "1em",
-  background: colors.eggShellWhite,
+  background: colors.bg2,
 })
 
 const LinkContainer = styled(Link, { shouldForwardProp: (prop) => prop !== "isActive"})<{isActive: boolean}>(
   ({isActive}) => ({
-    background: isActive ? colors.eggShellWhite : colors.darkGray,
-    color: colors.leatherBlack,
+    background: isActive ? colors.bg4 : colors.bg2,
+    color: isActive ? colors.wineRed : colors.eggShellWhite,
     padding: "1rem",
-    border: "0.15rem solid gray",
-    borderBottom: "none",
+    border: isActive ? `0.10rem solid ${colors.darkGray}` : "none",
+    borderBottom: isActive ? "none" : `0.10rem solid ${colors.darkGray}`,
     fontWeight: "bold",
-    borderTopLeftRadius: "0.5rem",
-    borderTopRightRadius: "0.5rem",
-    bottom: "-0.14rem",
+    borderTopLeftRadius: "0.3rem",
+    borderTopRightRadius: "0.3rem",
+    bottom: "-0.10rem",
     position: "relative",
     zIndex: 3,
     textDecoration: "none",
     transition: "color 0.1s ease-in-out, background 0.1s ease-in-out",
     "&:hover": {
-      color: isActive ? colors.leatherBlack : colors.eggShellWhite,
-      background: isActive ? colors.eggShellWhite : colors.wineRed,
+      // color: isActive ? colors.eggShellWhite : colors.wineRed,
+      color: colors.wineRed
     },
   })
 )
