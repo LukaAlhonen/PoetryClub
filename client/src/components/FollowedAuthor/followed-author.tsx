@@ -27,13 +27,14 @@ const FollowedAuthor = (props: FollowedAuthorProps) => {
 export default FollowedAuthor;
 
 const FollowedAuthorContainer = styled.div({
-  background: colors.eggShellWhite,
-  color: colors.leatherBlack,
+  background: colors.bg2,
+  color: colors.eggShellWhite,
   display: "flex",
   flexDirection: "row",
   boxSizing: "border-box",
-  border: "0.15rem solid gray",
-  borderRadius: "0.5rem",
+  // border: "0.15rem solid gray",
+  border: `0.10rem solid ${colors.darkGray}`,
+  borderRadius: "0.3rem",
   padding: "1rem",
   margin: "1rem",
 })
@@ -43,7 +44,7 @@ const AuthorContainer = styled(Link)({
   flexDirection: "row",
   textDecoration: "none",
   fontWeight: "bold",
-  color: colors.leatherBlack,
+  color: colors.eggShellWhite,
   alignItems: "center",
   transition: "color 0.1s ease-in-out",
   "&:hover": {
